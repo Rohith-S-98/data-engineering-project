@@ -4,20 +4,11 @@ from pathlib import Path
 
 from pyspark.sql import DataFrame
 from pyspark.sql.functions import col, concat_ws, lit, trim, when
-from pyspark.sql.window import Window
 from pyspark.sql.functions import count
+from pyspark.sql.window import Window
 
+from scripts.pipeline_config import load_pipeline_config
 from scripts.spark_session import get_spark_session
-
-
-BRONZE_INPUT_PATH = "data/bronze/customer_bronze"
-DQ_RULES_FILE = Path("config/rules/customer_dq_rules.json")
-
-SILVER_OUTPUT_PATH = "data/silver/customer_valid"
-QUARANTINE_OUTPUT_PATH = "output/quarantine/pyspark_customer_quarantine"
-
-DQ_REPORT_DIR = Path("output/dq_reports")
-DQ_REPORT_FILE = DQ_REPORT_DIR / "pyspark_customer_dq_report.json"
 
 
 def read_json(file_path: Path) -> dict:
@@ -42,8 +33,8 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
 
         if rule_type == "not_null":
             failed_condition = (
-                col(column_name).isNull() |
-                (trim(col(column_name).cast("string")) == "")
+                col(column_name).isNull()
+                | (trim(col(column_name).cast("string")) == "")
             )
 
         elif rule_type == "allowed_values":
@@ -54,7 +45,7 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
             window_spec = Window.partitionBy(column_name)
             validated_df = validated_df.withColumn(
                 f"{column_name}_count",
-                count(column_name).over(window_spec)
+                count(column_name).over(window_spec),
             )
             failed_condition = col(f"{column_name}_count") > 1
 
@@ -63,7 +54,7 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
 
         validated_df = validated_df.withColumn(
             error_column,
-            when(failed_condition, lit(rule_name)).otherwise(lit(None))
+            when(failed_condition, lit(rule_name)).otherwise(lit(None)),
         )
 
         failed_count = validated_df.filter(col(error_column).isNotNull()).count()
@@ -85,7 +76,7 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
 
     validated_df = validated_df.withColumn(
         "dq_errors",
-        concat_ws(", ", *[col(error_col) for error_col in error_columns])
+        concat_ws(", ", *[col(error_col) for error_col in error_columns]),
     )
 
     quarantine_df = validated_df.filter(col("dq_errors") != "")
@@ -108,19 +99,24 @@ def write_dq_report(
     quarantined_rows: int,
     rule_summary: list[dict],
     rules_config: dict,
+    config: dict,
 ) -> None:
     failed_rules = [
         rule for rule in rule_summary
         if rule["failed_count"] > 0
     ]
 
+    dq_report_file = Path(config["dq_report_file"])
+    dq_report_file.parent.mkdir(parents=True, exist_ok=True)
+
     report = {
+        "environment": config["environment"],
         "table_name": rules_config["table_name"],
         "primary_key": rules_config["primary_key"],
         "report_generated_at": datetime.now().isoformat(timespec="seconds"),
-        "input_layer": BRONZE_INPUT_PATH,
-        "silver_output_path": SILVER_OUTPUT_PATH,
-        "quarantine_output_path": QUARANTINE_OUTPUT_PATH,
+        "input_layer": config["bronze_output_path"],
+        "silver_output_path": config["silver_output_path"],
+        "quarantine_output_path": config["quarantine_output_path"],
         "total_input_rows": total_input_rows,
         "valid_rows": valid_rows,
         "quarantined_rows": quarantined_rows,
@@ -130,20 +126,26 @@ def write_dq_report(
         "rule_summary": rule_summary,
     }
 
-    DQ_REPORT_DIR.mkdir(parents=True, exist_ok=True)
-
-    with open(DQ_REPORT_FILE, mode="w", encoding="utf-8") as file:
+    with open(dq_report_file, mode="w", encoding="utf-8") as file:
         json.dump(report, file, indent=4)
 
 
 def run_pyspark_silver_dq() -> None:
     print("Starting PySpark silver DQ validation...")
 
+    config = load_pipeline_config()
+
+    bronze_input_path = config["bronze_output_path"]
+    dq_rules_file = Path(config["dq_rules_file"])
+    silver_output_path = config["silver_output_path"]
+    quarantine_output_path = config["quarantine_output_path"]
+    dq_report_file = config["dq_report_file"]
+
     spark = get_spark_session("PySparkSilverDQ")
 
-    rules_config = read_json(DQ_RULES_FILE)
+    rules_config = read_json(dq_rules_file)
 
-    bronze_df = spark.read.parquet(BRONZE_INPUT_PATH)
+    bronze_df = spark.read.parquet(bronze_input_path)
 
     print("Bronze DataFrame:")
     bronze_df.show(truncate=False)
@@ -157,8 +159,8 @@ def run_pyspark_silver_dq() -> None:
     valid_rows = valid_df.count()
     quarantined_rows = quarantine_df.count()
 
-    valid_df.write.mode("overwrite").parquet(SILVER_OUTPUT_PATH)
-    quarantine_df.write.mode("overwrite").parquet(QUARANTINE_OUTPUT_PATH)
+    valid_df.write.mode("overwrite").parquet(silver_output_path)
+    quarantine_df.write.mode("overwrite").parquet(quarantine_output_path)
 
     write_dq_report(
         total_input_rows=total_input_rows,
@@ -166,14 +168,15 @@ def run_pyspark_silver_dq() -> None:
         quarantined_rows=quarantined_rows,
         rule_summary=rule_summary,
         rules_config=rules_config,
+        config=config,
     )
 
     print(f"Total input rows: {total_input_rows}")
     print(f"Valid rows: {valid_rows}")
     print(f"Quarantined rows: {quarantined_rows}")
-    print(f"Silver valid records written at: {SILVER_OUTPUT_PATH}")
-    print(f"Quarantine records written at: {QUARANTINE_OUTPUT_PATH}")
-    print(f"DQ report written at: {DQ_REPORT_FILE}")
+    print(f"Silver valid records written at: {silver_output_path}")
+    print(f"Quarantine records written at: {quarantine_output_path}")
+    print(f"DQ report written at: {dq_report_file}")
 
     spark.stop()
 
