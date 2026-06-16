@@ -24,3 +24,27 @@ Valid Records + Quarantine Records
 DQ Summary Report
         ↓
 End-to-End Pipeline Runner
+
+## V2: PySpark / Databricks-Style Pipeline
+
+This project also includes a PySpark-based pipeline that simulates a Databricks-style medallion architecture.
+
+The PySpark version processes customer data through Bronze, Silver, and Gold layers.
+
+### V2 Architecture
+
+```text
+Raw Customer CSV
+        ↓
+Bronze Layer
+Raw data is ingested using PySpark and stored as Parquet
+        ↓
+Silver Layer
+Config-driven DQ rules are applied using PySpark
+Valid and quarantined records are separated
+        ↓
+Gold Layer
+Valid customer records are transformed into a canonical customer model
+        ↓
+Reltio-Style Payload
+Gold data is exported as JSON payload output

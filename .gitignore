@@ -8,3 +8,11 @@ venv/
 data/raw/*
 data/processed/*
 output/*
+.venv/
+*.log
+data/bronze/*
+!data/bronze/.gitkeep
+mkdir -p data/silver
+touch data/silver/.gitkeep
+data/gold/*
+!data/gold/.gitkeep
