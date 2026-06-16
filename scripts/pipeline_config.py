@@ -24,6 +24,7 @@ def load_pipeline_config(config_file: str | Path = DEFAULT_CONFIG_FILE) -> dict:
         "quarantine_output_path",
         "dq_report_file",
         "reltio_payload_output_path",
+        "audit_log_file"
     ]
 
     missing_keys = [
