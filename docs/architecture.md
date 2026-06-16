@@ -25,3 +25,36 @@ Silver DQ Layer
 Gold Canonical Layer
         ↓
 Reltio-Style JSON Payload
+
+---
+
+## Production-Style Configuration Layer
+
+The pipeline uses a centralized JSON config file to manage environment-specific paths and runtime settings.
+
+Config file:
+
+```text
+config/pipeline/local_config.json
+```
+
+Config loader:
+
+```text
+scripts/pipeline_config.py
+```
+
+This allows the pipeline to avoid hardcoded paths inside Bronze, Silver, and Gold scripts.
+
+The same pipeline logic can be reused across different environments by changing the config file.
+
+Example environments:
+
+```text
+local
+dev
+qa
+prod
+```
+
+This improves maintainability and makes the project closer to enterprise data engineering practices.

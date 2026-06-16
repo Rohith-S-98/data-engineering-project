@@ -169,6 +169,48 @@ Gold canonical transformation
         ↓
 Reltio-style JSON payload generation
 ```
+---
+
+## V4: Production-Style Pipeline Configuration
+
+The project now includes a production-style pipeline configuration layer.
+
+Instead of hardcoding input and output paths inside the PySpark scripts, the pipeline reads runtime paths and settings from a JSON config file.
+
+### Config File
+
+```text
+config/pipeline/local_config.json
+```
+
+### Config Loader
+
+```text
+scripts/pipeline_config.py
+```
+
+### Why This Matters
+
+This makes the pipeline easier to maintain and prepares it for environment-based execution such as:
+
+```text
+local
+dev
+qa
+prod
+```
+
+With this approach, Bronze, Silver, and Gold scripts can use the same core logic while changing only the configuration file for different environments.
+
+### V4 Improvements
+
+* Added centralized pipeline config file
+* Added config loader with required-key validation
+* Refactored Bronze ingestion to use config paths
+* Refactored Silver DQ validation to use config paths
+* Refactored Gold canonical transformation to use config paths
+* Added unit tests for config loader
+
 
 ---
 
