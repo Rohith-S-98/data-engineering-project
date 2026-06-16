@@ -7,13 +7,21 @@ from pathlib import Path
 RAW_DATA_FILE = Path("data/raw/customer_data.csv")
 DQ_RULES_FILE = Path("config/rules/customer_dq_rules.json")
 
+# OUTPUT_DIR = Path("output")
+# DQ_REPORT_DIR = OUTPUT_DIR / "dq_reports"
+# QUARANTINE_DIR = OUTPUT_DIR / "quarantine"
+
+# DQ_REPORT_FILE = DQ_REPORT_DIR / "config_driven_customer_dq_report.json"
+# QUARANTINE_FILE = QUARANTINE_DIR / "customer_quarantine.csv"
+
 OUTPUT_DIR = Path("output")
 DQ_REPORT_DIR = OUTPUT_DIR / "dq_reports"
 QUARANTINE_DIR = OUTPUT_DIR / "quarantine"
+PROCESSED_DATA_DIR = Path("data/processed")
 
 DQ_REPORT_FILE = DQ_REPORT_DIR / "config_driven_customer_dq_report.json"
 QUARANTINE_FILE = QUARANTINE_DIR / "customer_quarantine.csv"
-
+VALID_RECORDS_FILE = PROCESSED_DATA_DIR / "customer_valid.csv"
 
 def read_csv(file_path: Path) -> list[dict]:
     if not file_path.exists():
@@ -183,12 +191,14 @@ def run_config_driven_dq() -> None:
         rules_config=rules_config,
     )
 
+    write_csv(valid_rows, VALID_RECORDS_FILE)
     write_csv(quarantine_rows, QUARANTINE_FILE)
     write_json(report, DQ_REPORT_FILE)
 
     print(f"Total input rows: {len(rows)}")
     print(f"Valid rows: {len(valid_rows)}")
     print(f"Quarantined rows: {len(quarantine_rows)}")
+    print(f"Valid records file created at: {VALID_RECORDS_FILE}")
     print(f"DQ report created at: {DQ_REPORT_FILE}")
     print(f"Quarantine file created at: {QUARANTINE_FILE}")
 
