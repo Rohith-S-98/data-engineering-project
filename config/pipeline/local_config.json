@@ -9,5 +9,6 @@
 
   "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
   "dq_report_file": "output/dq_reports/pyspark_customer_dq_report.json",
-  "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json"
+  "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json",
+  "audit_log_file": "output/audit/pipeline_runs.csv"
 }
