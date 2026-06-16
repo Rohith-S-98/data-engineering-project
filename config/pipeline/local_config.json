@@ -1,0 +1,13 @@
+{
+  "environment": "local",
+  "raw_data_file": "data/raw/customer_data.csv",
+  "dq_rules_file": "config/rules/customer_dq_rules.json",
+
+  "bronze_output_path": "data/bronze/customer_bronze",
+  "silver_output_path": "data/silver/customer_valid",
+  "gold_output_path": "data/gold/customer_canonical",
+
+  "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
+  "dq_report_file": "output/dq_reports/pyspark_customer_dq_report.json",
+  "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json"
+}

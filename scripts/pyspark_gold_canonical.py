@@ -1,19 +1,21 @@
 from pyspark.sql.functions import col, concat_ws, current_timestamp, lit
 
+from scripts.pipeline_config import load_pipeline_config
 from scripts.spark_session import get_spark_session
-
-
-SILVER_INPUT_PATH = "data/silver/customer_valid"
-GOLD_OUTPUT_PATH = "data/gold/customer_canonical"
-RELTIO_PAYLOAD_OUTPUT_PATH = "output/reltio_payloads/customer_payload_json"
 
 
 def run_pyspark_gold_canonical() -> None:
     print("Starting PySpark gold canonical transformation...")
 
+    config = load_pipeline_config()
+
+    silver_input_path = config["silver_output_path"]
+    gold_output_path = config["gold_output_path"]
+    reltio_payload_output_path = config["reltio_payload_output_path"]
+
     spark = get_spark_session("PySparkGoldCanonical")
 
-    silver_df = spark.read.parquet(SILVER_INPUT_PATH)
+    silver_df = spark.read.parquet(silver_input_path)
 
     print("Silver valid records:")
     silver_df.show(truncate=False)
@@ -43,18 +45,18 @@ def run_pyspark_gold_canonical() -> None:
     print("Gold canonical records:")
     gold_df.show(truncate=False)
 
-    gold_df.write.mode("overwrite").parquet(GOLD_OUTPUT_PATH)
+    gold_df.write.mode("overwrite").parquet(gold_output_path)
 
     (
         gold_df
         .coalesce(1)
         .write
         .mode("overwrite")
-        .json(RELTIO_PAYLOAD_OUTPUT_PATH)
+        .json(reltio_payload_output_path)
     )
 
-    print(f"Gold canonical data written at: {GOLD_OUTPUT_PATH}")
-    print(f"Reltio-style JSON payload written at: {RELTIO_PAYLOAD_OUTPUT_PATH}")
+    print(f"Gold canonical data written at: {gold_output_path}")
+    print(f"Reltio-style JSON payload written at: {reltio_payload_output_path}")
 
     spark.stop()
 
