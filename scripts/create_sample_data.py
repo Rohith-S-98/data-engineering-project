@@ -1,79 +1,64 @@
 import csv
+import shutil
 from pathlib import Path
-
 
 RAW_DATA_DIR = Path("data/raw")
 RAW_DATA_FILE = RAW_DATA_DIR / "customer_data.csv"
+CLEAN_RAW_DATA_FILE = RAW_DATA_DIR / "customer_data_clean.csv"
+DIRTY_RAW_DATA_FILE = RAW_DATA_DIR / "customer_data_dirty.csv"
 
+CUSTOMER_COLUMNS = [
+    "customer_id",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "city",
+    "state",
+    "created_date",
+    "source_system",
+]
 
-sample_customers = [
-    {
-        "customer_id": "CUST001",
-        "first_name": "Rohith",
-        "last_name": "S",
-        "email": "rohith@example.com",
-        "phone": "9876543210",
-        "city": "Bengaluru",
-        "state": "Karnataka",
-        "created_date": "2026-06-16",
-        "source_system": "CSV",
-    },
-    {
-        "customer_id": "CUST002",
-        "first_name": "Anil",
-        "last_name": "Kumar",
-        "email": "anil@example.com",
-        "phone": "9876543211",
-        "city": "Kolar",
-        "state": "Karnataka",
-        "created_date": "2026-06-16",
-        "source_system": "API",
-    },
-    {
-        "customer_id": "CUST003",
-        "first_name": "Megha",
-        "last_name": "Rao",
-        "email": "",
-        "phone": "9876543212",
-        "city": "Mysuru",
-        "state": "Karnataka",
-        "created_date": "2026-06-16",
-        "source_system": "CSV",
-    },
-    {
-        "customer_id": "CUST004",
-        "first_name": "Suresh",
-        "last_name": "M",
-        "email": "suresh@example.com",
-        "phone": "",
-        "city": "Chennai",
-        "state": "Tamil Nadu",
-        "created_date": "2026-06-16",
-        "source_system": "API",
-    },
-    {
-        "customer_id": "CUST002",
-        "first_name": "Anil",
-        "last_name": "Kumar",
-        "email": "anil@example.com",
-        "phone": "9876543211",
-        "city": "Kolar",
-        "state": "Karnataka",
-        "created_date": "2026-06-16",
-        "source_system": "API",
-    },
+CLEAN_CUSTOMERS = [
+    ["CUST001", "Rohith", "S", "rohith@example.com", "9876543210", "Bengaluru", "Karnataka", "2026-06-16", "CSV"],
+    ["CUST002", "Anil", "Kumar", "anil@example.com", "9876543211", "Kolar", "Karnataka", "2026-06-16", "API"],
+    ["CUST003", "Megha", "Rao", "megha@example.com", "9876543212", "Mysuru", "Karnataka", "2026-06-16", "CSV"],
+    ["CUST004", "Suresh", "M", "suresh@example.com", "9876543213", "Chennai", "Tamil Nadu", "2026-06-16", "API"],
+]
+
+DIRTY_CUSTOMERS = [
+    ["CUST001", "Rohith", "S", "rohith@example.com", "9876543210", "Bengaluru", "Karnataka", "2026-06-16", "CSV"],
+    ["CUST002", "Anil", "Kumar", "anil@example.com", "9876543211", "Kolar", "Karnataka", "2026-06-16", "API"],
+    ["CUST003", "Megha", "Rao", "", "9876543212", "Mysuru", "Karnataka", "2026-06-16", "CSV"],
+    ["CUST004", "Suresh", "M", "suresh@example.com", "", "Chennai", "Tamil Nadu", "2026-06-16", "API"],
+    ["CUST002", "Anil", "Kumar", "anil@example.com", "9876543211", "Kolar", "Karnataka", "2026-06-16", "API"],
 ]
 
 
-def create_raw_customer_data() -> None:
-    RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+def write_customer_csv(file_path: Path, rows: list[list[str]]) -> None:
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(file_path, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(CUSTOMER_COLUMNS)
+        writer.writerows(rows)
 
-    with open(RAW_DATA_FILE, mode="w", newline="", encoding="utf-8") as file:
-        writer = csv.DictWriter(file, fieldnames=sample_customers[0].keys())
-        writer.writeheader()
-        writer.writerows(sample_customers)
 
-    print(f"Raw customer data created successfully at: {RAW_DATA_FILE}")
+def create_raw_customer_data(use_dirty_data: bool = False) -> None:
+    """
+    Create clean and dirty sample datasets.
+
+    The default active file is clean so the end-to-end PySpark pipeline can reach Gold.
+    Dirty data remains available for demonstrating DQ quarantine and failure control.
+    """
+    write_customer_csv(CLEAN_RAW_DATA_FILE, CLEAN_CUSTOMERS)
+    write_customer_csv(DIRTY_RAW_DATA_FILE, DIRTY_CUSTOMERS)
+
+    source_file = DIRTY_RAW_DATA_FILE if use_dirty_data else CLEAN_RAW_DATA_FILE
+    shutil.copyfile(source_file, RAW_DATA_FILE)
+
+    print(f"Clean sample data available at: {CLEAN_RAW_DATA_FILE}")
+    print(f"Dirty sample data available at: {DIRTY_RAW_DATA_FILE}")
+    print(f"Active raw customer data created at: {RAW_DATA_FILE}")
 
 
 if __name__ == "__main__":

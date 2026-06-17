@@ -3,14 +3,14 @@ import os
 import sys
 from pathlib import Path
 
-# Must be set before SparkSession creation.
+# These values must be set before SparkSession creation.
 os.environ.setdefault("PYSPARK_PYTHON", sys.executable)
 os.environ.setdefault("PYSPARK_DRIVER_PYTHON", sys.executable)
-
+os.environ.setdefault("PYARROW_IGNORE_TIMEZONE", "1")
 os.environ["PYSPARK_SUBMIT_ARGS"] = (
     "--conf spark.ui.showConsoleProgress=false "
-    "--conf spark.driver.extraJavaOptions='-Dlog4j.configurationFile=config/log4j2.properties' "
-    "--conf spark.executor.extraJavaOptions='-Dlog4j.configurationFile=config/log4j2.properties' "
+    "--conf spark.driver.extraJavaOptions=-Dlog4j.configurationFile=config/log4j2.properties "
+    "--conf spark.executor.extraJavaOptions=-Dlog4j.configurationFile=config/log4j2.properties "
     "pyspark-shell"
 )
 
@@ -20,18 +20,12 @@ from pyspark.sql import SparkSession
 @contextlib.contextmanager
 def suppress_spark_startup_noise():
     """
-    Suppresses JVM/Spark startup stderr noise during SparkSession creation.
+    Suppress local JVM/Spark startup stderr noise.
 
-    This hides common local Spark messages like:
-    - Using incubator modules
-    - NativeCodeLoader warning
-    - default log4j profile warning
-
-    Real Python exceptions will still be raised.
+    This keeps local demo output clean. Python exceptions are still raised.
     """
     devnull = open(os.devnull, "w")
     old_stderr_fd = os.dup(2)
-
     try:
         os.dup2(devnull.fileno(), 2)
         yield
@@ -57,5 +51,4 @@ def get_spark_session(app_name: str = "DataEngineeringPipeline") -> SparkSession
         )
 
     spark.sparkContext.setLogLevel("ERROR")
-
     return spark

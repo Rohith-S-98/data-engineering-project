@@ -7,12 +7,12 @@ class PipelineConfigError(PipelineError):
 
 
 class DataIngestionError(PipelineError):
-    """Raised when data ingestion fails."""
+    """Raised when ingestion fails."""
 
 
 class DQValidationError(PipelineError):
-    """Raised when data quality validation fails."""
+    """Raised when data quality validation must stop the pipeline."""
 
 
 class PipelineExecutionError(PipelineError):
-    """Raised when pipeline execution fails."""
+    """Raised when the full pipeline execution fails."""

@@ -1,60 +1,79 @@
-# Architecture Overview
+# Architecture
 
-## Project Summary
-
-This project simulates an enterprise-style customer data engineering pipeline.
-
-It has two implementations:
-
-1. Python-based config-driven DQ pipeline
-2. PySpark-based medallion architecture pipeline
-
-The PySpark version follows a Bronze, Silver, and Gold layer design similar to Databricks workloads.
-
----
-
-## High-Level Flow
+## Current V1-V9 Architecture
 
 ```text
 Raw Customer CSV
         ↓
-Bronze Layer
+Bronze Schema Validation
         ↓
-Silver DQ Layer
+Incremental Watermark Filter
         ↓
-Gold Canonical Layer
+Bronze Parquet
+        ↓
+Silver DQ Validation
+        ↓
+Silver Schema Validation
+        ↓
+Severity-Based DQ Decision
+        ↓
+Gold Canonical Transformation
         ↓
 Reltio-Style JSON Payload
-
----
-
-## Production-Style Configuration Layer
-
-The pipeline uses a centralized JSON config file to manage environment-specific paths and runtime settings.
-
-Config file:
-
-```text
-config/pipeline/local_config.json
+        ↓
+Commit Watermark After Success
+        ↓
+Pipeline Audit Update
 ```
 
-Config loader:
+## Main Layers
+
+### Bronze
+
+Raw customer data is read from CSV and written as Parquet after schema validation and incremental filtering.
+
+### Silver
+
+Data quality rules are applied. Valid records are written to Silver and failed records are written to quarantine.
+
+### Gold
+
+Silver valid records are transformed into a canonical customer structure and exported as a Reltio-style JSON payload.
+
+## Control Frameworks
+
+### Schema Validation
+
+Schema contracts are stored in:
 
 ```text
-scripts/pipeline_config.py
+configs/schema_contracts/
 ```
 
-This allows the pipeline to avoid hardcoded paths inside Bronze, Silver, and Gold scripts.
-
-The same pipeline logic can be reused across different environments by changing the config file.
-
-Example environments:
+Schema audit output is stored in:
 
 ```text
-local
-dev
-qa
-prod
+data/audit/schema_validation_audit.jsonl
 ```
 
-This improves maintainability and makes the project closer to enterprise data engineering practices.
+### Watermark Management
+
+Committed watermark file:
+
+```text
+data/audit/watermark_store.json
+```
+
+Pending watermark file:
+
+```text
+data/audit/pending_watermark_updates.json
+```
+
+### Pipeline Audit
+
+Pipeline run audit file:
+
+```text
+output/audit/pipeline_runs.csv
+```

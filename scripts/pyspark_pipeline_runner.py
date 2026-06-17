@@ -31,14 +31,16 @@ def run_pyspark_pipeline(raise_on_failure: bool = True) -> str:
         dq_status = run_pyspark_silver_dq()
 
         if dq_status == "FAILED":
-            raise DQValidationError(
-                "Pipeline stopped because HIGH severity DQ rules failed."
-            )
+            raise DQValidationError("Pipeline stopped because HIGH severity DQ rules failed.")
 
         print("\nStep 3: Running Gold Canonical Transformation")
         run_pyspark_gold_canonical()
 
-        commit_staged_watermark_update(dataset="customers")
+        commit_staged_watermark_update(
+            dataset=config["dataset_name"],
+            watermark_store_path=config["watermark_store_file"],
+            pending_watermark_path=config["pending_watermark_file"],
+        )
 
         update_pipeline_run(
             run_id=run_id,
@@ -49,6 +51,7 @@ def run_pyspark_pipeline(raise_on_failure: bool = True) -> str:
         print("\n" + "=" * 70)
         print("PySpark Pipeline Completed Successfully")
         print("=" * 70)
+        return "SUCCESS"
 
         return "SUCCESS"
 
@@ -67,9 +70,7 @@ def run_pyspark_pipeline(raise_on_failure: bool = True) -> str:
         print("=" * 70)
 
         if raise_on_failure:
-            raise PipelineExecutionError(
-                f"Pipeline execution failed: {error}"
-            ) from None
+            raise PipelineExecutionError(f"Pipeline execution failed: {error}") from None
 
         return "FAILED"
 

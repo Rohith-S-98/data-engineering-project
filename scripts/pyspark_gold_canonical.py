@@ -8,57 +8,51 @@ def run_pyspark_gold_canonical() -> None:
     print("Starting PySpark gold canonical transformation...")
 
     config = load_pipeline_config()
-
     silver_input_path = config["silver_output_path"]
     gold_output_path = config["gold_output_path"]
     reltio_payload_output_path = config["reltio_payload_output_path"]
 
     spark = get_spark_session("PySparkGoldCanonical")
 
-    silver_df = spark.read.parquet(silver_input_path)
+    try:
+        silver_df = spark.read.parquet(silver_input_path)
 
-    print("Silver valid records:")
-    silver_df.show(truncate=False)
+        print("Silver valid records:")
+        silver_df.show(truncate=False)
 
-    gold_df = (
-        silver_df
-        .withColumn("source_id", col("customer_id"))
-        .withColumn("full_name", concat_ws(" ", col("first_name"), col("last_name")))
-        .withColumn("record_type", lit("Customer"))
-        .withColumn("record_status", lit("ACTIVE"))
-        .withColumn("processed_at", current_timestamp())
-        .select(
-            col("source_system"),
-            col("source_id"),
-            col("record_type"),
-            col("record_status"),
-            col("full_name"),
-            col("email").alias("contact_email"),
-            col("phone").cast("string").alias("contact_phone"),
-            col("city").alias("address_city"),
-            col("state").alias("address_state"),
-            col("created_date"),
-            col("processed_at"),
+        gold_df = (
+            silver_df
+            .withColumn("source_id", col("customer_id"))
+            .withColumn("full_name", concat_ws(" ", col("first_name"), col("last_name")))
+            .withColumn("record_type", lit("Customer"))
+            .withColumn("record_status", lit("ACTIVE"))
+            .withColumn("processed_at", current_timestamp())
+            .select(
+                col("source_system"),
+                col("source_id"),
+                col("record_type"),
+                col("record_status"),
+                col("full_name"),
+                col("email").alias("contact_email"),
+                col("phone").cast("string").alias("contact_phone"),
+                col("city").alias("address_city"),
+                col("state").alias("address_state"),
+                col("created_date"),
+                col("processed_at"),
+            )
         )
-    )
 
-    print("Gold canonical records:")
-    gold_df.show(truncate=False)
+        print("Gold canonical records:")
+        gold_df.show(truncate=False)
 
-    gold_df.write.mode("overwrite").parquet(gold_output_path)
+        gold_df.write.mode("overwrite").parquet(gold_output_path)
+        gold_df.coalesce(1).write.mode("overwrite").json(reltio_payload_output_path)
 
-    (
-        gold_df
-        .coalesce(1)
-        .write
-        .mode("overwrite")
-        .json(reltio_payload_output_path)
-    )
+        print(f"Gold canonical data written at: {gold_output_path}")
+        print(f"Reltio-style JSON payload written at: {reltio_payload_output_path}")
 
-    print(f"Gold canonical data written at: {gold_output_path}")
-    print(f"Reltio-style JSON payload written at: {reltio_payload_output_path}")
-
-    spark.stop()
+    finally:
+        spark.stop()
 
 
 if __name__ == "__main__":

@@ -1,14 +1,21 @@
 {
-  "environment": "local",
-  "raw_data_file": "data/raw/customer_data.csv",
-  "dq_rules_file": "config/rules/customer_dq_rules.json",
-
-  "bronze_output_path": "data/bronze/customer_bronze",
-  "silver_output_path": "data/silver/customer_valid",
-  "gold_output_path": "data/gold/customer_canonical",
-
-  "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
-  "dq_report_file": "output/dq_reports/pyspark_customer_dq_report.json",
-  "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json",
-  "audit_log_file": "output/audit/pipeline_runs.csv"
+    "environment": "local",
+    "dataset_name": "customers",
+    "watermark_column": "created_date",
+    "raw_data_file": "data/raw/customer_data.csv",
+    "clean_raw_data_file": "data/raw/customer_data_clean.csv",
+    "dirty_raw_data_file": "data/raw/customer_data_dirty.csv",
+    "dq_rules_file": "config/rules/customer_dq_rules.json",
+    "bronze_output_path": "data/bronze/customer_bronze",
+    "silver_output_path": "data/silver/customer_valid",
+    "gold_output_path": "data/gold/customer_canonical",
+    "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
+    "dq_report_file": "output/dq_reports/pyspark_customer_dq_report.json",
+    "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json",
+    "audit_log_file": "output/audit/pipeline_runs.csv",
+    "bronze_schema_contract": "configs/schema_contracts/bronze_customers_schema.json",
+    "silver_schema_contract": "configs/schema_contracts/silver_customers_schema.json",
+    "schema_validation_audit_file": "data/audit/schema_validation_audit.jsonl",
+    "watermark_store_file": "data/audit/watermark_store.json",
+    "pending_watermark_file": "data/audit/pending_watermark_updates.json"
 }

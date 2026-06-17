@@ -1,0 +1,52 @@
+{
+    "environment": "local",
+    "table_name": "customer",
+    "primary_key": "customer_id",
+    "report_generated_at": "2026-06-17T16:39:57",
+    "input_layer": "data/bronze/customer_bronze",
+    "silver_output_path": "data/silver/customer_valid",
+    "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
+    "total_input_rows": 4,
+    "valid_rows": 4,
+    "quarantined_rows": 0,
+    "total_rules": 5,
+    "failed_rule_count": 0,
+    "dq_status": "SUCCESS",
+    "rule_summary": [
+        {
+            "rule_name": "customer_id_not_null",
+            "rule_type": "not_null",
+            "column": "customer_id",
+            "severity": "HIGH",
+            "failed_count": 0
+        },
+        {
+            "rule_name": "email_not_null",
+            "rule_type": "not_null",
+            "column": "email",
+            "severity": "HIGH",
+            "failed_count": 0
+        },
+        {
+            "rule_name": "phone_not_null",
+            "rule_type": "not_null",
+            "column": "phone",
+            "severity": "MEDIUM",
+            "failed_count": 0
+        },
+        {
+            "rule_name": "customer_id_unique",
+            "rule_type": "unique",
+            "column": "customer_id",
+            "severity": "HIGH",
+            "failed_count": 0
+        },
+        {
+            "rule_name": "source_system_allowed_values",
+            "rule_type": "allowed_values",
+            "column": "source_system",
+            "severity": "LOW",
+            "failed_count": 0
+        }
+    ]
+}

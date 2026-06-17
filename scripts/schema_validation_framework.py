@@ -1,18 +1,19 @@
 import json
 import os
-from dataclasses import dataclass, asdict
-from datetime import datetime
+from dataclasses import asdict, dataclass
+from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql import functions as F
 
 
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
 class SchemaValidationException(Exception):
-    """
-    Custom exception for schema validation failures.
-    Compatible with V7 structured error handling style.
-    """
+    """Custom exception for schema validation failures."""
 
     def __init__(
         self,
@@ -34,7 +35,7 @@ class SchemaValidationException(Exception):
             "dataset": self.dataset,
             "layer": self.layer,
             "issues": self.issues,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": utc_now_iso(),
         }
 
 
@@ -67,10 +68,7 @@ def load_schema_contract(contract_path: str) -> Dict:
         return json.load(file)
 
 
-def normalize_data_type(data_type: str) -> str:
-    """
-    Normalizes Spark/simple schema types for comparison.
-    """
+def normalize_data_type(data_type: Optional[str]) -> str:
     if data_type is None:
         return ""
 
@@ -84,8 +82,6 @@ def normalize_data_type(data_type: str) -> str:
         "str": "string",
         "varchar": "string",
         "char": "string",
-        "float": "float",
-        "double": "double",
         "timestamp_ntz": "timestamp",
     }
 
@@ -106,10 +102,7 @@ def data_types_match(expected: str, actual: str) -> bool:
 
 
 def get_dataframe_schema_map(df: DataFrame) -> Dict[str, str]:
-    return {
-        field.name: field.dataType.simpleString()
-        for field in df.schema.fields
-    }
+    return {field.name: field.dataType.simpleString() for field in df.schema.fields}
 
 
 def find_duplicate_columns(df: DataFrame) -> List[str]:
@@ -168,10 +161,7 @@ def validate_schema(
     check_nullable_data = contract.get("check_nullable_data", False)
 
     expected_columns = contract.get("columns", [])
-    expected_column_map = {
-        column["name"]: column
-        for column in expected_columns
-    }
+    expected_column_map = {column["name"]: column for column in expected_columns}
 
     actual_columns = df.columns
     actual_column_set = set(actual_columns)
@@ -181,7 +171,6 @@ def validate_schema(
     issues: List[SchemaIssue] = []
 
     duplicate_columns = find_duplicate_columns(df)
-
     for column_name in duplicate_columns:
         issues.append(
             build_schema_issue(
@@ -283,7 +272,6 @@ def validate_schema(
 
     issue_dicts = [asdict(issue) for issue in issues]
     error_issues = [issue for issue in issues if issue.severity == "ERROR"]
-
     status = "FAILED" if error_issues else "PASSED"
 
     result = SchemaValidationResult(
@@ -293,7 +281,7 @@ def validate_schema(
         status=status,
         total_issues=len(issues),
         issues=issue_dicts,
-        validated_at=datetime.utcnow().isoformat(),
+        validated_at=utc_now_iso(),
     )
 
     write_schema_validation_audit(result, audit_path)

@@ -1,65 +1,20 @@
 {
-  "schema_name": "bronze_customers_schema",
-  "layer": "bronze",
-  "dataset": "customers",
-  "validation_mode": "fail_fast",
-  "allow_unexpected_columns": false,
-  "enforce_data_types": false,
-  "check_nullable_data": false,
-  "columns": [
-    {
-      "name": "customer_id",
-      "data_type": "string",
-      "required": true,
-      "nullable": false
-    },
-    {
-      "name": "first_name",
-      "data_type": "string",
-      "required": true,
-      "nullable": true
-    },
-    {
-      "name": "last_name",
-      "data_type": "string",
-      "required": true,
-      "nullable": true
-    },
-    {
-      "name": "email",
-      "data_type": "string",
-      "required": false,
-      "nullable": true
-    },
-    {
-      "name": "phone",
-      "data_type": "long",
-      "required": false,
-      "nullable": true
-    },
-    {
-      "name": "city",
-      "data_type": "string",
-      "required": false,
-      "nullable": true
-    },
-    {
-      "name": "state",
-      "data_type": "string",
-      "required": false,
-      "nullable": true
-    },
-    {
-      "name": "created_date",
-      "data_type": "date",
-      "required": false,
-      "nullable": true
-    },
-    {
-      "name": "source_system",
-      "data_type": "string",
-      "required": false,
-      "nullable": true
-    }
-  ]
+    "schema_name": "bronze_customers_schema",
+    "layer": "bronze",
+    "dataset": "customers",
+    "validation_mode": "fail_fast",
+    "allow_unexpected_columns": false,
+    "enforce_data_types": false,
+    "check_nullable_data": false,
+    "columns": [
+        {"name": "customer_id", "data_type": "string", "required": true, "nullable": false},
+        {"name": "first_name", "data_type": "string", "required": true, "nullable": true},
+        {"name": "last_name", "data_type": "string", "required": true, "nullable": true},
+        {"name": "email", "data_type": "string", "required": false, "nullable": true},
+        {"name": "phone", "data_type": "long", "required": false, "nullable": true},
+        {"name": "city", "data_type": "string", "required": false, "nullable": true},
+        {"name": "state", "data_type": "string", "required": false, "nullable": true},
+        {"name": "created_date", "data_type": "date", "required": false, "nullable": true},
+        {"name": "source_system", "data_type": "string", "required": false, "nullable": true}
+    ]
 }

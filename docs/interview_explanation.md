@@ -1,73 +1,43 @@
 # Interview Explanation
 
-## Project Introduction
+## Project Summary
 
-I built an end-to-end data engineering pipeline that simulates a customer data processing workflow.
+This project is an end-to-end Data Engineering pipeline simulator that demonstrates config-driven data quality, PySpark medallion processing, schema validation, incremental loading, audit tracking, and Reltio-style payload generation.
 
-The project has two versions.
+## How to Explain It
 
-V1 is a Python-based config-driven DQ framework.
+I built a local PySpark pipeline that simulates a Databricks-style Bronze/Silver/Gold architecture. Raw customer data is ingested into Bronze, data quality rules are applied in Silver, valid records are transformed into a Gold canonical model, and the final output is exported as a Reltio-style JSON payload.
 
-V2 is a PySpark-based medallion architecture pipeline with Bronze, Silver, and Gold layers.
+## Key Engineering Features
 
----
+### Config-Driven Design
 
-## How Data Flows
+Runtime paths, DQ rule files, schema contracts, and watermark settings are controlled through JSON configuration rather than hardcoded values.
 
-Raw customer data is first generated as a CSV file.
+### Data Quality Framework
 
-In the PySpark version, the raw CSV is ingested into the Bronze layer as Parquet.
+DQ rules are stored in JSON and support not-null, allowed-values, and unique-key checks. Failed records are quarantined with error details.
 
-Then the Silver layer applies data quality rules from a JSON config file.
+### Severity-Based Control
 
-Records that pass all rules are written as valid Silver records.
+HIGH severity DQ failures stop the pipeline. MEDIUM and LOW severity failures allow continuation with warnings.
 
-Records that fail rules are written into quarantine.
+### Audit Tracking
 
-A DQ report is generated to show total rows, valid rows, quarantined rows, and failed rule counts.
+Every pipeline run gets a unique run ID and records STARTED, SUCCESS, or FAILED status in an audit file.
 
-Finally, the Gold layer transforms valid records into a canonical customer model and exports a Reltio-style JSON payload.
+### Structured Error Handling
 
----
+Custom exceptions separate configuration errors, DQ errors, ingestion errors, and full pipeline execution errors.
 
-## Why I Used Config-Driven DQ
+### Schema Validation
 
-I used config-driven DQ because hardcoding validation logic is not scalable.
+Bronze and Silver DataFrames are validated against JSON schema contracts. Validation results are written to an audit JSONL file.
 
-With a JSON config file, new rules can be added or modified without changing the core engine logic.
+### Incremental Load
 
-This makes the pipeline more flexible and closer to enterprise data engineering patterns.
+The pipeline reads only new records using a `created_date` watermark. The watermark is staged after Bronze and committed only after the full pipeline succeeds, preventing data loss when DQ or Gold fails.
 
----
+## Business Value
 
-## Why Bronze, Silver, and Gold Layers Are Used
-
-Bronze keeps raw ingested data.
-
-Silver applies validation, cleansing, and quality checks.
-
-Gold prepares business-ready canonical output for downstream systems.
-
-This separation improves traceability, debugging, replay, and maintainability.
-
----
-
-## Key Technical Highlights
-
-- Python pipeline implementation
-- PySpark pipeline implementation
-- JSON-based DQ rule config
-- Duplicate detection using PySpark window functions
-- Valid and quarantine split
-- DQ report generation
-- Gold canonical transformation
-- Reltio-style JSON payload output
-- Unit testing
-- GitHub Actions CI
-- Git branching, pull requests, and version tags
-
----
-
-## Resume-Ready Summary
-
-Built an end-to-end config-driven data quality pipeline using Python and PySpark. Implemented Bronze, Silver, and Gold layers, JSON-based validation rules, quarantine handling, DQ reporting, canonical customer transformation, Reltio-style JSON payload generation, unit tests, and GitHub Actions CI.
+This project demonstrates how enterprise data pipelines protect downstream systems by combining DQ validation, schema contracts, quarantine handling, audit logs, and safe incremental processing.
