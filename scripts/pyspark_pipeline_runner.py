@@ -24,7 +24,9 @@ def run_pyspark_pipeline() -> None:
         run_bronze_ingestion()
 
         print("\nStep 2: Running Silver DQ Validation")
-        run_pyspark_silver_dq()
+        dq_status = run_pyspark_silver_dq()
+        if dq_status == "FAILED":
+            raise Exception("Pipeline stopped because HIGH severity DQ rules failed.")
 
         print("\nStep 3: Running Gold Canonical Transformation")
         run_pyspark_gold_canonical()
