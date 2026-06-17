@@ -10,6 +10,7 @@ from pyspark.sql.window import Window
 from scripts.pipeline_config import load_pipeline_config
 from scripts.spark_session import get_spark_session
 
+from scripts.dq_decision import evaluate_dq_status
 
 def read_json(file_path: Path) -> dict:
     if not file_path.exists():
@@ -158,6 +159,7 @@ def run_pyspark_silver_dq() -> None:
     total_input_rows = bronze_df.count()
     valid_rows = valid_df.count()
     quarantined_rows = quarantine_df.count()
+    dq_final_status = evaluate_dq_status(rule_summary)
 
     valid_df.write.mode("overwrite").parquet(silver_output_path)
     quarantine_df.write.mode("overwrite").parquet(quarantine_output_path)
@@ -174,11 +176,13 @@ def run_pyspark_silver_dq() -> None:
     print(f"Total input rows: {total_input_rows}")
     print(f"Valid rows: {valid_rows}")
     print(f"Quarantined rows: {quarantined_rows}")
+    print(f"DQ Final Status: {dq_final_status}")
     print(f"Silver valid records written at: {silver_output_path}")
     print(f"Quarantine records written at: {quarantine_output_path}")
     print(f"DQ report written at: {dq_report_file}")
 
     spark.stop()
+    return dq_final_status
 
 
 if __name__ == "__main__":
