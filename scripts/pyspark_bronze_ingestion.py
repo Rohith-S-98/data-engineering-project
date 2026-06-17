@@ -7,6 +7,12 @@ from scripts.schema_validation_framework import (
     validate_schema,
     print_schema_validation_result,
 )
+from scripts.watermark_manager import (
+    get_last_watermark_value,
+    filter_incremental_dataframe,
+    get_max_watermark_value,
+    stage_watermark_update,
+)
 
 def run_bronze_ingestion() -> None:
     print("Starting PySpark bronze ingestion...")
@@ -41,16 +47,41 @@ def run_bronze_ingestion() -> None:
 
     print_schema_validation_result(bronze_schema_result)
 
-    print("Raw DataFrame preview:")
-    raw_df.show(truncate=False)
+    print("Incremental Bronze DataFrame preview:")
+    incremental_df.show(truncate=False)
 
-    (
-        raw_df.write
-        .mode("overwrite")
-        .parquet(bronze_output_path)
-    )
+    incremental_df.write.mode("overwrite").parquet(bronze_output_path)
 
     print(f"Bronze data written successfully at: {bronze_output_path}")
+
+    watermark_column = "created_date"
+    dataset_name = "customers"
+
+    last_watermark = get_last_watermark_value(dataset=dataset_name)
+
+    incremental_df = filter_incremental_dataframe(
+        df=raw_df,
+        watermark_column=watermark_column,
+        last_watermark=last_watermark,
+    )
+
+    raw_row_count = raw_df.count()
+    incremental_row_count = incremental_df.count()
+
+    print(f"Raw input row count: {raw_row_count}")
+    print(f"Incremental row count: {incremental_row_count}")
+
+    new_watermark = get_max_watermark_value(
+        df=incremental_df,
+        watermark_column=watermark_column,
+    )
+
+    stage_watermark_update(
+        dataset=dataset_name,
+        watermark_column=watermark_column,
+        previous_watermark=last_watermark,
+        new_watermark=new_watermark,
+    )
 
     spark.stop()
 

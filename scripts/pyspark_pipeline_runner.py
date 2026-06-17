@@ -4,6 +4,7 @@ from scripts.pyspark_silver_dq import run_pyspark_silver_dq
 from scripts.pyspark_gold_canonical import run_pyspark_gold_canonical
 from scripts.run_metadata import create_pipeline_run, update_pipeline_run
 from scripts.exceptions import DQValidationError, PipelineExecutionError
+from scripts.watermark_manager import commit_staged_watermark_update
 
 def run_pyspark_pipeline() -> None:
     config = load_pipeline_config()
@@ -30,6 +31,8 @@ def run_pyspark_pipeline() -> None:
 
         print("\nStep 3: Running Gold Canonical Transformation")
         run_pyspark_gold_canonical()
+
+        commit_staged_watermark_update(dataset="customers")
 
         update_pipeline_run(
             run_id=run_id,
