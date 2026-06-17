@@ -4,3 +4,5 @@ de031d50-3c97-4465-8712-b14e2756fd02,pyspark_customer_medallion_pipeline,local,2
 b422b0c6-9a0e-4cef-b2d2-7db7019d430c,pyspark_customer_medallion_pipeline,local,2026-06-17T17:35:15,2026-06-17T17:35:38,SUCCESS,
 945a9ba9-3260-4dbc-8f7a-7f2ed9bb82ed,pyspark_customer_medallion_pipeline,local,2026-06-17T17:36:38,2026-06-17T17:37:01,SUCCESS,
 f78e6267-6b88-412c-a50e-489c4b84ab5d,pyspark_customer_medallion_pipeline,local,2026-06-17T17:37:54,2026-06-17T17:38:18,SUCCESS,
+b6ad6701-ea70-4d34-aa37-e0a3f84c1044,pyspark_customer_medallion_pipeline,local,2026-06-17T18:09:05,2026-06-17T18:09:24,FAILED,'silver_schema_contract'
+1e2a363e-8d1d-4ce0-80ac-f7242393920b,pyspark_customer_medallion_pipeline,local,2026-06-17T18:14:56,2026-06-17T18:15:18,SUCCESS,
