@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from scripts.pipeline_config import load_pipeline_config
-
+from scripts.exceptions import PipelineConfigError
 
 class TestPipelineConfig(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class TestPipelineConfig(unittest.TestCase):
         self.assertIn("reltio_payload_output_path", config)
 
     def test_load_pipeline_config_fails_when_file_missing(self):
-        with self.assertRaises(FileNotFoundError):
+        with self.assertRaises(PipelineConfigError):
             load_pipeline_config("config/pipeline/missing_config.json")
 
     def test_load_pipeline_config_fails_when_required_key_missing(self):
@@ -37,7 +37,7 @@ class TestPipelineConfig(unittest.TestCase):
             with open(temp_config_file, mode="w", encoding="utf-8") as file:
                 json.dump(incomplete_config, file)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaises(PipelineConfigError):
                 load_pipeline_config(temp_config_file)
 
 
