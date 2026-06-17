@@ -12,6 +12,11 @@ from scripts.spark_session import get_spark_session
 
 from scripts.dq_decision import evaluate_dq_status
 
+from scripts.schema_validation_framework import (
+    validate_schema,
+    print_schema_validation_result,
+)
+
 def read_json(file_path: Path) -> dict:
     if not file_path.exists():
         raise FileNotFoundError(f"DQ rules file not found: {file_path}")
@@ -155,6 +160,18 @@ def run_pyspark_silver_dq() -> None:
         bronze_df,
         rules_config,
     )
+
+    print("Silver DataFrame schema before schema validation:")
+    valid_df.printSchema()
+
+    silver_schema_result = validate_schema(
+        df=valid_df,
+        contract_path="configs/schema_contracts/silver_customers_schema.json",
+        audit_path="data/audit/schema_validation_audit.jsonl",
+        raise_on_failure=True,
+    )
+
+    print_schema_validation_result(silver_schema_result)
 
     total_input_rows = bronze_df.count()
     valid_rows = valid_df.count()

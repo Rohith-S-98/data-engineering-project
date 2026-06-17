@@ -3,7 +3,10 @@ from pathlib import Path
 from scripts.create_sample_data import create_raw_customer_data
 from scripts.pipeline_config import load_pipeline_config
 from scripts.spark_session import get_spark_session
-
+from scripts.schema_validation_framework import (
+    validate_schema,
+    print_schema_validation_result,
+)
 
 def run_bronze_ingestion() -> None:
     print("Starting PySpark bronze ingestion...")
@@ -28,6 +31,15 @@ def run_bronze_ingestion() -> None:
 
     print("Raw DataFrame schema:")
     raw_df.printSchema()
+
+    bronze_schema_result = validate_schema(
+        df=raw_df,
+        contract_path="configs/schema_contracts/bronze_customers_schema.json",
+        audit_path="data/audit/schema_validation_audit.jsonl",
+        raise_on_failure=True,
+    )
+
+    print_schema_validation_result(bronze_schema_result)
 
     print("Raw DataFrame preview:")
     raw_df.show(truncate=False)
