@@ -1,5 +1,7 @@
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
 .venv/
 venv/
 .env
@@ -8,8 +10,12 @@ venv/
 .ipynb_checkpoints/
 *.log
 
+# Runtime datasets and outputs are regenerated locally.
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/customer_data_clean.csv
+!data/raw/customer_data_dirty.csv
+!data/raw/customer_data.csv
 
 data/processed/*
 !data/processed/.gitkeep
@@ -28,3 +34,18 @@ data/audit/*
 
 output/*
 !output/.gitkeep
+!output/audit/
+!output/audit/.gitkeep
+!output/dq_reports/
+!output/dq_reports/.gitkeep
+!output/logs/
+!output/logs/.gitkeep
+!output/quarantine/
+!output/quarantine/.gitkeep
+!output/reltio_payloads/
+!output/reltio_payloads/.gitkeep
+
+# Spark local runtime noise
+metastore_db/
+spark-warehouse/
+derby.log

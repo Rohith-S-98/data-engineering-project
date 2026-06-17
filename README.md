@@ -1,236 +1,150 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a data engineering pipeline simulator that demonstrates how customer data can be generated, ingested, validated, separated into valid and quarantined records, transformed into a canonical model, and exported as downstream-ready output.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python and PySpark. It demonstrates how customer data can be generated, ingested, validated, separated into valid and quarantined records, transformed into a canonical model, and exported as downstream-ready Reltio-style JSON output.
 
-The project is inspired by real enterprise data engineering workflows such as:
-
-* Medallion architecture
-* Config-driven data quality validation
-* Quarantine handling
-* DQ reporting
-* Pipeline orchestration
-* PySpark-based transformation
-* Reltio-style payload generation
+The project is inspired by real enterprise workflows such as medallion architecture, config-driven data quality, schema validation, incremental loading, audit tracking, exception handling, and MDM-style payload generation.
 
 ---
 
 ## Project Versions
 
-This repository contains two versions of the pipeline:
-
-| Version | Description                                                  |
-| ------- | ------------------------------------------------------------ |
-| V1      | Python-based config-driven DQ pipeline                       |
-| V2      | PySpark / Databricks-style Bronze, Silver, and Gold pipeline |
-
----
-
-# V1: Python Config-Driven DQ Pipeline
-
-## V1 Architecture
-
-```text
-Raw Customer Data
-        ↓
-Sample Data Generator
-        ↓
-Config-Driven DQ Rules
-        ↓
-DQ Validation Engine
-        ↓
-Valid Records + Quarantine Records
-        ↓
-DQ Summary Report
-        ↓
-End-to-End Pipeline Runner
-```
-
-## V1 Features
-
-* Generates sample customer source data
-* Reads raw CSV input
-* Applies JSON-based configurable data quality rules
-* Supports not-null validation
-* Supports unique key validation
-* Supports allowed values validation
-* Splits data into valid and quarantined records
-* Generates DQ summary report in JSON format
-* Provides an end-to-end runner through `main.py`
-* Includes logging
-* Includes unit tests
-* Includes GitHub Actions CI
-
-## V1 Main Components
-
-```text
-scripts/create_sample_data.py
-scripts/ingest_data.py
-scripts/generate_dq_report.py
-scripts/config_driven_dq.py
-scripts/logger_config.py
-main.py
-```
-
-## How to Run V1 Pipeline
-
-```bash
-python3 main.py
-```
-
-This executes:
-
-```text
-Create raw customer data
-        ↓
-Run config-driven DQ validation
-        ↓
-Generate valid records
-        ↓
-Generate quarantine records
-        ↓
-Generate DQ report
-```
+| Version | Feature |
+|---|---|
+| v1.0.0 | Python config-driven DQ pipeline |
+| v2.0.0 | PySpark Bronze/Silver/Gold medallion pipeline |
+| v3.0.0 | Databricks-style documentation and interview explanation |
+| v4.0.0 | Production-style centralized pipeline configuration |
+| v5.0.0 | Pipeline audit tracking |
+| v6.0.0 | Severity-based DQ failure control |
+| v7.0.0 | Custom exceptions and structured error handling |
+| v8.0.0 | Schema Validation Framework |
+| v9.0.0 | Incremental Load and Watermark Framework |
 
 ---
 
-# V2: PySpark / Databricks-Style Pipeline
-
-This project also includes a PySpark-based pipeline that simulates a Databricks-style medallion architecture.
-
-The PySpark version processes customer data through Bronze, Silver, and Gold layers.
-
-## V2 Architecture
+## Current Architecture
 
 ```text
 Raw Customer CSV
         ↓
-Bronze Layer
-Raw data is ingested using PySpark and stored as Parquet
+Bronze Schema Validation
         ↓
-Silver Layer
-Config-driven DQ rules are applied using PySpark
-Valid and quarantined records are separated
+Incremental Watermark Filter
         ↓
-Gold Layer
-Valid customer records are transformed into a canonical customer model
+Bronze Parquet
         ↓
-Reltio-Style Payload
-Gold data is exported as JSON payload output
-```
-
-## V2 Features
-
-* Reads raw customer CSV using PySpark
-* Writes Bronze data as Parquet
-* Reads DQ rules from JSON config
-* Applies PySpark-based DQ validation
-* Uses window functions for duplicate detection
-* Separates valid and quarantined records
-* Writes Silver valid records
-* Writes quarantine records
-* Generates DQ report
-* Transforms Silver records into Gold canonical customer model
-* Exports Reltio-style JSON payload
-* Provides an end-to-end PySpark pipeline runner
-
-## V2 Main Components
-
-```text
-scripts/spark_session.py
-scripts/pyspark_smoke_test.py
-scripts/pyspark_bronze_ingestion.py
-scripts/pyspark_silver_dq.py
-scripts/pyspark_gold_canonical.py
-scripts/pyspark_pipeline_runner.py
-```
-
-## How to Run V2 Pipeline
-
-Activate the virtual environment:
-
-```bash
-source .venv/bin/activate
-```
-
-Run the full PySpark pipeline:
-
-```bash
-python -m scripts.pyspark_pipeline_runner
-```
-
-This executes:
-
-```text
-Bronze ingestion
+Silver DQ Validation
         ↓
-Silver DQ validation
+Silver Schema Validation
         ↓
-Gold canonical transformation
+Severity-Based DQ Decision
         ↓
-Reltio-style JSON payload generation
+Gold Canonical Transformation
+        ↓
+Reltio-Style JSON Payload
+        ↓
+Commit Watermark After Success
+        ↓
+Pipeline Audit Update
 ```
----
-
-## V4: Production-Style Pipeline Configuration
-
-The project now includes a production-style pipeline configuration layer.
-
-Instead of hardcoding input and output paths inside the PySpark scripts, the pipeline reads runtime paths and settings from a JSON config file.
-
-### Config File
-
-```text
-config/pipeline/local_config.json
-```
-
-### Config Loader
-
-```text
-scripts/pipeline_config.py
-```
-
-### Why This Matters
-
-This makes the pipeline easier to maintain and prepares it for environment-based execution such as:
-
-```text
-local
-dev
-qa
-prod
-```
-
-With this approach, Bronze, Silver, and Gold scripts can use the same core logic while changing only the configuration file for different environments.
-
-### V4 Improvements
-
-* Added centralized pipeline config file
-* Added config loader with required-key validation
-* Refactored Bronze ingestion to use config paths
-* Refactored Silver DQ validation to use config paths
-* Refactored Gold canonical transformation to use config paths
-* Added unit tests for config loader
-
 
 ---
 
-# Data Quality Rules
+## Features
 
-The DQ rules are stored in:
+- Python config-driven DQ pipeline
+- PySpark medallion pipeline
+- Bronze, Silver, and Gold layer processing
+- JSON-based DQ rules
+- Not-null, unique-key, and allowed-values validation
+- Quarantine handling
+- DQ summary reporting
+- Severity-based pipeline stop control
+- Pipeline audit tracking
+- Custom exception handling
+- JSON schema validation framework
+- Incremental load using watermark tracking
+- Pending watermark staging to prevent data loss
+- Reltio-style JSON payload generation
+- GitHub Actions CI
+
+---
+
+## Folder Structure
+
+```text
+data-engineering-project/
+├── .github/
+│   └── workflows/
+│       └── python-ci.yml
+├── config/
+│   ├── log4j2.properties
+│   ├── pipeline/
+│   │   └── local_config.json
+│   └── rules/
+│       └── customer_dq_rules.json
+├── configs/
+│   └── schema_contracts/
+│       ├── bronze_customers_schema.json
+│       └── silver_customers_schema.json
+├── data/
+│   ├── raw/
+│   │   ├── customer_data.csv
+│   │   ├── customer_data_clean.csv
+│   │   └── customer_data_dirty.csv
+│   ├── bronze/
+│   ├── silver/
+│   ├── gold/
+│   └── audit/
+├── docs/
+│   ├── architecture.md
+│   ├── interview_explanation.md
+│   ├── v5_pipeline_audit_tracking.md
+│   ├── v6_severity_based_dq_control.md
+│   ├── v7_custom_exceptions_error_handling.md
+│   ├── v8_schema_validation_framework.md
+│   └── v9_incremental_load_watermark.md
+├── output/
+│   ├── audit/
+│   ├── dq_reports/
+│   ├── quarantine/
+│   ├── logs/
+│   └── reltio_payloads/
+├── scripts/
+│   ├── config_driven_dq.py
+│   ├── create_sample_data.py
+│   ├── dq_decision.py
+│   ├── exceptions.py
+│   ├── pipeline_config.py
+│   ├── pyspark_bronze_ingestion.py
+│   ├── pyspark_silver_dq.py
+│   ├── pyspark_gold_canonical.py
+│   ├── pyspark_pipeline_runner.py
+│   ├── run_metadata.py
+│   ├── schema_validation_framework.py
+│   ├── spark_session.py
+│   └── watermark_manager.py
+├── tests/
+│   ├── test_config_driven_dq.py
+│   ├── test_dq_decision.py
+│   ├── test_pipeline_config.py
+│   ├── test_run_metadata.py
+│   ├── test_schema_validation_framework.py
+│   └── test_watermark_manager.py
+├── main.py
+├── requirements.txt
+├── README.md
+└── .gitignore
+```
+
+---
+
+## Data Quality Rules
+
+DQ rules are stored in:
 
 ```text
 config/rules/customer_dq_rules.json
-```
-
-Example rule:
-
-```json
-{
-  "rule_name": "email_not_null",
-  "column": "email",
-  "rule_type": "not_null",
-  "severity": "HIGH"
-}
 ```
 
 Supported rule types:
@@ -241,93 +155,98 @@ unique
 allowed_values
 ```
 
+Severity behavior:
+
+| Severity | Behavior |
+|---|---|
+| HIGH | Stops the pipeline if failed |
+| MEDIUM | Allows continuation with warning |
+| LOW | Allows continuation with warning |
+
 ---
 
-# Folder Structure
+## Schema Validation
+
+Schema contracts are stored in:
 
 ```text
-data-engineering-project/
-│
-├── .github/
-│   └── workflows/
-│       └── python-ci.yml
-│
-├── config/
-│   └── rules/
-│       └── customer_dq_rules.json
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   ├── bronze/
-│   ├── silver/
-│   └── gold/
-│
-├── docs/
-├── notebooks/
-│
-├── output/
-│   ├── dq_reports/
-│   ├── quarantine/
-│   ├── logs/
-│   └── reltio_payloads/
-│
-├── scripts/
-│   ├── __init__.py
-│   ├── create_sample_data.py
-│   ├── ingest_data.py
-│   ├── generate_dq_report.py
-│   ├── config_driven_dq.py
-│   ├── logger_config.py
-│   ├── spark_session.py
-│   ├── pyspark_smoke_test.py
-│   ├── pyspark_bronze_ingestion.py
-│   ├── pyspark_silver_dq.py
-│   ├── pyspark_gold_canonical.py
-│   └── pyspark_pipeline_runner.py
-│
-├── tests/
-│   ├── __init__.py
-│   └── test_config_driven_dq.py
-│
-├── main.py
-├── requirements.txt
-├── README.md
-└── .gitignore
+configs/schema_contracts/
+```
+
+Schema validation checks:
+
+- Required columns
+- Unexpected columns
+- Data type mismatches
+- Nullability violations
+
+Audit output:
+
+```text
+data/audit/schema_validation_audit.jsonl
 ```
 
 ---
 
-# Outputs
+## Incremental Load and Watermark
 
-## V1 Outputs
-
-```text
-data/processed/customer_valid.csv
-output/quarantine/customer_quarantine.csv
-output/dq_reports/config_driven_customer_dq_report.json
-output/logs/pipeline.log
-```
-
-## V2 Outputs
+V9 adds incremental processing using:
 
 ```text
-data/bronze/customer_bronze
-data/silver/customer_valid
-data/gold/customer_canonical
-output/quarantine/pyspark_customer_quarantine
-output/dq_reports/pyspark_customer_dq_report.json
-output/reltio_payloads/customer_payload_json
+created_date
 ```
+
+Watermark files:
+
+```text
+data/audit/watermark_store.json
+data/audit/pending_watermark_updates.json
+```
+
+The watermark is staged after Bronze and committed only after the full pipeline succeeds.
 
 ---
 
-# Testing
+## How to Run
 
-Run unit tests:
+Activate virtual environment:
 
 ```bash
-python3 -m unittest discover tests
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create clean sample data:
+
+```bash
+python -m scripts.create_sample_data
+```
+
+Run the full PySpark pipeline:
+
+```bash
+python -m scripts.pyspark_pipeline_runner
+```
+
+Run V1 Python pipeline:
+
+```bash
+python main.py
+```
+
+---
+
+## Testing
+
+Run all tests:
+
+```bash
+python -m unittest discover tests
 ```
 
 Expected result:
@@ -338,14 +257,55 @@ OK
 
 ---
 
-# CI/CD
-
-This project uses GitHub Actions to run unit tests automatically on:
+## Outputs
 
 ```text
-push to main
-pull request to main
+data/bronze/customer_bronze
+data/silver/customer_valid
+data/gold/customer_canonical
+data/audit/schema_validation_audit.jsonl
+data/audit/watermark_store.json
+output/audit/pipeline_runs.csv
+output/quarantine/pyspark_customer_quarantine
+output/dq_reports/pyspark_customer_dq_report.json
+output/reltio_payloads/customer_payload_json
 ```
+
+---
+
+## Dirty Data Demo
+
+To test DQ failure behavior, replace the active raw file with dirty data:
+
+```bash
+cp data/raw/customer_data_dirty.csv data/raw/customer_data.csv
+rm -f data/audit/watermark_store.json data/audit/pending_watermark_updates.json
+python -m scripts.pyspark_pipeline_runner
+```
+
+Expected behavior:
+
+```text
+Bronze schema validation PASSED
+Watermark staged
+Silver DQ status FAILED
+Pipeline stopped because HIGH severity DQ rules failed
+Watermark NOT committed
+```
+
+Restore clean data:
+
+```bash
+cp data/raw/customer_data_clean.csv data/raw/customer_data.csv
+rm -f data/audit/watermark_store.json data/audit/pending_watermark_updates.json
+python -m scripts.pyspark_pipeline_runner
+```
+
+---
+
+## CI/CD
+
+GitHub Actions runs unit tests on push and pull request to `main`.
 
 Workflow file:
 
@@ -355,38 +315,34 @@ Workflow file:
 
 ---
 
-# Skills Demonstrated
+## Skills Demonstrated
 
-* Python
-* PySpark
-* CSV processing
-* JSON config handling
-* Data quality validation
-* Config-driven framework design
-* Quarantine handling
-* DQ reporting
-* Logging
-* Unit testing
-* GitHub Actions CI
-* Parquet read/write
-* Medallion architecture
-* Bronze, Silver, Gold layer design
-* Window functions
-* Canonical data modeling
-* Reltio-style JSON payload generation
-* Git and GitHub version control
+- Python
+- PySpark
+- Data Engineering
+- Medallion architecture
+- Config-driven framework design
+- Data quality validation
+- Quarantine handling
+- Audit logging
+- Schema validation
+- Incremental loading
+- Watermark management
+- Structured exception handling
+- Unit testing
+- GitHub Actions CI
+- Reltio-style JSON payload generation
 
 ---
 
-# Future Enhancements
+## Future Enhancements
 
-* Add Delta Lake support
-* Add Databricks notebook version
-* Add Databricks Asset Bundle structure
-* Add schema validation
-* Add Great Expectations-style checks
-* Add API ingestion source
-* Add database ingestion source
-* Add dashboard for DQ metrics
-* Add Docker support
-* Add deployment documentation
+- Delta Lake support
+- Databricks notebook version
+- Databricks Asset Bundle structure
+- Great Expectations-style checks
+- API ingestion source
+- Database ingestion source
+- DQ metrics dashboard
+- Docker support
+- Deployment documentation

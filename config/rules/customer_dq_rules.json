@@ -1,37 +1,37 @@
 {
-  "table_name": "customer",
-  "primary_key": "customer_id",
-  "rules": [
-    {
-      "rule_name": "customer_id_not_null",
-      "column": "customer_id",
-      "rule_type": "not_null",
-      "severity": "HIGH"
-    },
-    {
-      "rule_name": "email_not_null",
-      "column": "email",
-      "rule_type": "not_null",
-      "severity": "HIGH"
-    },
-    {
-      "rule_name": "phone_not_null",
-      "column": "phone",
-      "rule_type": "not_null",
-      "severity": "MEDIUM"
-    },
-    {
-      "rule_name": "customer_id_unique",
-      "column": "customer_id",
-      "rule_type": "unique",
-      "severity": "HIGH"
-    },
-    {
-      "rule_name": "source_system_allowed_values",
-      "column": "source_system",
-      "rule_type": "allowed_values",
-      "allowed_values": ["CSV", "API"],
-      "severity": "LOW"
-    }
-  ]
+    "table_name": "customer",
+    "primary_key": "customer_id",
+    "rules": [
+        {
+            "rule_name": "customer_id_not_null",
+            "column": "customer_id",
+            "rule_type": "not_null",
+            "severity": "HIGH"
+        },
+        {
+            "rule_name": "email_not_null",
+            "column": "email",
+            "rule_type": "not_null",
+            "severity": "HIGH"
+        },
+        {
+            "rule_name": "phone_not_null",
+            "column": "phone",
+            "rule_type": "not_null",
+            "severity": "MEDIUM"
+        },
+        {
+            "rule_name": "customer_id_unique",
+            "column": "customer_id",
+            "rule_type": "unique",
+            "severity": "HIGH"
+        },
+        {
+            "rule_name": "source_system_allowed_values",
+            "column": "source_system",
+            "rule_type": "allowed_values",
+            "allowed_values": ["CSV", "API"],
+            "severity": "LOW"
+        }
+    ]
 }
