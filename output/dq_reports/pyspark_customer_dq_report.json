@@ -1,8 +1,10 @@
 {
     "environment": "local",
+    "dataset_name": "customers",
+    "storage_format": "delta",
     "table_name": "customer",
     "primary_key": "customer_id",
-    "report_generated_at": "2026-06-17T18:15:17",
+    "report_generated_at": "2026-06-17T18:59:44",
     "input_layer": "data/bronze/customer_bronze",
     "silver_output_path": "data/silver/customer_valid",
     "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",

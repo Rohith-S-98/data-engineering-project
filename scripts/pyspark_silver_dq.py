@@ -7,15 +7,19 @@ from pyspark.sql.functions import col, concat_ws, count, lit, trim, when
 from pyspark.sql.window import Window
 
 from scripts.dq_decision import evaluate_dq_status
+from scripts.lakehouse_io import (
+    assert_delta_table_exists,
+    get_storage_format,
+    read_lakehouse_table,
+    write_lakehouse_table,
+)
 from scripts.pipeline_config import load_pipeline_config
-from scripts.schema_validation_framework import print_schema_validation_result, validate_schema
+from scripts.schema_validation_framework import (
+    print_schema_validation_result,
+    validate_schema,
+)
 from scripts.spark_session import get_spark_session
 
-
-from scripts.schema_validation_framework import (
-    validate_schema,
-    print_schema_validation_result,
-)
 
 def read_json(file_path: Path) -> dict:
     if not file_path.exists():
@@ -25,7 +29,10 @@ def read_json(file_path: Path) -> dict:
         return json.load(file)
 
 
-def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame, DataFrame, list[dict]]:
+def apply_pyspark_dq_rules(
+    df: DataFrame,
+    rules_config: dict,
+) -> tuple[DataFrame, DataFrame, list[dict]]:
     rules = rules_config["rules"]
     validated_df = df
     rule_summary = []
@@ -38,7 +45,10 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
         error_column = f"{rule_name}_failed"
 
         if rule_type == "not_null":
-            failed_condition = col(column_name).isNull() | (trim(col(column_name).cast("string")) == "")
+            failed_condition = (
+                col(column_name).isNull()
+                | (trim(col(column_name).cast("string")) == "")
+            )
 
         elif rule_type == "allowed_values":
             allowed_values = rule["allowed_values"]
@@ -83,7 +93,9 @@ def apply_pyspark_dq_rules(df: DataFrame, rules_config: dict) -> tuple[DataFrame
     valid_df = validated_df.filter(col("dq_errors") == "")
 
     technical_columns = error_columns + [
-        f"{rule['column']}_count" for rule in rules if rule["rule_type"] == "unique"
+        f"{rule['column']}_count"
+        for rule in rules
+        if rule["rule_type"] == "unique"
     ]
 
     valid_df = valid_df.drop(*technical_columns, "dq_errors")
@@ -107,6 +119,8 @@ def write_dq_report(
 
     report = {
         "environment": config["environment"],
+        "dataset_name": config["dataset_name"],
+        "storage_format": config["storage_format"],
         "table_name": rules_config["table_name"],
         "primary_key": rules_config["primary_key"],
         "report_generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -130,22 +144,32 @@ def run_pyspark_silver_dq() -> str:
     print("Starting PySpark silver DQ validation...")
 
     config = load_pipeline_config()
+
     bronze_input_path = config["bronze_output_path"]
     dq_rules_file = Path(config["dq_rules_file"])
     silver_output_path = config["silver_output_path"]
     quarantine_output_path = config["quarantine_output_path"]
     dq_report_file = config["dq_report_file"]
+    storage_format = get_storage_format(config)
 
     spark = get_spark_session("PySparkSilverDQ")
 
     try:
         rules_config = read_json(dq_rules_file)
-        bronze_df = spark.read.parquet(bronze_input_path)
+
+        bronze_df = read_lakehouse_table(
+            spark=spark,
+            input_path=bronze_input_path,
+            storage_format=storage_format,
+        )
 
         print("Bronze DataFrame:")
         bronze_df.show(truncate=False)
 
-        valid_df, quarantine_df, rule_summary = apply_pyspark_dq_rules(bronze_df, rules_config)
+        valid_df, quarantine_df, rule_summary = apply_pyspark_dq_rules(
+            bronze_df,
+            rules_config,
+        )
 
         print("Silver DataFrame schema before schema validation:")
         valid_df.printSchema()
@@ -156,15 +180,34 @@ def run_pyspark_silver_dq() -> str:
             audit_path=config["schema_validation_audit_file"],
             raise_on_failure=True,
         )
+
         print_schema_validation_result(silver_schema_result)
 
         total_input_rows = bronze_df.count()
         valid_rows = valid_df.count()
         quarantined_rows = quarantine_df.count()
+
         dq_final_status = evaluate_dq_status(rule_summary)
 
-        valid_df.write.mode("overwrite").parquet(silver_output_path)
-        quarantine_df.write.mode("overwrite").parquet(quarantine_output_path)
+        write_lakehouse_table(
+            df=valid_df,
+            output_path=silver_output_path,
+            storage_format=storage_format,
+            mode="overwrite",
+        )
+
+        write_lakehouse_table(
+            df=quarantine_df,
+            output_path=quarantine_output_path,
+            storage_format=storage_format,
+            mode="overwrite",
+        )
+
+        if storage_format == "delta":
+            assert_delta_table_exists(
+                table_path=silver_output_path,
+                table_name="Silver customers",
+            )
 
         write_dq_report(
             total_input_rows=total_input_rows,
@@ -180,8 +223,14 @@ def run_pyspark_silver_dq() -> str:
         print(f"Valid rows: {valid_rows}")
         print(f"Quarantined rows: {quarantined_rows}")
         print(f"DQ Final Status: {dq_final_status}")
-        print(f"Silver valid records written at: {silver_output_path}")
-        print(f"Quarantine records written at: {quarantine_output_path}")
+        print(
+            f"Silver valid records written at: "
+            f"{silver_output_path} using format={storage_format}"
+        )
+        print(
+            f"Quarantine records written at: "
+            f"{quarantine_output_path} using format={storage_format}"
+        )
         print(f"DQ report written at: {dq_report_file}")
 
         return dq_final_status
