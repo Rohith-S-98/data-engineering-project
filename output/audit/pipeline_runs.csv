@@ -1,3 +1,6 @@
 run_id,pipeline_name,environment,start_time,end_time,status,error_message
 e948bf16-de21-469c-9caf-acbd870bc30f,pyspark_customer_medallion_pipeline,local,2026-06-17T16:36:40,2026-06-17T16:37:03,SUCCESS,
 de031d50-3c97-4465-8712-b14e2756fd02,pyspark_customer_medallion_pipeline,local,2026-06-17T16:39:35,2026-06-17T16:39:58,SUCCESS,
+b422b0c6-9a0e-4cef-b2d2-7db7019d430c,pyspark_customer_medallion_pipeline,local,2026-06-17T17:35:15,2026-06-17T17:35:38,SUCCESS,
+945a9ba9-3260-4dbc-8f7a-7f2ed9bb82ed,pyspark_customer_medallion_pipeline,local,2026-06-17T17:36:38,2026-06-17T17:37:01,SUCCESS,
+f78e6267-6b88-412c-a50e-489c4b84ab5d,pyspark_customer_medallion_pipeline,local,2026-06-17T17:37:54,2026-06-17T17:38:18,SUCCESS,
