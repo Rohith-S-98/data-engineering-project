@@ -1,51 +1,90 @@
-# V9.0.0 - Incremental Load and Watermark Framework
+Watermark Flow
+Raw input
+↓
+Read last committed watermark
+↓
+Filter records where created_date > last_watermark
+↓
+Write incremental records to Bronze
+↓
+Stage new watermark
+↓
+Run Silver DQ
+↓
+Run Gold Canonical
+↓
+Commit watermark only after pipeline success
+Why Pending Watermark Is Needed
+The watermark should not be committed immediately after Bronze.
+If Bronze succeeds but Silver DQ fails, committing the watermark would cause failed records to be skipped in the next run.
+Therefore, V9 stages the watermark first and commits it only after all pipeline stages complete successfully.
+Watermark Store
+Committed watermark file:
+data/audit/watermark_store.json
+Pending watermark file:
+data/audit/pending_watermark_updates.json
+Run Test
+python -m tests.test_watermark_manager
+Run Pipeline
+python -m scripts.pyspark_pipeline_runner
+Version
+v9.0.0 - Incremental Load and Watermark Framework
 
-## Objective
+---
 
-V9 introduces incremental data processing using a configurable watermark framework.
+# Step 9 — Update README
 
-The pipeline reads only new records based on the `created_date` watermark column.
+Add this section:
 
-## Key Features
+```markdown
+## v9.0.0 - Incremental Load and Watermark Framework
 
-- Watermark store
-- Pending watermark staging
-- Incremental dataframe filtering
-- Max watermark calculation
-- Watermark commit only after full pipeline success
-- Protection against data loss when DQ or Gold fails
+V9 adds incremental data processing using a watermark column.
 
-## New Files
+### Features
+
+- Reads last committed watermark
+- Filters only new records
+- Stages pending watermark after Bronze
+- Commits watermark only after full pipeline success
+- Prevents data loss when DQ validation fails
+
+### Main Files
 
 ```text
 scripts/watermark_manager.py
 tests/test_watermark_manager.py
 docs/v9_incremental_load_watermark.md
-data/audit/watermark_store.json
-data/audit/pending_watermark_updates.json
+Test
+python -m tests.test_watermark_manager
+Run Pipeline
+python -m scripts.pyspark_pipeline_runner
 
-# V9.0.0 - Incremental Load and Watermark Framework
+---
 
-## Objective
+# Step 10 — Commit and tag V9
 
-V9 introduces incremental data processing using a configurable watermark framework.
+After the test passes:
 
-The pipeline reads only new records based on the `created_date` watermark column.
-
-## Key Features
-
-- Watermark store
-- Pending watermark staging
-- Incremental dataframe filtering
-- Max watermark calculation
-- Watermark commit only after full pipeline success
-- Protection against data loss when DQ or Gold fails
-
-## New Files
-
-```text
-scripts/watermark_manager.py
-tests/test_watermark_manager.py
-docs/v9_incremental_load_watermark.md
-data/audit/watermark_store.json
-data/audit/pending_watermark_updates.json
+```bash
+git status
+git add .
+git commit -m "v9.0.0 add incremental load and watermark framework"
+git tag v9.0.0
+git push origin main
+git push origin v9.0.0
+V9 completion checklist
+Run:
+python -m tests.test_watermark_manager
+python -m scripts.pyspark_pipeline_runner
+cat data/audit/pending_watermark_updates.json
+cat data/audit/watermark_store.json
+git tag
+For your current dirty DQ data, pipeline may stop at Silver, but V9 is still working if:
+Watermark staged
+Watermark not committed because pipeline failed
+For clean DQ data, V9 is fully complete if:
+Watermark staged
+Pipeline completed successfully
+Watermark committed
+v9.0.0 tag exists
