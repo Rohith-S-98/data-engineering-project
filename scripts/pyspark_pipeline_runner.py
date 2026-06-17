@@ -53,6 +53,8 @@ def run_pyspark_pipeline(raise_on_failure: bool = True) -> str:
         print("=" * 70)
         return "SUCCESS"
 
+        return "SUCCESS"
+
     except Exception as error:
         update_pipeline_run(
             run_id=run_id,

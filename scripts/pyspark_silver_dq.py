@@ -12,6 +12,11 @@ from scripts.schema_validation_framework import print_schema_validation_result, 
 from scripts.spark_session import get_spark_session
 
 
+from scripts.schema_validation_framework import (
+    validate_schema,
+    print_schema_validation_result,
+)
+
 def read_json(file_path: Path) -> dict:
     if not file_path.exists():
         raise FileNotFoundError(f"DQ rules file not found: {file_path}")
