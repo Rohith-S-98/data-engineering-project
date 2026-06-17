@@ -55,6 +55,37 @@ class TestPipelineConfig(unittest.TestCase):
             if temp_config_file:
                 Path(temp_config_file).unlink(missing_ok=True)
 
+    def test_load_pipeline_config_fails_for_unsupported_storage_format(self):
+        config = {
+            key: "dummy_value"
+            for key in REQUIRED_KEYS
+        }
+        config["storage_format"] = "orc"
+
+        temp_config_file = None
+
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                suffix=".json",
+                delete=False,
+                encoding="utf-8",
+            ) as temp_file:
+                json.dump(config, temp_file)
+                temp_config_file = temp_file.name
+
+            with self.assertRaises(ValueError) as context:
+                load_pipeline_config(temp_config_file)
+
+            self.assertIn(
+                "Unsupported storage_format",
+                str(context.exception),
+            )
+
+        finally:
+            if temp_config_file:
+                Path(temp_config_file).unlink(missing_ok=True)
+
 
 if __name__ == "__main__":
     unittest.main()

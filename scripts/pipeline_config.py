@@ -5,6 +5,7 @@ from pathlib import Path
 REQUIRED_KEYS = [
     "environment",
     "dataset_name",
+    "storage_format",
 
     "raw_data_file",
     "dq_rules_file",
@@ -29,6 +30,9 @@ REQUIRED_KEYS = [
 ]
 
 
+SUPPORTED_STORAGE_FORMATS = {"parquet", "delta"}
+
+
 def load_pipeline_config(
     config_path: str = "config/pipeline/local_config.json",
 ) -> dict:
@@ -36,7 +40,8 @@ def load_pipeline_config(
     Load centralized pipeline configuration from JSON file.
 
     Raises:
-        ValueError: If the config file is missing or required keys are absent.
+        ValueError: If the config file is missing, required keys are absent,
+        or unsupported storage format is configured.
     """
 
     config_file = Path(config_path)
@@ -53,5 +58,15 @@ def load_pipeline_config(
         raise ValueError(
             f"Missing required pipeline config keys: {missing_keys}"
         )
+
+    storage_format = str(config["storage_format"]).lower()
+
+    if storage_format not in SUPPORTED_STORAGE_FORMATS:
+        raise ValueError(
+            f"Unsupported storage_format: {storage_format}. "
+            f"Supported values: {sorted(SUPPORTED_STORAGE_FORMATS)}"
+        )
+
+    config["storage_format"] = storage_format
 
     return config

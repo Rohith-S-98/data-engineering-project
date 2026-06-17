@@ -6,6 +6,10 @@ The project is inspired by real enterprise workflows such as medallion architect
 
 ---
 
+Current Version: v10.0.0
+
+---
+
 ## Project Versions
 
 | Version | Feature |
@@ -19,6 +23,7 @@ The project is inspired by real enterprise workflows such as medallion architect
 | v7.0.0 | Custom exceptions and structured error handling |
 | v8.0.0 | Schema Validation Framework |
 | v9.0.0 | Incremental Load and Watermark Framework |
+| v10.0.0 | Delta Lake / Lakehouse Storage Upgrade | Upgraded Bronze, Silver, Gold, and Quarantine outputs from Parquet-only paths to configurable Delta Lake storage with Delta transaction log validation. |
 
 ---
 
@@ -346,3 +351,17 @@ Workflow file:
 - DQ metrics dashboard
 - Docker support
 - Deployment documentation
+
+## V10 - Delta Lake / Lakehouse Upgrade
+
+The pipeline now supports configurable Lakehouse storage through the `storage_format` config key.
+
+Supported values:
+
+- `parquet`
+- `delta`
+
+For local V10 execution, the project uses Delta Lake by default:
+
+```json
+"storage_format": "delta"
