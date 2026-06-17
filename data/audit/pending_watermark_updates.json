@@ -1,0 +1,10 @@
+{
+    "customers": {
+        "dataset": "customers",
+        "watermark_column": "created_date",
+        "previous_watermark": null,
+        "new_watermark": "2026-06-16",
+        "status": "PENDING",
+        "staged_at": "2026-06-17T10:11:12.247048"
+    }
+}
