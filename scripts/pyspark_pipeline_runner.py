@@ -3,7 +3,7 @@ from scripts.pyspark_bronze_ingestion import run_bronze_ingestion
 from scripts.pyspark_silver_dq import run_pyspark_silver_dq
 from scripts.pyspark_gold_canonical import run_pyspark_gold_canonical
 from scripts.run_metadata import create_pipeline_run, update_pipeline_run
-
+from scripts.exceptions import DQValidationError, PipelineExecutionError
 
 def run_pyspark_pipeline() -> None:
     config = load_pipeline_config()
@@ -26,7 +26,7 @@ def run_pyspark_pipeline() -> None:
         print("\nStep 2: Running Silver DQ Validation")
         dq_status = run_pyspark_silver_dq()
         if dq_status == "FAILED":
-            raise Exception("Pipeline stopped because HIGH severity DQ rules failed.")
+            raise DQValidationError("Pipeline stopped because HIGH severity DQ rules failed.")
 
         print("\nStep 3: Running Gold Canonical Transformation")
         run_pyspark_gold_canonical()
@@ -54,7 +54,7 @@ def run_pyspark_pipeline() -> None:
         print(f"Error: {error}")
         print("=" * 70)
 
-        raise
+        raise PipelineExecutionError(f"Pipeline execution failed: {error}") from error
 
 
 if __name__ == "__main__":

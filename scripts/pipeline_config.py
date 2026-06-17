@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from scripts.exceptions import PipelineConfigError
 
 
 DEFAULT_CONFIG_FILE = Path("config/pipeline/local_config.json")
@@ -9,7 +10,7 @@ def load_pipeline_config(config_file: str | Path = DEFAULT_CONFIG_FILE) -> dict:
     config_path = Path(config_file)
 
     if not config_path.exists():
-        raise FileNotFoundError(f"Pipeline config file not found: {config_path}")
+        raise PipelineConfigError(f"Pipeline config file not found: {config_path}")
 
     with open(config_path, mode="r", encoding="utf-8") as file:
         config = json.load(file)
@@ -33,6 +34,6 @@ def load_pipeline_config(config_file: str | Path = DEFAULT_CONFIG_FILE) -> dict:
     ]
 
     if missing_keys:
-        raise ValueError(f"Missing required config keys: {missing_keys}")
+        raise PipelineConfigError(f"Missing required config keys: {missing_keys}")
 
     return config
