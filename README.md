@@ -5,9 +5,9 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 The project is inspired by real enterprise workflows such as medallion architecture, config-driven data quality, schema validation, incremental loading, audit tracking, exception handling, and MDM-style payload generation.
 
 ---
-
-Current Version: v10.0.0
-
+```
+Current Version: v11.0.0
+```
 ---
 
 ## Project Versions
@@ -24,6 +24,7 @@ Current Version: v10.0.0
 | v8.0.0 | Schema Validation Framework |
 | v9.0.0 | Incremental Load and Watermark Framework |
 | v10.0.0 | Delta Lake / Lakehouse Storage Upgrade | Upgraded Bronze, Silver, Gold, and Quarantine outputs from Parquet-only paths to configurable Delta Lake storage with Delta transaction log validation. |
+| v11.0.0 | Delta MERGE / Upsert Framework | Added config-driven Delta MERGE upserts for Bronze, Silver, Quarantine, and Gold using layer-specific merge keys. |
 
 ---
 
@@ -36,17 +37,13 @@ Bronze Schema Validation
         ↓
 Incremental Watermark Filter
         ↓
-Bronze Parquet
-        ↓
-Silver DQ Validation
-        ↓
-Silver Schema Validation
-        ↓
-Severity-Based DQ Decision
-        ↓
-Gold Canonical Transformation
-        ↓
-Reltio-Style JSON Payload
+Bronze Delta Table
+↓
+Silver Delta Table + Quarantine Delta Table
+↓
+Gold Canonical Delta Table
+↓
+Reltio-style JSON Payload
         ↓
 Commit Watermark After Success
         ↓

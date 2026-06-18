@@ -8,7 +8,13 @@ from scripts.lakehouse_io import (
 )
 from scripts.pipeline_config import load_pipeline_config
 from scripts.spark_session import get_spark_session
-
+from scripts.lakehouse_io import (
+    assert_delta_table_exists,
+    get_lakehouse_write_strategy,
+    get_storage_format,
+    read_lakehouse_table,
+    write_or_merge_lakehouse_table,
+)
 
 def run_pyspark_gold_canonical() -> None:
     print("Starting PySpark gold canonical transformation...")
@@ -19,7 +25,7 @@ def run_pyspark_gold_canonical() -> None:
     gold_output_path = config["gold_output_path"]
     reltio_payload_output_path = config["reltio_payload_output_path"]
     storage_format = get_storage_format(config)
-
+    write_strategy = get_lakehouse_write_strategy(config)
     spark = get_spark_session("PySparkGoldCanonical")
 
     try:
@@ -57,11 +63,13 @@ def run_pyspark_gold_canonical() -> None:
         print("Gold canonical records:")
         gold_df.show(truncate=False)
 
-        write_lakehouse_table(
+        gold_write_status = write_or_merge_lakehouse_table(
+            spark=spark,
             df=gold_df,
             output_path=gold_output_path,
             storage_format=storage_format,
-            mode="overwrite",
+            write_strategy=write_strategy,
+            merge_keys=config["gold_merge_keys"],
         )
 
         if storage_format == "delta":
@@ -74,8 +82,9 @@ def run_pyspark_gold_canonical() -> None:
         gold_df.coalesce(1).write.mode("overwrite").json(reltio_payload_output_path)
 
         print(
-            f"Gold canonical data written at: "
-            f"{gold_output_path} using format={storage_format}"
+            f"Gold canonical data {gold_write_status} at: "
+            f"{gold_output_path} using format={storage_format}, "
+            f"strategy={write_strategy}"
         )
         print(f"Reltio-style JSON payload written at: {reltio_payload_output_path}")
 

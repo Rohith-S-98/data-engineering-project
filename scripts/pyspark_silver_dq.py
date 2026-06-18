@@ -19,7 +19,13 @@ from scripts.schema_validation_framework import (
     validate_schema,
 )
 from scripts.spark_session import get_spark_session
-
+from scripts.lakehouse_io import (
+    assert_delta_table_exists,
+    get_lakehouse_write_strategy,
+    get_storage_format,
+    read_lakehouse_table,
+    write_or_merge_lakehouse_table,
+)
 
 def read_json(file_path: Path) -> dict:
     if not file_path.exists():
@@ -151,6 +157,7 @@ def run_pyspark_silver_dq() -> str:
     quarantine_output_path = config["quarantine_output_path"]
     dq_report_file = config["dq_report_file"]
     storage_format = get_storage_format(config)
+    write_strategy = get_lakehouse_write_strategy(config)
 
     spark = get_spark_session("PySparkSilverDQ")
 
@@ -189,24 +196,33 @@ def run_pyspark_silver_dq() -> str:
 
         dq_final_status = evaluate_dq_status(rule_summary)
 
-        write_lakehouse_table(
+        silver_write_status = write_or_merge_lakehouse_table(
+            spark=spark,
             df=valid_df,
             output_path=silver_output_path,
             storage_format=storage_format,
-            mode="overwrite",
+            write_strategy=write_strategy,
+            merge_keys=config["silver_merge_keys"],
         )
 
-        write_lakehouse_table(
+        quarantine_write_status = write_or_merge_lakehouse_table(
+            spark=spark,
             df=quarantine_df,
             output_path=quarantine_output_path,
             storage_format=storage_format,
-            mode="overwrite",
+            write_strategy=write_strategy,
+            merge_keys=config["quarantine_merge_keys"],
         )
 
         if storage_format == "delta":
             assert_delta_table_exists(
                 table_path=silver_output_path,
                 table_name="Silver customers",
+            )
+
+            assert_delta_table_exists(
+                table_path=quarantine_output_path,
+                table_name="Quarantine customers",
             )
 
         write_dq_report(
@@ -224,12 +240,14 @@ def run_pyspark_silver_dq() -> str:
         print(f"Quarantined rows: {quarantined_rows}")
         print(f"DQ Final Status: {dq_final_status}")
         print(
-            f"Silver valid records written at: "
-            f"{silver_output_path} using format={storage_format}"
+            f"Silver valid records {silver_write_status} at: "
+            f"{silver_output_path} using format={storage_format}, "
+            f"strategy={write_strategy}"
         )
         print(
-            f"Quarantine records written at: "
-            f"{quarantine_output_path} using format={storage_format}"
+            f"Quarantine records {quarantine_write_status} at: "
+            f"{quarantine_output_path} using format={storage_format}, "
+            f"strategy={write_strategy}"
         )
         print(f"DQ report written at: {dq_report_file}")
 

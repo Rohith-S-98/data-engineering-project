@@ -2,6 +2,7 @@
   "environment": "local",
   "dataset_name": "customers",
   "storage_format": "delta",
+  "lakehouse_write_strategy": "merge",
 
   "watermark_column": "created_date",
 
@@ -10,6 +11,10 @@
   "dirty_raw_data_file": "data/raw/customer_data_dirty.csv",
 
   "dq_rules_file": "config/rules/customer_dq_rules.json",
+
+  "bronze_schema_contract": "configs/schema_contracts/bronze_customers_schema.json",
+  "silver_schema_contract": "configs/schema_contracts/silver_customers_schema.json",
+  "schema_validation_audit_file": "data/audit/schema_validation_audit.jsonl",
 
   "bronze_output_path": "data/bronze/customer_bronze",
   "silver_output_path": "data/silver/customer_valid",
@@ -21,10 +26,11 @@
 
   "audit_log_file": "output/audit/pipeline_runs.csv",
 
-  "bronze_schema_contract": "configs/schema_contracts/bronze_customers_schema.json",
-  "silver_schema_contract": "configs/schema_contracts/silver_customers_schema.json",
-  "schema_validation_audit_file": "data/audit/schema_validation_audit.jsonl",
-
   "watermark_store_file": "data/audit/watermark_store.json",
-  "pending_watermark_file": "data/audit/pending_watermark_updates.json"
+  "pending_watermark_file": "data/audit/pending_watermark_updates.json",
+
+  "bronze_merge_keys": ["customer_id"],
+  "silver_merge_keys": ["customer_id"],
+  "quarantine_merge_keys": ["customer_id"],
+  "gold_merge_keys": ["source_system", "source_id"]
 }
