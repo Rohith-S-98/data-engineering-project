@@ -6,6 +6,7 @@ REQUIRED_KEYS = [
     "environment",
     "dataset_name",
     "storage_format",
+    "lakehouse_write_strategy",
 
     "raw_data_file",
     "dq_rules_file",
@@ -27,10 +28,44 @@ REQUIRED_KEYS = [
     "watermark_column",
     "watermark_store_file",
     "pending_watermark_file",
+
+    "bronze_merge_keys",
+    "silver_merge_keys",
+    "quarantine_merge_keys",
+    "gold_merge_keys",
 ]
 
 
 SUPPORTED_STORAGE_FORMATS = {"parquet", "delta"}
+SUPPORTED_WRITE_STRATEGIES = {"overwrite", "merge"}
+
+
+def _validate_merge_keys(config: dict) -> None:
+    merge_key_configs = [
+        "bronze_merge_keys",
+        "silver_merge_keys",
+        "quarantine_merge_keys",
+        "gold_merge_keys",
+    ]
+
+    for key_config in merge_key_configs:
+        merge_keys = config[key_config]
+
+        if not isinstance(merge_keys, list) or not merge_keys:
+            raise ValueError(
+                f"{key_config} must be a non-empty list of column names"
+            )
+
+        invalid_keys = [
+            key
+            for key in merge_keys
+            if not isinstance(key, str) or not key.strip()
+        ]
+
+        if invalid_keys:
+            raise ValueError(
+                f"{key_config} contains invalid merge keys: {invalid_keys}"
+            )
 
 
 def load_pipeline_config(
@@ -41,7 +76,7 @@ def load_pipeline_config(
 
     Raises:
         ValueError: If the config file is missing, required keys are absent,
-        or unsupported storage format is configured.
+        unsupported storage/write strategy is configured, or merge keys are invalid.
     """
 
     config_file = Path(config_path)
@@ -60,6 +95,7 @@ def load_pipeline_config(
         )
 
     storage_format = str(config["storage_format"]).lower()
+    write_strategy = str(config["lakehouse_write_strategy"]).lower()
 
     if storage_format not in SUPPORTED_STORAGE_FORMATS:
         raise ValueError(
@@ -67,6 +103,21 @@ def load_pipeline_config(
             f"Supported values: {sorted(SUPPORTED_STORAGE_FORMATS)}"
         )
 
+    if write_strategy not in SUPPORTED_WRITE_STRATEGIES:
+        raise ValueError(
+            f"Unsupported lakehouse_write_strategy: {write_strategy}. "
+            f"Supported values: {sorted(SUPPORTED_WRITE_STRATEGIES)}"
+        )
+
+    if write_strategy == "merge" and storage_format != "delta":
+        raise ValueError(
+            "lakehouse_write_strategy='merge' is supported only when "
+            "storage_format='delta'"
+        )
+
     config["storage_format"] = storage_format
+    config["lakehouse_write_strategy"] = write_strategy
+
+    _validate_merge_keys(config)
 
     return config

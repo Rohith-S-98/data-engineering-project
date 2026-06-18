@@ -4,6 +4,8 @@ from pathlib import Path
 
 from scripts.lakehouse_io import (
     assert_delta_table_exists,
+    build_merge_condition,
+    get_lakehouse_write_strategy,
     get_storage_format,
     is_delta_table_path,
 )
@@ -24,6 +26,20 @@ class TestLakehouseIO(unittest.TestCase):
         result = get_storage_format(config)
 
         self.assertEqual(result, "delta")
+
+    def test_get_lakehouse_write_strategy_defaults_to_overwrite(self):
+        config = {}
+
+        result = get_lakehouse_write_strategy(config)
+
+        self.assertEqual(result, "overwrite")
+
+    def test_get_lakehouse_write_strategy_returns_lowercase_value(self):
+        config = {"lakehouse_write_strategy": "MERGE"}
+
+        result = get_lakehouse_write_strategy(config)
+
+        self.assertEqual(result, "merge")
 
     def test_is_delta_table_path_returns_true_when_delta_log_exists(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -55,6 +71,41 @@ class TestLakehouseIO(unittest.TestCase):
                 "Expected _delta_log folder was not found",
                 str(context.exception),
             )
+
+    def test_build_merge_condition_for_single_key(self):
+        result = build_merge_condition(["customer_id"])
+
+        self.assertEqual(
+            result,
+            "target.customer_id = source.customer_id",
+        )
+
+    def test_build_merge_condition_for_multiple_keys(self):
+        result = build_merge_condition(["source_system", "source_id"])
+
+        self.assertEqual(
+            result,
+            "target.source_system = source.source_system "
+            "AND target.source_id = source.source_id",
+        )
+
+    def test_build_merge_condition_fails_for_empty_keys(self):
+        with self.assertRaises(ValueError) as context:
+            build_merge_condition([])
+
+        self.assertIn(
+            "merge_keys must contain at least one column",
+            str(context.exception),
+        )
+
+    def test_build_merge_condition_fails_for_invalid_key(self):
+        with self.assertRaises(ValueError) as context:
+            build_merge_condition(["customer_id", ""])
+
+        self.assertIn(
+            "Invalid merge keys",
+            str(context.exception),
+        )
 
 
 if __name__ == "__main__":

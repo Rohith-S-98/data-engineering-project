@@ -86,6 +86,81 @@ class TestPipelineConfig(unittest.TestCase):
             if temp_config_file:
                 Path(temp_config_file).unlink(missing_ok=True)
 
+    def test_load_pipeline_config_fails_for_unsupported_write_strategy(self):
+        config = {
+            key: "dummy_value"
+            for key in REQUIRED_KEYS
+        }
+
+        config["storage_format"] = "delta"
+        config["lakehouse_write_strategy"] = "append"
+
+        config["bronze_merge_keys"] = ["customer_id"]
+        config["silver_merge_keys"] = ["customer_id"]
+        config["quarantine_merge_keys"] = ["customer_id"]
+        config["gold_merge_keys"] = ["source_system", "source_id"]
+
+        temp_config_file = None
+
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                suffix=".json",
+                delete=False,
+                encoding="utf-8",
+            ) as temp_file:
+                json.dump(config, temp_file)
+                temp_config_file = temp_file.name
+
+            with self.assertRaises(ValueError) as context:
+                load_pipeline_config(temp_config_file)
+
+            self.assertIn(
+                "Unsupported lakehouse_write_strategy",
+                str(context.exception),
+            )
+
+        finally:
+            if temp_config_file:
+                Path(temp_config_file).unlink(missing_ok=True)
+
+    def test_load_pipeline_config_fails_when_merge_keys_are_invalid(self):
+        config = {
+            key: "dummy_value"
+            for key in REQUIRED_KEYS
+        }
+
+        config["storage_format"] = "delta"
+        config["lakehouse_write_strategy"] = "merge"
+
+        config["bronze_merge_keys"] = []
+        config["silver_merge_keys"] = ["customer_id"]
+        config["quarantine_merge_keys"] = ["customer_id"]
+        config["gold_merge_keys"] = ["source_system", "source_id"]
+
+        temp_config_file = None
+
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                suffix=".json",
+                delete=False,
+                encoding="utf-8",
+            ) as temp_file:
+                json.dump(config, temp_file)
+                temp_config_file = temp_file.name
+
+            with self.assertRaises(ValueError) as context:
+                load_pipeline_config(temp_config_file)
+
+            self.assertIn(
+                "bronze_merge_keys must be a non-empty list",
+                str(context.exception),
+            )
+
+        finally:
+            if temp_config_file:
+                Path(temp_config_file).unlink(missing_ok=True)
 
 if __name__ == "__main__":
     unittest.main()

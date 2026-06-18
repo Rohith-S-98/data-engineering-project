@@ -10,3 +10,11 @@ c15180fa-79e8-4d9a-9eb1-037c1fa514c9,pyspark_customer_medallion_pipeline,local,2
 2e964df9-6673-4843-beb2-9012707cc351,pyspark_customer_medallion_pipeline,local,2026-06-17T18:59:06,2026-06-17T18:59:52,SUCCESS,
 35057b03-7810-412a-8ec2-c23ff24bef3a,pyspark_customer_medallion_pipeline,local,2026-06-17T19:39:26,2026-06-17T19:40:04,SUCCESS,
 d7d9744a-3fed-47ed-a955-64fa0d9b06d5,pyspark_customer_medallion_pipeline,local,2026-06-17T19:58:48,2026-06-17T19:59:23,SUCCESS,
+bd8fb40c-af9c-4e46-bc86-c8196f4d7c5e,pyspark_customer_medallion_pipeline,local,2026-06-18T19:03:41,2026-06-18T19:03:59,FAILED,[PATH_NOT_FOUND] Path does not exist: data/bronze/customer_bronze. SQLSTATE: 42K03
+c1a8340a-06b2-4575-aa07-b7a5f3e6454b,pyspark_customer_medallion_pipeline,local,2026-06-18T19:13:47,2026-06-18T19:14:23,SUCCESS,
+3b11a7b8-c789-4be7-a50c-40c99586ab70,pyspark_customer_medallion_pipeline,local,2026-06-18T19:15:46,2026-06-18T19:16:22,SUCCESS,
+653ef256-6783-43cd-adde-a1740c7ea107,pyspark_customer_medallion_pipeline,local,2026-06-18T19:16:41,2026-06-18T19:17:20,SUCCESS,
+b329854b-332f-400c-b8c0-7104ccc7548a,pyspark_customer_medallion_pipeline,local,2026-06-18T19:18:57,2026-06-18T19:19:37,SUCCESS,
+dddc711e-22d2-49ef-844a-9de631b68073,pyspark_customer_medallion_pipeline,local,2026-06-18T19:19:37,2026-06-18T19:20:20,SUCCESS,
+37aa50b6-8866-48fc-a6d9-f796b41f7b29,pyspark_customer_medallion_pipeline,local,2026-06-18T19:22:15,2026-06-18T19:22:50,SUCCESS,
+5d2c46a6-6cde-42ea-92c2-94c5ed8289d0,pyspark_customer_medallion_pipeline,local,2026-06-18T19:22:51,2026-06-18T19:23:30,SUCCESS,

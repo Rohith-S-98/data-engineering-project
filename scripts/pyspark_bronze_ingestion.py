@@ -3,8 +3,9 @@ from pathlib import Path
 from scripts.create_sample_data import create_raw_customer_data
 from scripts.lakehouse_io import (
     assert_delta_table_exists,
+    get_lakehouse_write_strategy,
     get_storage_format,
-    write_lakehouse_table,
+    write_or_merge_lakehouse_table,
 )
 from scripts.pipeline_config import load_pipeline_config
 from scripts.schema_validation_framework import (
@@ -31,10 +32,14 @@ def run_bronze_ingestion() -> None:
     dataset_name = config["dataset_name"]
     watermark_column = config["watermark_column"]
     storage_format = get_storage_format(config)
+    write_strategy = get_lakehouse_write_strategy(config)
 
     if not raw_data_file.exists():
-        print("Raw data file not found. Creating clean sample data...")
-        create_raw_customer_data(use_dirty_data=False)
+        print("Raw data file not found. Creating sample data...")
+        try:
+            create_raw_customer_data(use_dirty_data=False)
+        except TypeError:
+            create_raw_customer_data()
 
     spark = get_spark_session("PySparkBronzeIngestion")
 
@@ -78,11 +83,13 @@ def run_bronze_ingestion() -> None:
         print("Incremental Bronze DataFrame preview:")
         incremental_df.show(truncate=False)
 
-        write_lakehouse_table(
+        bronze_write_status = write_or_merge_lakehouse_table(
+            spark=spark,
             df=incremental_df,
             output_path=bronze_output_path,
             storage_format=storage_format,
-            mode="overwrite",
+            write_strategy=write_strategy,
+            merge_keys=config["bronze_merge_keys"],
         )
 
         if storage_format == "delta":
@@ -92,8 +99,9 @@ def run_bronze_ingestion() -> None:
             )
 
         print(
-            f"Bronze data written successfully at: "
-            f"{bronze_output_path} using format={storage_format}"
+            f"Bronze data {bronze_write_status} successfully at: "
+            f"{bronze_output_path} using format={storage_format}, "
+            f"strategy={write_strategy}"
         )
 
         new_watermark = get_max_watermark_value(
@@ -101,13 +109,16 @@ def run_bronze_ingestion() -> None:
             watermark_column=watermark_column,
         )
 
-        stage_watermark_update(
-            dataset=dataset_name,
-            watermark_column=watermark_column,
-            previous_watermark=last_watermark,
-            new_watermark=new_watermark,
-            pending_watermark_path=config["pending_watermark_file"],
-        )
+        if new_watermark is not None:
+            stage_watermark_update(
+                dataset=dataset_name,
+                watermark_column=watermark_column,
+                previous_watermark=last_watermark,
+                new_watermark=new_watermark,
+                pending_watermark_path=config["pending_watermark_file"],
+            )
+        else:
+            print("No new watermark staged because no incremental records were found.")
 
     finally:
         spark.stop()
