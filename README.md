@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v14.0.0
+Current Version: v15.0.0
 ```
 
 ---
@@ -465,4 +465,52 @@ Documentation:
 
 ```text
 docs/v14_pipeline_orchestration_job_control.md
+```
+
+---
+
+## V15.0.0 - Scheduling, Dependency Management, and Runtime Parameterization
+
+V15 upgrades the V14 config-driven orchestrator with runtime parameters, dependency validation, dry-run support, and schedule metadata.
+
+### V15 Highlights
+
+- Added runtime parameter defaults.
+- Added manual, scheduled, and backfill run modes.
+- Added dry-run execution mode.
+- Added step dependency metadata.
+- Added dependency validation before execution.
+- Added schedule metadata for local portfolio simulation.
+- Added runtime parameter snapshots for each orchestrated job run.
+
+### V15 Run Commands
+
+Manual run:
+
+```bash
+python -m scripts.pipeline_orchestrator --run-mode manual --run-date 2026-06-23
+```
+
+Dry run:
+
+```bash
+python -m scripts.pipeline_orchestrator --run-mode manual --run-date 2026-06-23 --dry-run
+```
+
+Backfill-mode simulation:
+
+```bash
+python -m scripts.pipeline_orchestrator --run-mode backfill --backfill-start-date 2026-06-16 --backfill-end-date 2026-06-17
+```
+
+### V15 Runtime Outputs
+
+```text
+output/runtime_parameters/runtime_parameters_<job_run_id>.json
+```
+
+Documentation:
+
+```text
+docs/v15_scheduling_dependency_runtime_parameters.md
 ```

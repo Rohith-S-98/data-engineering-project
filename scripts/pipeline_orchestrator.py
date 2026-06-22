@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import importlib
 import json
 import sys
@@ -16,6 +17,12 @@ from scripts.job_control import (
     update_step_run,
 )
 from scripts.pipeline_config import load_pipeline_config
+from scripts.runtime_parameters import (
+    load_default_runtime_parameters,
+    merge_runtime_parameters,
+    save_runtime_parameters_snapshot,
+    validate_runtime_parameters,
+)
 
 DEFAULT_JOB_CONFIG_PATH = "config/jobs/customer_medallion_job.json"
 
@@ -30,8 +37,8 @@ def load_job_config(job_config_path: str = DEFAULT_JOB_CONFIG_PATH) -> dict[str,
         job_config = json.load(file)
 
     required_keys = ["job_name", "environment", "steps"]
-
     missing_keys = [key for key in required_keys if key not in job_config]
+
     if missing_keys:
         raise ValueError(f"Missing required job config keys: {missing_keys}")
 
@@ -40,9 +47,7 @@ def load_job_config(job_config_path: str = DEFAULT_JOB_CONFIG_PATH) -> dict[str,
 
     for step in job_config["steps"]:
         required_step_keys = ["step_id", "step_name", "module", "function"]
-        missing_step_keys = [
-            key for key in required_step_keys if key not in step
-        ]
+        missing_step_keys = [key for key in required_step_keys if key not in step]
 
         if missing_step_keys:
             raise ValueError(
@@ -95,7 +100,6 @@ def _resolve_step_kwargs(
     pipeline_config: dict[str, Any],
 ) -> dict[str, Any]:
     kwargs = dict(step_config.get("kwargs", {}))
-
     kwargs_from_config = step_config.get("kwargs_from_config", {})
 
     for argument_name, config_key in kwargs_from_config.items():
@@ -114,12 +118,53 @@ def _sort_steps(steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(steps, key=lambda step: int(step["step_id"]))
 
 
+def _dependency_token(depends_on_item: Any) -> str:
+    return str(depends_on_item).strip()
+
+
+def _get_unmet_dependencies(
+    step_config: dict[str, Any],
+    successful_step_ids: set[str],
+    successful_step_names: set[str],
+) -> list[str]:
+    unmet_dependencies: list[str] = []
+
+    for dependency in step_config.get("depends_on", []):
+        dependency_name = _dependency_token(dependency)
+
+        if (
+            dependency_name not in successful_step_ids
+            and dependency_name not in successful_step_names
+        ):
+            unmet_dependencies.append(dependency_name)
+
+    return unmet_dependencies
+
+
+def _build_runtime_parameters(
+    job_config: dict[str, Any],
+    runtime_parameters: dict[str, Any] | None,
+) -> dict[str, Any]:
+    default_parameters = load_default_runtime_parameters()
+    job_default_parameters = job_config.get("runtime_parameters", {})
+
+    merged_parameters = merge_runtime_parameters(
+        default_parameters,
+        job_default_parameters,
+        runtime_parameters,
+    )
+
+    return validate_runtime_parameters(merged_parameters)
+
+
 def run_pipeline_orchestrator(
     job_config_path: str = DEFAULT_JOB_CONFIG_PATH,
     raise_on_failure: bool = True,
+    runtime_parameters: dict[str, Any] | None = None,
 ) -> str:
     job_config = load_job_config(job_config_path)
     pipeline_config = load_pipeline_config()
+    runtime_parameters = _build_runtime_parameters(job_config, runtime_parameters)
 
     job_name = job_config["job_name"]
     environment = job_config.get("environment", pipeline_config["environment"])
@@ -127,7 +172,7 @@ def run_pipeline_orchestrator(
     step_run_log_file = job_config.get("step_run_log_file", DEFAULT_STEP_RUN_LOG_FILE)
     continue_on_optional_step_failure = job_config.get(
         "continue_on_optional_step_failure",
-        True,
+        runtime_parameters.get("allow_optional_step_failure", True),
     )
 
     steps = _sort_steps(job_config["steps"])
@@ -137,17 +182,27 @@ def run_pipeline_orchestrator(
     skipped_steps = 0
     final_status = "SUCCESS"
     error_message = ""
+    successful_step_ids: set[str] = set()
+    successful_step_names: set[str] = set()
 
     job_run_id = create_job_run(
         job_name=job_name,
         environment=environment,
         job_run_log_file=job_run_log_file,
     )
+    runtime_snapshot_file = save_runtime_parameters_snapshot(
+        job_run_id=job_run_id,
+        parameters=runtime_parameters,
+    )
 
     print("=" * 70)
-    print("Starting V14 Pipeline Orchestration Job")
+    print("Starting V15 Pipeline Orchestration Job")
     print(f"Job Name: {job_name}")
     print(f"Job Run ID: {job_run_id}")
+    print(f"Run Mode: {runtime_parameters['run_mode']}")
+    print(f"Run Date: {runtime_parameters.get('run_date')}")
+    print(f"Dry Run : {runtime_parameters['dry_run']}")
+    print(f"Runtime Parameters: {runtime_snapshot_file}")
     print("=" * 70)
 
     for step_config in steps:
@@ -155,11 +210,13 @@ def run_pipeline_orchestrator(
         step_name = step_config["step_name"]
         enabled = step_config.get("enabled", True)
         critical = step_config.get("critical", True)
+        depends_on = step_config.get("depends_on", [])
 
         print("\n" + "-" * 70)
         print(f"Step {step_id}: {step_name}")
-        print(f"Enabled : {enabled}")
-        print(f"Critical: {critical}")
+        print(f"Enabled     : {enabled}")
+        print(f"Critical    : {critical}")
+        print(f"Depends On  : {depends_on}")
         print("-" * 70)
 
         create_step_run(
@@ -175,11 +232,59 @@ def run_pipeline_orchestrator(
                 job_run_id=job_run_id,
                 step_id=step_id,
                 status="SKIPPED",
-                result_status="SKIPPED",
+                result_status="DISABLED",
                 step_run_log_file=step_run_log_file,
             )
 
-            print(f"Step skipped: {step_name}")
+            print(f"Step skipped because it is disabled: {step_name}")
+            continue
+
+        unmet_dependencies = _get_unmet_dependencies(
+            step_config=step_config,
+            successful_step_ids=successful_step_ids,
+            successful_step_names=successful_step_names,
+        )
+
+        if unmet_dependencies:
+            dependency_message = (
+                f"Step '{step_name}' has unmet dependencies: {unmet_dependencies}"
+            )
+            skipped_steps += 1
+            error_message = dependency_message
+
+            update_step_run(
+                job_run_id=job_run_id,
+                step_id=step_id,
+                status="SKIPPED",
+                result_status="DEPENDENCY_NOT_MET",
+                error_message=dependency_message,
+                step_run_log_file=step_run_log_file,
+            )
+
+            print(dependency_message)
+
+            if critical:
+                final_status = "FAILED"
+                failed_steps += 1
+                break
+
+            final_status = "SUCCESS_WITH_WARNINGS"
+            continue
+
+        if runtime_parameters["dry_run"]:
+            successful_steps += 1
+            successful_step_ids.add(str(step_id))
+            successful_step_names.add(step_name)
+
+            update_step_run(
+                job_run_id=job_run_id,
+                step_id=step_id,
+                status="DRY_RUN",
+                result_status="DRY_RUN",
+                step_run_log_file=step_run_log_file,
+            )
+
+            print(f"Dry run only. Step was not executed: {step_name}")
             continue
 
         try:
@@ -210,6 +315,8 @@ def run_pipeline_orchestrator(
                 )
 
             successful_steps += 1
+            successful_step_ids.add(str(step_id))
+            successful_step_names.add(step_name)
 
             update_step_run(
                 job_run_id=job_run_id,
@@ -257,7 +364,7 @@ def run_pipeline_orchestrator(
     )
 
     print("\n" + "=" * 70)
-    print("V14 Pipeline Orchestration Job Completed")
+    print("V15 Pipeline Orchestration Job Completed")
     print(f"Final Status    : {final_status}")
     print(f"Total Steps     : {total_steps}")
     print(f"Successful Steps: {successful_steps}")
@@ -267,12 +374,81 @@ def run_pipeline_orchestrator(
 
     if final_status == "FAILED" and raise_on_failure:
         raise PipelineExecutionError(
-            f"V14 orchestrated job failed: {error_message}"
+            f"V15 orchestrated job failed: {error_message}"
         ) from None
 
     return final_status
 
 
+def _parse_cli_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Run the V15 config-driven pipeline orchestrator."
+    )
+    parser.add_argument(
+        "--job-config-path",
+        default=DEFAULT_JOB_CONFIG_PATH,
+        help="Path to the orchestration job config JSON file.",
+    )
+    parser.add_argument(
+        "--run-mode",
+        choices=["manual", "scheduled", "backfill"],
+        default=None,
+        help="Runtime execution mode.",
+    )
+    parser.add_argument(
+        "--run-date",
+        default=None,
+        help="Logical run date in YYYY-MM-DD format.",
+    )
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Validate dependency order and runtime parameters without executing steps.",
+    )
+    parser.add_argument(
+        "--backfill-start-date",
+        default=None,
+        help="Backfill start date in YYYY-MM-DD format.",
+    )
+    parser.add_argument(
+        "--backfill-end-date",
+        default=None,
+        help="Backfill end date in YYYY-MM-DD format.",
+    )
+    parser.add_argument(
+        "--triggered-by",
+        default=None,
+        help="User, system, or scheduler identity that triggered the run.",
+    )
+
+    return parser.parse_args()
+
+
+def _runtime_parameters_from_args(args: argparse.Namespace) -> dict[str, Any]:
+    parameters: dict[str, Any] = {}
+
+    for key in [
+        "run_mode",
+        "run_date",
+        "backfill_start_date",
+        "backfill_end_date",
+        "triggered_by",
+    ]:
+        value = getattr(args, key)
+        if value is not None:
+            parameters[key] = value
+
+    if args.dry_run:
+        parameters["dry_run"] = True
+
+    return parameters
+
+
 if __name__ == "__main__":
-    status = run_pipeline_orchestrator(raise_on_failure=False)
+    cli_args = _parse_cli_args()
+    status = run_pipeline_orchestrator(
+        job_config_path=cli_args.job_config_path,
+        raise_on_failure=False,
+        runtime_parameters=_runtime_parameters_from_args(cli_args),
+    )
     sys.exit(0 if status in {"SUCCESS", "SUCCESS_WITH_WARNINGS"} else 1)

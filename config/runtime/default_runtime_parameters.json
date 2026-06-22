@@ -1,0 +1,9 @@
+{
+  "run_mode": "manual",
+  "run_date": null,
+  "dry_run": false,
+  "backfill_start_date": null,
+  "backfill_end_date": null,
+  "triggered_by": "local_cli",
+  "allow_optional_step_failure": true
+}

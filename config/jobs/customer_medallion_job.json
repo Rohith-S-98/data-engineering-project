@@ -1,69 +1,125 @@
 {
-  "job_name": "customer_medallion_orchestration_job",
-  "environment": "local",
-  "description": "Config-driven orchestration job for the customer medallion pipeline.",
-  "job_run_log_file": "output/job_control/job_runs.csv",
-  "step_run_log_file": "output/job_control/step_runs.csv",
-  "continue_on_optional_step_failure": true,
-  "steps": [
-    {
-      "step_id": 1,
-      "step_name": "bronze_ingestion",
-      "module": "scripts.pyspark_bronze_ingestion",
-      "function": "run_bronze_ingestion",
-      "enabled": true,
-      "critical": true,
-      "expected_success_statuses": ["SUCCESS", null]
+    "job_name": "customer_medallion_orchestration_job",
+    "environment": "local",
+    "description": "Config-driven orchestration job for the customer medallion pipeline with V15 runtime parameters, dependency metadata, and schedule metadata.",
+    "job_run_log_file": "output/job_control/job_runs.csv",
+    "step_run_log_file": "output/job_control/step_runs.csv",
+    "continue_on_optional_step_failure": true,
+    "steps": [
+        {
+            "step_id": 1,
+            "step_name": "bronze_ingestion",
+            "module": "scripts.pyspark_bronze_ingestion",
+            "function": "run_bronze_ingestion",
+            "enabled": true,
+            "critical": true,
+            "expected_success_statuses": [
+                "SUCCESS",
+                null
+            ],
+            "depends_on": [],
+            "allow_dry_run": true
+        },
+        {
+            "step_id": 2,
+            "step_name": "silver_dq_validation",
+            "module": "scripts.pyspark_silver_dq",
+            "function": "run_pyspark_silver_dq",
+            "enabled": true,
+            "critical": true,
+            "expected_success_statuses": [
+                "SUCCESS"
+            ],
+            "depends_on": [
+                "bronze_ingestion"
+            ],
+            "allow_dry_run": true
+        },
+        {
+            "step_id": 3,
+            "step_name": "customer_history_scd2",
+            "module": "scripts.pyspark_customer_history_scd2",
+            "function": "run_customer_history_scd2",
+            "enabled": true,
+            "critical": true,
+            "expected_success_statuses": [
+                "SUCCESS",
+                null
+            ],
+            "depends_on": [
+                "silver_dq_validation"
+            ],
+            "allow_dry_run": true
+        },
+        {
+            "step_id": 4,
+            "step_name": "gold_canonical_transformation",
+            "module": "scripts.pyspark_gold_canonical",
+            "function": "run_pyspark_gold_canonical",
+            "enabled": true,
+            "critical": true,
+            "expected_success_statuses": [
+                "SUCCESS",
+                null
+            ],
+            "depends_on": [
+                "customer_history_scd2"
+            ],
+            "allow_dry_run": true
+        },
+        {
+            "step_id": 5,
+            "step_name": "commit_watermark",
+            "module": "scripts.watermark_manager",
+            "function": "commit_staged_watermark_update",
+            "enabled": true,
+            "critical": true,
+            "expected_success_statuses": [
+                "SUCCESS",
+                null
+            ],
+            "kwargs_from_config": {
+                "dataset": "dataset_name",
+                "watermark_store_path": "watermark_store_file",
+                "pending_watermark_path": "pending_watermark_file"
+            },
+            "depends_on": [
+                "gold_canonical_transformation"
+            ],
+            "allow_dry_run": true
+        },
+        {
+            "step_id": 6,
+            "step_name": "pipeline_observability",
+            "module": "scripts.pipeline_observability",
+            "function": "run_pipeline_observability",
+            "enabled": true,
+            "critical": false,
+            "expected_success_statuses": [
+                "SUCCESS",
+                "SKIPPED"
+            ],
+            "depends_on": [
+                "commit_watermark"
+            ],
+            "allow_dry_run": true
+        }
+    ],
+    "version": "v15.0.0",
+    "schedule": {
+        "schedule_name": "customer_medallion_daily_schedule",
+        "enabled": false,
+        "timezone": "Asia/Kolkata",
+        "cron_expression": "0 6 * * *",
+        "description": "Metadata-only schedule used for local portfolio simulation."
     },
-    {
-      "step_id": 2,
-      "step_name": "silver_dq_validation",
-      "module": "scripts.pyspark_silver_dq",
-      "function": "run_pyspark_silver_dq",
-      "enabled": true,
-      "critical": true,
-      "expected_success_statuses": ["SUCCESS"]
-    },
-    {
-      "step_id": 3,
-      "step_name": "customer_history_scd2",
-      "module": "scripts.pyspark_customer_history_scd2",
-      "function": "run_customer_history_scd2",
-      "enabled": true,
-      "critical": true,
-      "expected_success_statuses": ["SUCCESS", null]
-    },
-    {
-      "step_id": 4,
-      "step_name": "gold_canonical_transformation",
-      "module": "scripts.pyspark_gold_canonical",
-      "function": "run_pyspark_gold_canonical",
-      "enabled": true,
-      "critical": true,
-      "expected_success_statuses": ["SUCCESS", null]
-    },
-    {
-      "step_id": 5,
-      "step_name": "commit_watermark",
-      "module": "scripts.watermark_manager",
-      "function": "commit_staged_watermark_update",
-      "enabled": true,
-      "critical": true,
-      "expected_success_statuses": ["SUCCESS", null],
-      "kwargs_from_config": {
-        "dataset": "dataset_name",
-        "watermark_store_path": "watermark_store_file",
-        "pending_watermark_path": "pending_watermark_file"
-      }
-    },
-    {
-      "step_id": 6,
-      "step_name": "pipeline_observability",
-      "module": "scripts.pipeline_observability",
-      "function": "run_pipeline_observability",
-      "enabled": true,
-      "critical": false,
-      "expected_success_statuses": ["SUCCESS", "SKIPPED"]
+    "runtime_parameters": {
+        "run_mode": "manual",
+        "run_date": null,
+        "dry_run": false,
+        "backfill_start_date": null,
+        "backfill_end_date": null,
+        "triggered_by": "local_cli",
+        "allow_optional_step_failure": true
     }
-  ]
 }
