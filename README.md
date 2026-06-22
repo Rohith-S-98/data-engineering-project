@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v13.0.2
+Current Version: v14.0.0
 ```
 
 ---
@@ -29,6 +29,7 @@ Current Version: v13.0.2
 | v12.0.0 | SCD Type 2 / Historical Dimension Tracking |
 | v13.0.0 | Data Observability + Pipeline Metrics Mart |
 | v13.0.1 | Pre-V14 repository review and roadmap handoff cleanup |
+| v13.0.2 | Markdown formatting cleanup before V14 |
 
 ---
 
@@ -56,6 +57,8 @@ Commit Watermark After Success
 Pipeline Audit Update
 ↓
 V13 Observability Metrics Mart
+↓
+V14 Job Orchestration + Job Control
 ```
 
 ---
@@ -229,6 +232,7 @@ Important current config keys:
 ```text
 data-engineering-project/
 ├── .github/workflows/python-ci.yml
+├── config/jobs/customer_medallion_job.json
 ├── config/pipeline/local_config.json
 ├── config/rules/customer_dq_rules.json
 ├── configs/schema_contracts/bronze_customers_schema.json
@@ -241,17 +245,23 @@ data-engineering-project/
 ├── docs/12_month_data_engineering_roadmap_progress.md
 ├── docs/v12_scd_type2_historical_tracking.md
 ├── docs/v13_data_observability_metrics.md
+├── docs/v14_pipeline_orchestration_job_control.md
 ├── output/audit/
 ├── output/dq_reports/
 ├── output/quarantine/
 ├── output/logs/
 ├── output/observability/
+├── output/job_control/
 ├── output/reltio_payloads/
+├── scripts/job_control.py
 ├── scripts/metrics_collector.py
 ├── scripts/pipeline_observability.py
+├── scripts/pipeline_orchestrator.py
 ├── scripts/pyspark_pipeline_runner.py
 ├── scripts/pyspark_customer_history_scd2.py
+├── tests/test_job_control.py
 ├── tests/test_metrics_collector.py
+├── tests/test_pipeline_orchestrator.py
 ├── tests/test_scd_type2.py
 ├── main.py
 ├── requirements.txt
@@ -279,6 +289,12 @@ Create clean sample data:
 
 ```bash
 python -m scripts.create_sample_data
+```
+
+Run the V14 orchestrator:
+
+```bash
+python -m scripts.pipeline_orchestrator
 ```
 
 Run the full PySpark pipeline:
@@ -380,7 +396,7 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ## Future Enhancements
 
-- Pipeline orchestration and job control
+- Scheduling, dependency management, and runtime parameterization
 - API ingestion source
 - Database ingestion source
 - Great Expectations-style checks
@@ -388,3 +404,65 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Docker support
 - Databricks Asset Bundle structure
 - Deployment documentation
+
+## V14.0.0 - Pipeline Orchestration + Job Control Framework
+
+V14 adds a config-driven orchestration and job-control layer on top of the existing PySpark medallion pipeline.
+
+### V14 Highlights
+
+- Added job-level orchestration configuration.
+- Added step-level execution control.
+- Added enabled/disabled step handling.
+- Added critical vs optional step handling.
+- Added expected status validation.
+- Added job run audit logging.
+- Added step run audit logging.
+- Added observability as an orchestrated pipeline step.
+
+### V14 Runtime Outputs
+
+```text
+output/job_control/job_runs.csv
+output/job_control/step_runs.csv
+```
+
+### V14 Run Command
+
+```bash
+python -m scripts.pipeline_orchestrator
+```
+
+### V14 Orchestrated Flow
+
+```text
+Bronze Ingestion
+↓
+Silver DQ Validation
+↓
+Customer History SCD Type 2
+↓
+Gold Canonical Transformation
+↓
+Commit Watermark
+↓
+Pipeline Observability
+```
+
+### V14 Verification
+
+```text
+V14 unit tests: OK
+Full test suite: expected OK
+Orchestrator status: SUCCESS
+Total steps: 6
+Successful steps: 6
+Failed steps: 0
+Skipped steps: 0
+```
+
+Documentation:
+
+```text
+docs/v14_pipeline_orchestration_job_control.md
+```
