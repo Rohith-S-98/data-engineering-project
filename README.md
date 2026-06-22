@@ -1,30 +1,32 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python and PySpark. It demonstrates how customer data can be generated, ingested, validated, separated into valid and quarantined records, transformed into a canonical model, and exported as downstream-ready Reltio-style JSON output.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, and production-style framework patterns.
 
-The project is inspired by real enterprise workflows such as medallion architecture, config-driven data quality, schema validation, incremental loading, audit tracking, exception handling, and MDM-style payload generation.
+It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, and exported as downstream-ready Reltio-style JSON output.
 
----
+```text
+Current Version: v12.0.0
 ```
-Current Version: v11.0.0
-```
+
 ---
 
 ## Project Versions
 
 | Version | Feature |
 |---|---|
+| v0.0.0 | Project foundation and local repository setup |
 | v1.0.0 | Python config-driven DQ pipeline |
 | v2.0.0 | PySpark Bronze/Silver/Gold medallion pipeline |
-| v3.0.0 | Databricks-style documentation and interview explanation |
+| v3.0.0 | Databricks-style documentation and notebook structure |
 | v4.0.0 | Production-style centralized pipeline configuration |
 | v5.0.0 | Pipeline audit tracking |
 | v6.0.0 | Severity-based DQ failure control |
 | v7.0.0 | Custom exceptions and structured error handling |
 | v8.0.0 | Schema Validation Framework |
 | v9.0.0 | Incremental Load and Watermark Framework |
-| v10.0.0 | Delta Lake / Lakehouse Storage Upgrade | Upgraded Bronze, Silver, Gold, and Quarantine outputs from Parquet-only paths to configurable Delta Lake storage with Delta transaction log validation. |
-| v11.0.0 | Delta MERGE / Upsert Framework | Added config-driven Delta MERGE upserts for Bronze, Silver, Quarantine, and Gold using layer-specific merge keys. |
+| v10.0.0 | Delta Lake / Lakehouse Storage Upgrade |
+| v11.0.0 | Delta MERGE / Upsert Framework |
+| v12.0.0 | SCD Type 2 / Historical Dimension Tracking |
 
 ---
 
@@ -32,21 +34,23 @@ Current Version: v11.0.0
 
 ```text
 Raw Customer CSV
-        ↓
+↓
 Bronze Schema Validation
-        ↓
+↓
 Incremental Watermark Filter
-        ↓
+↓
 Bronze Delta Table
 ↓
 Silver Delta Table + Quarantine Delta Table
 ↓
+Customer History SCD2 Delta Table
+↓
 Gold Canonical Delta Table
 ↓
 Reltio-style JSON Payload
-        ↓
+↓
 Commit Watermark After Success
-        ↓
+↓
 Pipeline Audit Update
 ```
 
@@ -56,19 +60,96 @@ Pipeline Audit Update
 
 - Python config-driven DQ pipeline
 - PySpark medallion pipeline
-- Bronze, Silver, and Gold layer processing
-- JSON-based DQ rules
-- Not-null, unique-key, and allowed-values validation
-- Quarantine handling
-- DQ summary reporting
-- Severity-based pipeline stop control
-- Pipeline audit tracking
-- Custom exception handling
-- JSON schema validation framework
+- Bronze, Silver, Gold, and Quarantine layers
+- Delta Lake storage support
+- Config-driven Delta MERGE / Upsert support
+- Schema validation using JSON contracts
 - Incremental load using watermark tracking
 - Pending watermark staging to prevent data loss
+- Severity-based DQ failure control
+- Quarantine handling
+- Pipeline audit tracking
+- Custom exception handling
+- SCD Type 2 customer history tracking
 - Reltio-style JSON payload generation
+- Unit testing
 - GitHub Actions CI
+
+---
+
+## V12 - SCD Type 2 Historical Tracking
+
+V12 adds a customer history Delta table:
+
+```text
+data/gold/customer_history
+```
+
+Tracked business key:
+
+```text
+customer_id
+```
+
+Tracked attributes:
+
+```text
+first_name
+last_name
+email
+phone
+city
+state
+source_system
+```
+
+SCD2 metadata columns:
+
+```text
+effective_start_date
+effective_end_date
+is_current
+record_hash
+created_at
+updated_at
+```
+
+Documentation:
+
+```text
+docs/v12_scd_type2_historical_tracking.md
+```
+
+---
+
+## Key Configuration
+
+Pipeline configuration is stored in:
+
+```text
+config/pipeline/local_config.json
+```
+
+Important V12 config keys:
+
+```json
+{
+  "storage_format": "delta",
+  "lakehouse_write_strategy": "merge",
+  "customer_history_output_path": "data/gold/customer_history",
+  "scd2_business_keys": ["customer_id"],
+  "scd2_tracked_columns": [
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "city",
+    "state",
+    "source_system"
+  ],
+  "scd2_effective_start_column": "created_date"
+}
+```
 
 ---
 
@@ -80,7 +161,6 @@ data-engineering-project/
 │   └── workflows/
 │       └── python-ci.yml
 ├── config/
-│   ├── log4j2.properties
 │   ├── pipeline/
 │   │   └── local_config.json
 │   └── rules/
@@ -91,9 +171,6 @@ data-engineering-project/
 │       └── silver_customers_schema.json
 ├── data/
 │   ├── raw/
-│   │   ├── customer_data.csv
-│   │   ├── customer_data_clean.csv
-│   │   └── customer_data_dirty.csv
 │   ├── bronze/
 │   ├── silver/
 │   ├── gold/
@@ -105,7 +182,10 @@ data-engineering-project/
 │   ├── v6_severity_based_dq_control.md
 │   ├── v7_custom_exceptions_error_handling.md
 │   ├── v8_schema_validation_framework.md
-│   └── v9_incremental_load_watermark.md
+│   ├── v9_incremental_load_watermark.md
+│   ├── v10_delta_lakehouse_storage_upgrade.md
+│   ├── v11_delta_merge_upsert_framework.md
+│   └── v12_scd_type2_historical_tracking.md
 ├── output/
 │   ├── audit/
 │   ├── dq_reports/
@@ -117,20 +197,25 @@ data-engineering-project/
 │   ├── create_sample_data.py
 │   ├── dq_decision.py
 │   ├── exceptions.py
+│   ├── lakehouse_io.py
 │   ├── pipeline_config.py
 │   ├── pyspark_bronze_ingestion.py
-│   ├── pyspark_silver_dq.py
+│   ├── pyspark_customer_history_scd2.py
 │   ├── pyspark_gold_canonical.py
 │   ├── pyspark_pipeline_runner.py
+│   ├── pyspark_silver_dq.py
 │   ├── run_metadata.py
+│   ├── scd_type2.py
 │   ├── schema_validation_framework.py
 │   ├── spark_session.py
 │   └── watermark_manager.py
 ├── tests/
 │   ├── test_config_driven_dq.py
 │   ├── test_dq_decision.py
+│   ├── test_lakehouse_io.py
 │   ├── test_pipeline_config.py
 │   ├── test_run_metadata.py
+│   ├── test_scd_type2.py
 │   ├── test_schema_validation_framework.py
 │   └── test_watermark_manager.py
 ├── main.py
@@ -138,74 +223,6 @@ data-engineering-project/
 ├── README.md
 └── .gitignore
 ```
-
----
-
-## Data Quality Rules
-
-DQ rules are stored in:
-
-```text
-config/rules/customer_dq_rules.json
-```
-
-Supported rule types:
-
-```text
-not_null
-unique
-allowed_values
-```
-
-Severity behavior:
-
-| Severity | Behavior |
-|---|---|
-| HIGH | Stops the pipeline if failed |
-| MEDIUM | Allows continuation with warning |
-| LOW | Allows continuation with warning |
-
----
-
-## Schema Validation
-
-Schema contracts are stored in:
-
-```text
-configs/schema_contracts/
-```
-
-Schema validation checks:
-
-- Required columns
-- Unexpected columns
-- Data type mismatches
-- Nullability violations
-
-Audit output:
-
-```text
-data/audit/schema_validation_audit.jsonl
-```
-
----
-
-## Incremental Load and Watermark
-
-V9 adds incremental processing using:
-
-```text
-created_date
-```
-
-Watermark files:
-
-```text
-data/audit/watermark_store.json
-data/audit/pending_watermark_updates.json
-```
-
-The watermark is staged after Bronze and committed only after the full pipeline succeeds.
 
 ---
 
@@ -220,7 +237,7 @@ source .venv/bin/activate
 Install dependencies:
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
 Create clean sample data:
@@ -235,7 +252,7 @@ Run the full PySpark pipeline:
 python -m scripts.pyspark_pipeline_runner
 ```
 
-Run V1 Python pipeline:
+Run the V1 Python-only pipeline:
 
 ```bash
 python main.py
@@ -259,12 +276,15 @@ OK
 
 ---
 
-## Outputs
+## Runtime Outputs
+
+Runtime outputs are generated locally and intentionally ignored by Git:
 
 ```text
 data/bronze/customer_bronze
 data/silver/customer_valid
 data/gold/customer_canonical
+data/gold/customer_history
 data/audit/schema_validation_audit.jsonl
 data/audit/watermark_store.json
 output/audit/pipeline_runs.csv
@@ -275,61 +295,22 @@ output/reltio_payloads/customer_payload_json
 
 ---
 
-## Dirty Data Demo
-
-To test DQ failure behavior, replace the active raw file with dirty data:
-
-```bash
-cp data/raw/customer_data_dirty.csv data/raw/customer_data.csv
-rm -f data/audit/watermark_store.json data/audit/pending_watermark_updates.json
-python -m scripts.pyspark_pipeline_runner
-```
-
-Expected behavior:
-
-```text
-Bronze schema validation PASSED
-Watermark staged
-Silver DQ status FAILED
-Pipeline stopped because HIGH severity DQ rules failed
-Watermark NOT committed
-```
-
-Restore clean data:
-
-```bash
-cp data/raw/customer_data_clean.csv data/raw/customer_data.csv
-rm -f data/audit/watermark_store.json data/audit/pending_watermark_updates.json
-python -m scripts.pyspark_pipeline_runner
-```
-
----
-
-## CI/CD
-
-GitHub Actions runs unit tests on push and pull request to `main`.
-
-Workflow file:
-
-```text
-.github/workflows/python-ci.yml
-```
-
----
-
 ## Skills Demonstrated
 
 - Python
 - PySpark
+- Delta Lake
 - Data Engineering
 - Medallion architecture
 - Config-driven framework design
+- Delta MERGE / Upsert
+- SCD Type 2 history tracking
 - Data quality validation
-- Quarantine handling
-- Audit logging
 - Schema validation
 - Incremental loading
 - Watermark management
+- Quarantine handling
+- Audit logging
 - Structured exception handling
 - Unit testing
 - GitHub Actions CI
@@ -339,26 +320,10 @@ Workflow file:
 
 ## Future Enhancements
 
-- Delta Lake support
-- Databricks notebook version
-- Databricks Asset Bundle structure
-- Great Expectations-style checks
 - API ingestion source
 - Database ingestion source
-- DQ metrics dashboard
+- Great Expectations-style checks
+- Data observability dashboard
 - Docker support
+- Databricks Asset Bundle structure
 - Deployment documentation
-
-## V10 - Delta Lake / Lakehouse Upgrade
-
-The pipeline now supports configurable Lakehouse storage through the `storage_format` config key.
-
-Supported values:
-
-- `parquet`
-- `delta`
-
-For local V10 execution, the project uses Delta Lake by default:
-
-```json
-"storage_format": "delta"
