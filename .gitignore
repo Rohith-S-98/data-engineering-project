@@ -49,3 +49,20 @@ output/*
 metastore_db/
 spark-warehouse/
 derby.log
+
+# Runtime pipeline outputs
+data/bronze/
+data/silver/
+data/gold/
+data/audit/schema_validation_audit.jsonl
+data/audit/watermark_store.json
+data/audit/pending_watermark_updates.json
+output/audit/
+output/dq_reports/
+output/quarantine/
+output/reltio_payloads/
+
+# Spark/Delta local artifacts
+*.crc
+*.snappy.parquet
+_delta_log/
