@@ -1,0 +1,13 @@
+{
+  "schedule_name": "customer_medallion_daily_schedule",
+  "job_name": "customer_medallion_orchestration_job",
+  "enabled": false,
+  "timezone": "Asia/Kolkata",
+  "cron_expression": "0 6 * * *",
+  "description": "Metadata-only local schedule definition for the customer medallion pipeline. V15 does not create a background scheduler.",
+  "default_runtime_parameters": {
+    "run_mode": "scheduled",
+    "dry_run": false,
+    "triggered_by": "schedule_metadata"
+  }
+}
