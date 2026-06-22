@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v13.0.1
+Current Version: v13.0.2
 ```
 
 ---
