@@ -3,8 +3,9 @@ import sys
 from scripts.exceptions import DQValidationError, PipelineExecutionError
 from scripts.pipeline_config import load_pipeline_config
 from scripts.pyspark_bronze_ingestion import run_bronze_ingestion
-from scripts.pyspark_silver_dq import run_pyspark_silver_dq
+from scripts.pyspark_customer_history_scd2 import run_customer_history_scd2
 from scripts.pyspark_gold_canonical import run_pyspark_gold_canonical
+from scripts.pyspark_silver_dq import run_pyspark_silver_dq
 from scripts.run_metadata import create_pipeline_run, update_pipeline_run
 from scripts.watermark_manager import commit_staged_watermark_update
 
@@ -35,7 +36,10 @@ def run_pyspark_pipeline(raise_on_failure: bool = True) -> str:
                 "Pipeline stopped because HIGH severity DQ rules failed."
             )
 
-        print("\nStep 3: Running Gold Canonical Transformation")
+        print("\nStep 3: Running Customer History SCD Type 2")
+        run_customer_history_scd2()
+
+        print("\nStep 4: Running Gold Canonical Transformation")
         run_pyspark_gold_canonical()
 
         commit_staged_watermark_update(

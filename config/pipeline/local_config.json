@@ -3,34 +3,48 @@
   "dataset_name": "customers",
   "storage_format": "delta",
   "lakehouse_write_strategy": "merge",
-
   "watermark_column": "created_date",
-
   "raw_data_file": "data/raw/customer_data.csv",
   "clean_raw_data_file": "data/raw/customer_data_clean.csv",
   "dirty_raw_data_file": "data/raw/customer_data_dirty.csv",
-
   "dq_rules_file": "config/rules/customer_dq_rules.json",
-
   "bronze_schema_contract": "configs/schema_contracts/bronze_customers_schema.json",
   "silver_schema_contract": "configs/schema_contracts/silver_customers_schema.json",
   "schema_validation_audit_file": "data/audit/schema_validation_audit.jsonl",
-
   "bronze_output_path": "data/bronze/customer_bronze",
   "silver_output_path": "data/silver/customer_valid",
   "gold_output_path": "data/gold/customer_canonical",
-
   "quarantine_output_path": "output/quarantine/pyspark_customer_quarantine",
   "dq_report_file": "output/dq_reports/pyspark_customer_dq_report.json",
   "reltio_payload_output_path": "output/reltio_payloads/customer_payload_json",
-
   "audit_log_file": "output/audit/pipeline_runs.csv",
-
   "watermark_store_file": "data/audit/watermark_store.json",
   "pending_watermark_file": "data/audit/pending_watermark_updates.json",
-
-  "bronze_merge_keys": ["customer_id"],
-  "silver_merge_keys": ["customer_id"],
-  "quarantine_merge_keys": ["customer_id"],
-  "gold_merge_keys": ["source_system", "source_id"]
+  "bronze_merge_keys": [
+    "customer_id"
+  ],
+  "silver_merge_keys": [
+    "customer_id"
+  ],
+  "quarantine_merge_keys": [
+    "customer_id"
+  ],
+  "gold_merge_keys": [
+    "source_system",
+    "source_id"
+  ],
+  "customer_history_output_path": "data/gold/customer_history",
+  "scd2_business_keys": [
+    "customer_id"
+  ],
+  "scd2_tracked_columns": [
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "city",
+    "state",
+    "source_system"
+  ],
+  "scd2_effective_start_column": "created_date"
 }
