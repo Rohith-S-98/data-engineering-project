@@ -1,0 +1,4 @@
+job_run_id,job_name,environment,start_time,end_time,status,total_steps,successful_steps,failed_steps,skipped_steps,error_message
+62a07965-2d7d-4006-8d33-86ed53c3685f,customer_medallion_orchestration_job,local,2026-06-22T23:29:27,2026-06-22T23:30:41,SUCCESS,6,6,0,0,
+5473837c-f889-4ca3-a3eb-525c32c9656e,customer_medallion_orchestration_job,local,2026-06-22T23:32:19,2026-06-22T23:34:33,SUCCESS,6,6,0,0,
+e877a43a-962a-44ce-b9e9-4f36a250716a,customer_medallion_orchestration_job,local,2026-06-22T23:42:33,2026-06-22T23:44:43,FAILED,6,0,1,0,An error occurred while calling o71.execute
