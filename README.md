@@ -2,10 +2,10 @@
 
 This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, and exported as downstream-ready Reltio-style JSON output.
+It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v13.0.0
+Current Version: v13.0.1
 ```
 
 ---
@@ -28,6 +28,7 @@ Current Version: v13.0.0
 | v11.0.0 | Delta MERGE / Upsert Framework |
 | v12.0.0 | SCD Type 2 / Historical Dimension Tracking |
 | v13.0.0 | Data Observability + Pipeline Metrics Mart |
+| v13.0.1 | Pre-V14 repository review and roadmap handoff cleanup |
 
 ---
 
@@ -63,7 +64,7 @@ V13 Observability Metrics Mart
 
 - Python config-driven DQ pipeline
 - PySpark medallion pipeline
-- Bronze, Silver, Gold, and Quarantine layers
+- Bronze, Silver, Gold, Quarantine, and Customer History layers
 - Delta Lake storage support
 - Config-driven Delta MERGE / Upsert support
 - Schema validation using JSON contracts
@@ -74,6 +75,9 @@ V13 Observability Metrics Mart
 - Pipeline audit tracking
 - Custom exception handling
 - SCD Type 2 customer history tracking
+- Data observability metrics mart
+- JSON summary metrics output
+- JSONL and CSV historical metrics logs
 - Reltio-style JSON payload generation
 - Unit testing
 - GitHub Actions CI
@@ -125,6 +129,65 @@ docs/v12_scd_type2_historical_tracking.md
 
 ---
 
+## V13 - Data Observability + Pipeline Metrics Mart
+
+V13 adds a production-style observability layer that summarizes pipeline health and data movement across the lakehouse pipeline.
+
+It captures:
+
+- Latest pipeline audit status
+- Bronze row count
+- Silver row count
+- Quarantine row count
+- Gold row count
+- Customer History row count
+- Latest DQ validation status
+- Latest schema validation status
+- Current watermark value
+- Pending watermark value
+- SCD Type 2 total history rows
+- SCD Type 2 current rows
+- SCD Type 2 expired rows
+- Changed customer count
+
+V13 writes metrics to:
+
+```text
+output/observability/pipeline_metrics_summary.json
+output/observability/pipeline_metrics_history.jsonl
+output/observability/pipeline_metrics_history.csv
+```
+
+Run command:
+
+```bash
+python -m scripts.pipeline_observability
+```
+
+Documentation:
+
+```text
+docs/v13_data_observability_metrics.md
+```
+
+---
+
+## Pre-V14 Roadmap Handoff
+
+The pre-V14 cleanup adds a single roadmap progress document:
+
+```text
+docs/12_month_data_engineering_roadmap_progress.md
+```
+
+This document summarizes the completed roadmap from v0.0.0 through v13.0.0 and defines the next planned milestone:
+
+```text
+v14.0.0 - Pipeline Orchestration + Job Control Framework
+```
+
+---
+
 ## Key Configuration
 
 Pipeline configuration is stored in:
@@ -133,53 +196,31 @@ Pipeline configuration is stored in:
 config/pipeline/local_config.json
 ```
 
-Important V12 config keys:
+Important current config keys:
 
 ```json
 {
-  "storage_format": "delta",
-  "lakehouse_write_strategy": "merge",
-  "customer_history_output_path": "data/gold/customer_history",
-  "scd2_business_keys": ["customer_id"],
-  "scd2_tracked_columns": [
-    "first_name",
-    "last_name",
-    "email",
-    "phone",
-    "city",
-    "state",
-    "source_system"
-  ],
-  "scd2_effective_start_column": "created_date"
+    "storage_format": "delta",
+    "lakehouse_write_strategy": "merge",
+    "customer_history_output_path": "data/gold/customer_history",
+    "scd2_business_keys": ["customer_id"],
+    "scd2_tracked_columns": [
+        "first_name",
+        "last_name",
+        "email",
+        "phone",
+        "city",
+        "state",
+        "source_system"
+    ],
+    "scd2_effective_start_column": "created_date",
+    "observability_enabled": true,
+    "observability_output_dir": "output/observability",
+    "observability_summary_file": "output/observability/pipeline_metrics_summary.json",
+    "observability_history_jsonl_file": "output/observability/pipeline_metrics_history.jsonl",
+    "observability_history_csv_file": "output/observability/pipeline_metrics_history.csv"
 }
 ```
-
----
-
-
----
-
-## 4. Add V13 feature section
-
-Add this under your features/capabilities section:
-
-```markdown
-### V13.0.0 - Data Observability + Pipeline Metrics Mart
-
-V13 adds a production-style observability layer for monitoring pipeline health and data movement.
-
-It captures:
-
-- Latest pipeline audit status
-- Bronze, Silver, Quarantine, Gold, and Customer History row counts
-- Latest DQ validation status
-- Latest schema validation status
-- Current and pending watermark values
-- SCD Type 2 total, current, expired, and changed-customer metrics
-- Reusable JSON summary output
-- JSONL and CSV historical metrics logs
-
-The observability layer is safe by design. Missing runtime files do not crash the metrics collection process. Instead, missing values are reported as `MISSING`, `UNKNOWN`, `0`, or `None`.
 
 ---
 
@@ -187,67 +228,31 @@ The observability layer is safe by design. Missing runtime files do not crash th
 
 ```text
 data-engineering-project/
-├── .github/
-│   └── workflows/
-│       └── python-ci.yml
-├── config/
-│   ├── pipeline/
-│   │   └── local_config.json
-│   └── rules/
-│       └── customer_dq_rules.json
-├── configs/
-│   └── schema_contracts/
-│       ├── bronze_customers_schema.json
-│       └── silver_customers_schema.json
-├── data/
-│   ├── raw/
-│   ├── bronze/
-│   ├── silver/
-│   ├── gold/
-│   └── audit/
-├── docs/
-│   ├── architecture.md
-│   ├── interview_explanation.md
-│   ├── v5_pipeline_audit_tracking.md
-│   ├── v6_severity_based_dq_control.md
-│   ├── v7_custom_exceptions_error_handling.md
-│   ├── v8_schema_validation_framework.md
-│   ├── v9_incremental_load_watermark.md
-│   ├── v10_delta_lakehouse_storage_upgrade.md
-│   ├── v11_delta_merge_upsert_framework.md
-│   └── v12_scd_type2_historical_tracking.md
-├── output/
-│   ├── audit/
-│   ├── dq_reports/
-│   ├── quarantine/
-│   ├── logs/
-│   └── reltio_payloads/
-├── scripts/
-│   ├── config_driven_dq.py
-│   ├── create_sample_data.py
-│   ├── dq_decision.py
-│   ├── exceptions.py
-│   ├── lakehouse_io.py
-│   ├── pipeline_config.py
-│   ├── pyspark_bronze_ingestion.py
-│   ├── pyspark_customer_history_scd2.py
-│   ├── pyspark_gold_canonical.py
-│   ├── pyspark_pipeline_runner.py
-│   ├── pyspark_silver_dq.py
-│   ├── run_metadata.py
-│   ├── scd_type2.py
-│   ├── schema_validation_framework.py
-│   ├── spark_session.py
-│   └── watermark_manager.py
-├── tests/
-│   ├── test_config_driven_dq.py
-│   ├── test_dq_decision.py
-│   ├── test_lakehouse_io.py
-│   ├── test_pipeline_config.py
-│   ├── test_run_metadata.py
-│   ├── test_scd_type2.py
-│   ├── test_schema_validation_framework.py
-│   └── test_watermark_manager.py
+├── .github/workflows/python-ci.yml
+├── config/pipeline/local_config.json
+├── config/rules/customer_dq_rules.json
+├── configs/schema_contracts/bronze_customers_schema.json
+├── configs/schema_contracts/silver_customers_schema.json
+├── data/raw/
+├── data/bronze/
+├── data/silver/
+├── data/gold/
+├── data/audit/
+├── docs/12_month_data_engineering_roadmap_progress.md
+├── docs/v12_scd_type2_historical_tracking.md
+├── docs/v13_data_observability_metrics.md
+├── output/audit/
+├── output/dq_reports/
+├── output/quarantine/
+├── output/logs/
+├── output/observability/
+├── output/reltio_payloads/
+├── scripts/metrics_collector.py
+├── scripts/pipeline_observability.py
+├── scripts/pyspark_pipeline_runner.py
+├── scripts/pyspark_customer_history_scd2.py
+├── tests/test_metrics_collector.py
+├── tests/test_scd_type2.py
 ├── main.py
 ├── requirements.txt
 ├── README.md
@@ -282,6 +287,12 @@ Run the full PySpark pipeline:
 python -m scripts.pyspark_pipeline_runner
 ```
 
+Run V13 observability:
+
+```bash
+python -m scripts.pipeline_observability
+```
+
 Run the V1 Python-only pipeline:
 
 ```bash
@@ -304,6 +315,17 @@ Expected result:
 OK
 ```
 
+Recommended validation before every release:
+
+```bash
+python -m py_compile scripts/metrics_collector.py
+python -m py_compile scripts/pipeline_observability.py
+python -m unittest tests.test_metrics_collector
+python -m unittest discover tests
+python -m scripts.pyspark_pipeline_runner
+python -m scripts.pipeline_observability
+```
+
 ---
 
 ## Runtime Outputs
@@ -317,11 +339,17 @@ data/gold/customer_canonical
 data/gold/customer_history
 data/audit/schema_validation_audit.jsonl
 data/audit/watermark_store.json
+data/audit/pending_watermark_updates.json
 output/audit/pipeline_runs.csv
 output/quarantine/pyspark_customer_quarantine
 output/dq_reports/pyspark_customer_dq_report.json
 output/reltio_payloads/customer_payload_json
+output/observability/pipeline_metrics_summary.json
+output/observability/pipeline_metrics_history.jsonl
+output/observability/pipeline_metrics_history.csv
 ```
+
+Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ---
 
@@ -335,6 +363,8 @@ output/reltio_payloads/customer_payload_json
 - Config-driven framework design
 - Delta MERGE / Upsert
 - SCD Type 2 history tracking
+- Data observability
+- Pipeline metrics mart
 - Data quality validation
 - Schema validation
 - Incremental loading
@@ -350,6 +380,7 @@ output/reltio_payloads/customer_payload_json
 
 ## Future Enhancements
 
+- Pipeline orchestration and job control
 - API ingestion source
 - Database ingestion source
 - Great Expectations-style checks
