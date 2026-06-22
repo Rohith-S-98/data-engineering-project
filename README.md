@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v12.0.0
+Current Version: v13.0.0
 ```
 
 ---
@@ -27,6 +27,7 @@ Current Version: v12.0.0
 | v10.0.0 | Delta Lake / Lakehouse Storage Upgrade |
 | v11.0.0 | Delta MERGE / Upsert Framework |
 | v12.0.0 | SCD Type 2 / Historical Dimension Tracking |
+| v13.0.0 | Data Observability + Pipeline Metrics Mart |
 
 ---
 
@@ -52,6 +53,8 @@ Reltio-style JSON Payload
 Commit Watermark After Success
 ↓
 Pipeline Audit Update
+↓
+V13 Observability Metrics Mart
 ```
 
 ---
@@ -150,6 +153,33 @@ Important V12 config keys:
   "scd2_effective_start_column": "created_date"
 }
 ```
+
+---
+
+
+---
+
+## 4. Add V13 feature section
+
+Add this under your features/capabilities section:
+
+```markdown
+### V13.0.0 - Data Observability + Pipeline Metrics Mart
+
+V13 adds a production-style observability layer for monitoring pipeline health and data movement.
+
+It captures:
+
+- Latest pipeline audit status
+- Bronze, Silver, Quarantine, Gold, and Customer History row counts
+- Latest DQ validation status
+- Latest schema validation status
+- Current and pending watermark values
+- SCD Type 2 total, current, expired, and changed-customer metrics
+- Reusable JSON summary output
+- JSONL and CSV historical metrics logs
+
+The observability layer is safe by design. Missing runtime files do not crash the metrics collection process. Instead, missing values are reported as `MISSING`, `UNKNOWN`, `0`, or `None`.
 
 ---
 

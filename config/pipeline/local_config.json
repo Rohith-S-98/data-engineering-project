@@ -46,5 +46,10 @@
     "state",
     "source_system"
   ],
-  "scd2_effective_start_column": "created_date"
+  "scd2_effective_start_column": "created_date",
+  "observability_enabled": true,
+  "observability_output_dir": "output/observability",
+  "observability_summary_file": "output/observability/pipeline_metrics_summary.json",
+  "observability_history_jsonl_file": "output/observability/pipeline_metrics_history.jsonl",
+  "observability_history_csv_file": "output/observability/pipeline_metrics_history.csv"
 }

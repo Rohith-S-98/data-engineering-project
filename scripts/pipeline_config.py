@@ -30,6 +30,11 @@ REQUIRED_KEYS = [
     "scd2_business_keys",
     "scd2_tracked_columns",
     "scd2_effective_start_column",
+    "observability_enabled",
+"observability_output_dir",
+"observability_summary_file",
+"observability_history_jsonl_file",
+"observability_history_csv_file",
 ]
 
 SUPPORTED_STORAGE_FORMATS = {"parquet", "delta"}

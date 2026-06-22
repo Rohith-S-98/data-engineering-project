@@ -52,3 +52,6 @@ derby.log
 *.crc
 *.snappy.parquet
 _delta_log/
+
+/output/observability/*
+!/output/observability/.gitkeep
