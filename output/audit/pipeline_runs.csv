@@ -21,3 +21,5 @@ dddc711e-22d2-49ef-844a-9de631b68073,pyspark_customer_medallion_pipeline,local,2
 edef8b87-c388-47fc-b283-a68df14013ae,pyspark_customer_medallion_pipeline,local,2026-06-18T20:52:52,2026-06-18T20:53:53,SUCCESS,
 f5e75643-a7da-4851-92a0-213e2f1d30a1,pyspark_customer_medallion_pipeline,local,2026-06-18T20:54:02,2026-06-18T20:54:57,SUCCESS,
 bf5c4499-fdef-415d-a535-0fc6587c8304,pyspark_customer_medallion_pipeline,local,2026-06-22T17:00:50,2026-06-22T17:01:50,SUCCESS,
+8dc12864-39f6-4b36-901d-bd86ee964cb5,pyspark_customer_medallion_pipeline,local,2026-06-22T17:02:55,2026-06-22T17:03:49,SUCCESS,
+5a9a0bdc-5942-41e7-b781-a56ec70a5ae5,pyspark_customer_medallion_pipeline,local,2026-06-22T17:04:46,2026-06-22T17:05:45,SUCCESS,
