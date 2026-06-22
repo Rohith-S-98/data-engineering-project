@@ -30,28 +30,35 @@ derby.log
 # Runtime pipeline outputs - keep only folder placeholders
 /data/bronze/*
 !/data/bronze/.gitkeep
+
 /data/silver/*
 !/data/silver/.gitkeep
+
 /data/gold/*
 !/data/gold/.gitkeep
+
 /data/audit/*
 !/data/audit/.gitkeep
 
 /output/audit/*
 !/output/audit/.gitkeep
+
 /output/dq_reports/*
 !/output/dq_reports/.gitkeep
+
 /output/quarantine/*
 !/output/quarantine/.gitkeep
+
 /output/reltio_payloads/*
 !/output/reltio_payloads/.gitkeep
+
 /output/logs/*
 !/output/logs/.gitkeep
+
+/output/observability/*
+!/output/observability/.gitkeep
 
 # Spark / Delta generated files
 *.crc
 *.snappy.parquet
 _delta_log/
-
-/output/observability/*
-!/output/observability/.gitkeep
