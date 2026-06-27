@@ -80,3 +80,8 @@ output/job_control/*.csv
 # V17 retry and recovery runtime outputs
 /output/recovery/*
 !/output/recovery/.gitkeep
+
+# Generated raw sample data
+/data/raw/customer_data.csv
+/data/raw/customer_data_clean.csv
+/data/raw/customer_data_dirty.csv
