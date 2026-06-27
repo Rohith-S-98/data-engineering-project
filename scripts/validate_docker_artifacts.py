@@ -10,7 +10,7 @@ REQUIRED_FILES = [
 ]
 
 REQUIRED_DOCKERFILE_SNIPPETS = [
-    "FROM python:3.11-slim",
+    "FROM python:3.11-slim-bookworm",
     "openjdk-17-jre-headless",
     "COPY requirements.txt requirements.txt",
     "pip install --no-cache-dir -r requirements.txt",
