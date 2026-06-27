@@ -57,6 +57,8 @@ data/raw/customer_data.csv
 data/raw/customer_data_clean.csv
 data/raw/customer_data_dirty.csv
 data/raw/customer_data_api.csv
+data/raw/customer_data_db.csv
+data/database/*.db
 
 # Spark and Delta generated files
 *.crc
