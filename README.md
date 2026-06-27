@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment structure, repository hygiene gates, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment metadata, Azure Data Factory-style orchestration metadata, Power BI-ready observability outputs, CI/CD gates, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, organized for Databricks-style deployment, protected by repository hygiene checks, and run through a containerized local runtime.
+It demonstrates how customer data can be extracted from API-style and database-style sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting and retry controls, organized for Databricks and ADF-style deployment, exported into Power BI-ready dashboard datasets, and verified through automated release gates.
 
 ```text
-Current Version: v23.0.1
+Current Version: v25.0.1
 ```
 
 ---
@@ -41,6 +41,9 @@ Current Version: v23.0.1
 | v22.0.0 | Advanced Data Quality Rule Catalog |
 | v23.0.0 | Databricks Asset Bundle Style Deployment Structure |
 | v23.0.1 | Pre-V24 Professional Repository Cleanup |
+| v24.0.0 | Azure Data Factory Orchestration Simulation |
+| v25.0.0 | Power BI-Ready Observability Dashboard |
+| v25.0.1 | Documentation and Release Gate Alignment |
 
 ---
 
@@ -87,7 +90,9 @@ V19 Docker Containerized Runtime
 ↓
 V23 Databricks Asset Bundle Style Deployment Structure
 ↓
-V23.0.1 Repository Hygiene Validation
+V24 Azure Data Factory Style Orchestration Simulation
+↓
+V25 Power BI-Ready Observability Dashboard Outputs
 ```
 
 ---
@@ -95,20 +100,12 @@ V23.0.1 Repository Hygiene Validation
 ## Features
 
 - Python config-driven DQ pipeline
-- Advanced metadata-driven DQ rule catalog
+- PySpark medallion architecture
+- Bronze, Silver, Gold, Quarantine, and Customer History layers
+- Delta Lake-style local storage support
 - Config-driven API ingestion framework
 - Config-driven database ingestion framework
-- Databricks Asset Bundle-style deployment structure
-- Local Databricks bundle structure validation
-- Repository hygiene validation gate
-- Hardened `.gitignore` and `.dockerignore`
-- Local SQLite source extraction for deterministic testing
-- Mock paginated source API fixture
-- API and database field landing into raw customer schema
-- PySpark medallion pipeline
-- Bronze, Silver, Gold, Quarantine, and Customer History layers
-- Delta Lake storage support
-- Config-driven Delta MERGE / Upsert support
+- Advanced metadata-driven DQ rule catalog
 - Schema validation using JSON contracts
 - Incremental load using watermark tracking
 - Pending watermark staging to prevent data loss
@@ -116,27 +113,32 @@ V23.0.1 Repository Hygiene Validation
 - Quarantine handling
 - Pipeline audit tracking
 - Custom exception handling
-- SCD Type 2 customer history tracking
+- Delta MERGE / Upsert design
+- SCD Type 2 history tracking
 - Data observability metrics mart
+- Power BI-ready observability dashboard exports
 - Alerting and SLA monitoring
 - Retry, recovery, and replay handling
 - Runtime parameterization and dry-run support
-- Python syntax validation gate
-- Config validation gate
-- Runtime-output cleanliness validation gate
-- Docker artifact validation gate
-- Release verification and tag safety checks
-- Staged GitHub Actions CI
-- Dockerfile and Docker Compose local runtime
+- Databricks Asset Bundle-style deployment structure
+- Azure Data Factory-style orchestration metadata
+- Docker containerized local runtime
+- CI/CD quality gates and release verification
+- Repository hygiene validation
+- Runtime-output cleanliness validation
 - Reltio-style JSON payload generation
 
 ---
 
-## Key Configuration
+## Key Configuration and Metadata
 
 ```text
 databricks.yml
 resources/customer_medallion_job.yml
+azure/adf/pipelines/customer_medallion_adf_pipeline.json
+azure/adf/linked_services/ls_databricks_customer_pipeline.json
+azure/adf/datasets/customer_landing_metadata.json
+dashboards/powerbi/observability_dashboard_schema.json
 config/pipeline/local_config.json
 config/rules/customer_dq_rules.json
 config/rules/advanced_customer_dq_rule_catalog.json
@@ -165,40 +167,55 @@ Install dependencies:
 python -m pip install -r requirements.txt
 ```
 
-Validate repository hygiene:
-
-```bash
-python -m scripts.validate_repo_hygiene
-```
-
-Validate Databricks bundle-style structure:
-
-```bash
-python -m scripts.validate_databricks_bundle_structure
-```
-
-Run API ingestion:
-
-```bash
-python -m scripts.api_ingestion
-```
-
-Run database ingestion:
-
-```bash
-python -m scripts.database_ingestion
-```
-
-Run advanced DQ catalog evaluation:
-
-```bash
-python -m scripts.advanced_dq_rule_catalog
-```
-
 Run dry-run orchestration:
 
 ```bash
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
+```
+
+Run observability collection:
+
+```bash
+python -m scripts.pipeline_observability
+```
+
+Export Power BI-ready observability files:
+
+```bash
+python -m scripts.powerbi_observability_exporter
+```
+
+---
+
+## Validation and Release Gates
+
+Run the full current verification set:
+
+```bash
+python -m scripts.validate_python_project
+python -m scripts.validate_config_files
+python -m scripts.validate_docker_artifacts
+python -m scripts.validate_databricks_bundle_structure
+python -m scripts.validate_repo_hygiene
+python -m scripts.validate_adf_artifacts
+python -m scripts.validate_powerbi_dashboard_artifacts
+python -m unittest tests.test_v24_adf_artifacts
+python -m unittest tests.test_v25_powerbi_observability_dashboard
+python -m unittest discover tests
+python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
+python -m scripts.validate_runtime_cleanliness
+```
+
+Run full release verification:
+
+```bash
+python -m scripts.release_verification --version v25.0.1
+```
+
+Validate release tag safety before tagging:
+
+```bash
+python -m scripts.validate_release_tag --version v25.0.1
 ```
 
 ---
@@ -221,186 +238,77 @@ databricks bundle deploy -t dev
 databricks bundle run customer_medallion_pipeline_job -t dev
 ```
 
-This portfolio project validates the structure locally without requiring a Databricks workspace.
-
 ---
 
-## How to Run with Docker
+## Azure Data Factory Orchestration Simulation
 
-Build the image:
+V24 adds ADF-style orchestration metadata:
 
-```bash
-docker compose build
+```text
+azure/adf/pipelines/customer_medallion_adf_pipeline.json
+azure/adf/linked_services/ls_databricks_customer_pipeline.json
+azure/adf/datasets/customer_landing_metadata.json
+azure/adf/README.md
 ```
 
-Run dry-run orchestration in Docker:
+Validate ADF artifacts:
 
 ```bash
-docker compose run --rm data-engineering-pipeline
-```
-
-Run Docker-based release verification:
-
-```bash
-docker compose run --rm release-verification
+python -m scripts.validate_adf_artifacts
 ```
 
 ---
 
-## Testing and Release Verification
+## Power BI Observability Dashboard
 
-Run the full test suite:
+V25 adds Power BI-ready observability outputs:
 
-```bash
-python -m unittest discover tests
+```text
+dashboards/powerbi/observability_dashboard_schema.json
+dashboards/powerbi/README.md
+output/observability/powerbi/dashboard_kpi_snapshot.csv
+output/observability/powerbi/dashboard_data_quality_snapshot.csv
+output/observability/powerbi/dashboard_layer_row_counts.csv
 ```
 
-Run V23.0.1 quality gates:
+Validate Power BI dashboard artifacts:
 
 ```bash
-python -m scripts.validate_python_project
-python -m scripts.validate_config_files
-python -m scripts.validate_docker_artifacts
-python -m scripts.validate_databricks_bundle_structure
-python -m scripts.validate_repo_hygiene
-python -m unittest tests.test_v23_0_1_repo_hygiene
-python -m unittest discover tests
-python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
-python -m scripts.validate_runtime_cleanliness
-```
-
-Run full release verification:
-
-```bash
-python -m scripts.release_verification --version v23.0.1
-```
-
-Validate release tag safety before tagging:
-
-```bash
-python -m scripts.validate_release_tag --version v23.0.1
+python -m scripts.validate_powerbi_dashboard_artifacts
 ```
 
 ---
 
 ## Runtime Outputs
 
-Runtime outputs are generated locally and intentionally ignored by Git:
+Runtime outputs are generated locally and intentionally ignored by Git. Only `.gitkeep` placeholders are committed for runtime output folders.
+
+---
+
+## Documentation
 
 ```text
-data/database/customer_source.db
-data/raw/customer_data.csv
-data/raw/customer_data_clean.csv
-data/raw/customer_data_dirty.csv
-data/raw/customer_data_api.csv
-data/raw/customer_data_db.csv
-data/bronze/customer_bronze
-data/silver/customer_valid
-data/gold/customer_canonical
-data/gold/customer_history
-data/audit/schema_validation_audit.jsonl
-data/audit/watermark_store.json
-data/audit/pending_watermark_updates.json
-output/audit/pipeline_runs.csv
-output/quarantine/pyspark_customer_quarantine
-output/dq_reports/pyspark_customer_dq_report.json
-output/dq_reports/advanced_dq_catalog_summary.json
-output/reltio_payloads/customer_payload_json
-output/observability/pipeline_metrics_summary.json
-output/observability/pipeline_metrics_history.jsonl
-output/observability/pipeline_metrics_history.csv
-output/job_control/job_runs.csv
-output/job_control/step_runs.csv
-output/runtime_parameters/runtime_parameters_<job_run_id>.json
-output/alerts/alert_events.jsonl
-output/alerts/alert_events.csv
-output/alerts/notification_summary.txt
-output/recovery/retry_events.csv
-output/recovery/retry_events.jsonl
-output/recovery/replay_requests.jsonl
+docs/v23_databricks_asset_bundle_structure.md
+docs/v23_0_1_pre_v24_professional_cleanup.md
+docs/v24_azure_data_factory_orchestration_simulation.md
+docs/v25_powerbi_observability_dashboard.md
 ```
-
-Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ---
 
 ## Skills Demonstrated
 
-- Python
-- API ingestion
-- Database ingestion
-- Advanced data quality rule catalog
-- Metadata-driven validation
-- Databricks Asset Bundles
-- Databricks deployment structure
-- Databricks job/resource metadata
-- Unity Catalog-style environment variables
-- Repository hygiene validation
-- CI/CD repository quality gates
-- SQLite source extraction
-- SQL query-based extraction
-- Config-driven source extraction
-- PySpark
-- Delta Lake
-- Docker
-- Data Engineering
-- Medallion architecture
-- Config-driven framework design
-- Delta MERGE / Upsert
-- SCD Type 2 history tracking
-- Data observability
-- Pipeline metrics mart
-- Data quality validation
-- Schema validation
-- Incremental loading
-- Watermark management
-- Quarantine handling
-- Audit logging
-- Structured exception handling
-- Alerting and SLA monitoring
-- Retry and recovery handling
-- CI/CD quality gates
-- Containerized runtime design
-- Release verification
-- GitHub Actions CI
-- Reltio-style JSON payload generation
-
----
-
-## V23.0.0 - Databricks Asset Bundle Style Deployment Structure
-
-V23 adds a Databricks Asset Bundle-style deployment structure for the pipeline.
-
-Documentation:
-
 ```text
-docs/v23_databricks_asset_bundle_structure.md
+Python, SQL-style extraction, PySpark, Delta Lake, Databricks deployment structure,
+Azure Data Factory orchestration concepts, Docker, CI/CD, metadata-driven DQ,
+watermarking, SCD2, observability, alerting, retry/replay, Power BI-ready reporting,
+Git/GitHub release discipline, and production-style data engineering design.
 ```
 
 ---
 
-## V23.0.1 - Pre-V24 Professional Repository Cleanup
-
-V23.0.1 cleans and hardens the repository before V24.
-
-Highlights:
-
-- Hardened `.gitignore`
-- Hardened `.dockerignore`
-- Added repository hygiene validator
-- Added repository hygiene tests
-- Added repository hygiene gate to release verification
-- Added repository hygiene job to GitHub Actions CI
-- Preserved required docs, configs, tests, fixtures, and runtime placeholders
-
-Documentation:
+## Latest Interview Explanation
 
 ```text
-docs/v23_0_1_pre_v24_professional_cleanup.md
-```
-
-V23.0.1 interview explanation:
-
-```text
-Before starting V24, I performed a professional repository cleanup release. I hardened .gitignore and .dockerignore, added a repository hygiene validator, added tests to prevent generated data or runtime artifacts from being tracked, integrated the hygiene gate into release verification and CI, and preserved all required docs, tests, configs, and sample fixtures.
+This project simulates an end-to-end production-style data engineering platform. It includes API and database ingestion, metadata-driven data quality, medallion processing, Delta-style storage, SCD2 history, observability, alerting, retry/replay, Databricks deployment metadata, ADF orchestration metadata, Docker runtime, CI/CD quality gates, and Power BI-ready dashboard exports. The latest cleanup aligned README, CI, and release verification gates through V25.0.1.
 ```
