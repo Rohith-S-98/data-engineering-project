@@ -1,0 +1,70 @@
+{
+  "catalog_name": "advanced_customer_dq_rule_catalog",
+  "dataset_name": "customers",
+  "description": "Advanced reusable data quality rule catalog for customer raw landing data.",
+  "rules": [
+    {
+      "rule_id": "CUST_ID_REQUIRED",
+      "rule_name": "Customer ID must be present",
+      "column": "customer_id",
+      "rule_type": "not_null",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "rule_id": "CUST_ID_UNIQUE",
+      "rule_name": "Customer ID must be unique",
+      "column": "customer_id",
+      "rule_type": "unique",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "rule_id": "EMAIL_REQUIRED",
+      "rule_name": "Email must be present",
+      "column": "email",
+      "rule_type": "not_null",
+      "severity": "critical",
+      "enabled": true
+    },
+    {
+      "rule_id": "EMAIL_FORMAT_VALID",
+      "rule_name": "Email must match valid email pattern",
+      "column": "email",
+      "rule_type": "regex",
+      "severity": "critical",
+      "enabled": true,
+      "pattern": "^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$"
+    },
+    {
+      "rule_id": "PHONE_LENGTH_VALID",
+      "rule_name": "Phone must have minimum 10 characters",
+      "column": "phone",
+      "rule_type": "min_length",
+      "severity": "warning",
+      "enabled": true,
+      "min_length": 10
+    },
+    {
+      "rule_id": "SOURCE_SYSTEM_ALLOWED",
+      "rule_name": "Source system must be from allowed inbound systems",
+      "column": "source_system",
+      "rule_type": "allowed_values",
+      "severity": "warning",
+      "enabled": true,
+      "allowed_values": [
+        "CSV",
+        "API",
+        "DB"
+      ]
+    },
+    {
+      "rule_id": "CREATED_DATE_REQUIRED",
+      "rule_name": "Created date must be present",
+      "column": "created_date",
+      "rule_type": "not_null",
+      "severity": "critical",
+      "enabled": true
+    }
+  ]
+}

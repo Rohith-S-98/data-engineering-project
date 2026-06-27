@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
+It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
 
 ```text
-Current Version: v21.0.0
+Current Version: v22.0.0
 ```
 
 ---
@@ -38,6 +38,7 @@ Current Version: v21.0.0
 | v19.0.0 | Docker Containerized Local Runtime |
 | v20.0.0 | API Ingestion Framework |
 | v21.0.0 | Database Ingestion Framework |
+| v22.0.0 | Advanced Data Quality Rule Catalog |
 
 ---
 
@@ -47,6 +48,8 @@ Current Version: v21.0.0
 Mock API / SQLite Database / Raw Customer CSV
 ↓
 V20 API Ingestion + V21 Database Ingestion + Raw Landing
+↓
+V22 Advanced DQ Rule Catalog
 ↓
 Bronze Schema Validation
 ↓
@@ -86,6 +89,7 @@ V19 Docker Containerized Runtime
 ## Features
 
 - Python config-driven DQ pipeline
+- Advanced metadata-driven DQ rule catalog
 - Config-driven API ingestion framework
 - Config-driven database ingestion framework
 - Local SQLite source extraction for deterministic testing
@@ -122,43 +126,15 @@ V19 Docker Containerized Runtime
 
 ```text
 config/pipeline/local_config.json
+config/rules/customer_dq_rules.json
+config/rules/advanced_customer_dq_rule_catalog.json
 config/api/customer_api_ingestion_config.json
 config/database/customer_database_ingestion_config.json
 config/jobs/customer_medallion_job.json
-config/rules/customer_dq_rules.json
 config/alerts/customer_medallion_alerts.json
 config/retries/customer_medallion_retry_policy.json
 configs/schema_contracts/bronze_customers_schema.json
 configs/schema_contracts/silver_customers_schema.json
-```
-
----
-
-## Folder Structure
-
-```text
-data-engineering-project/
-├── .github/workflows/python-ci.yml
-├── Dockerfile
-├── docker-compose.yml
-├── .dockerignore
-├── config/
-├── configs/schema_contracts/
-├── data/api/
-├── data/database/
-├── data/raw/
-├── data/bronze/
-├── data/silver/
-├── data/gold/
-├── data/audit/
-├── docs/
-├── output/
-├── scripts/
-├── tests/
-├── main.py
-├── requirements.txt
-├── README.md
-└── .gitignore
 ```
 
 ---
@@ -189,16 +165,10 @@ Run database ingestion:
 python -m scripts.database_ingestion
 ```
 
-Create sample data:
+Run advanced DQ catalog evaluation:
 
 ```bash
-python -m scripts.create_sample_data
-```
-
-Run the orchestrated pipeline:
-
-```bash
-python -m scripts.pipeline_orchestrator --run-date 2026-06-23
+python -m scripts.advanced_dq_rule_catalog
 ```
 
 Run dry-run orchestration:
@@ -239,14 +209,14 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V21 quality gates:
+Run V22 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
 python -m scripts.validate_docker_artifacts
-python -m unittest tests.test_v21_database_ingestion
-python -m scripts.database_ingestion
+python -m unittest tests.test_v22_advanced_dq_rule_catalog
+python -m scripts.advanced_dq_rule_catalog
 python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
@@ -255,13 +225,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v21.0.0
+python -m scripts.release_verification --version v22.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v21.0.0
+python -m scripts.validate_release_tag --version v22.0.0
 ```
 
 ---
@@ -287,6 +257,7 @@ data/audit/pending_watermark_updates.json
 output/audit/pipeline_runs.csv
 output/quarantine/pyspark_customer_quarantine
 output/dq_reports/pyspark_customer_dq_report.json
+output/dq_reports/advanced_dq_catalog_summary.json
 output/reltio_payloads/customer_payload_json
 output/observability/pipeline_metrics_summary.json
 output/observability/pipeline_metrics_history.jsonl
@@ -311,6 +282,8 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Python
 - API ingestion
 - Database ingestion
+- Advanced data quality rule catalog
+- Metadata-driven validation
 - SQLite source extraction
 - SQL query-based extraction
 - Config-driven source extraction
@@ -345,26 +318,10 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 V20 adds a config-driven API ingestion layer before the medallion pipeline.
 
-Highlights:
-
-- Added API ingestion source config
-- Added mock paginated API response fixture
-- Added reusable API ingestion runner
-- Added API field mapping into raw customer schema
-- Added generated raw API landing CSV output
-- Added V20 API ingestion unit tests
-- Added API config into config validation
-
 Documentation:
 
 ```text
 docs/v20_api_ingestion_framework.md
-```
-
-V20 interview explanation:
-
-```text
-I added an API ingestion layer to my data engineering project. It uses a config-driven source definition, supports paginated API-style payloads, maps source API fields into my raw customer schema, writes a raw CSV landing file, and includes unit tests for config validation, pagination, missing source handling, and output generation.
 ```
 
 ---
@@ -373,25 +330,36 @@ I added an API ingestion layer to my data engineering project. It uses a config-
 
 V21 adds a config-driven relational database ingestion layer before the medallion pipeline.
 
-Highlights:
-
-- Added database ingestion source config
-- Added local SQLite source database seeding
-- Added SQL query-based extraction
-- Added reusable database ingestion runner
-- Added generated raw DB landing CSV output
-- Added V21 database ingestion unit tests
-- Added database config into config validation
-- Added V21 targeted tests into release verification
-
 Documentation:
 
 ```text
 docs/v21_database_ingestion_framework.md
 ```
 
-V21 interview explanation:
+---
+
+## V22.0.0 - Advanced Data Quality Rule Catalog
+
+V22 adds a metadata-driven advanced DQ rule catalog before the medallion pipeline.
+
+Highlights:
+
+- Added advanced customer DQ rule catalog
+- Added reusable rule evaluator
+- Added not-null, regex, allowed-values, unique, and min-length rule support
+- Added critical and warning severity handling
+- Added structured DQ summary JSON output
+- Added V22 DQ catalog unit tests
+- Added V22 config validation and release verification gates
+
+Documentation:
 
 ```text
-I added a database ingestion layer to my data engineering project. It uses a config-driven SQLite source definition, seeds a local source table for reproducibility, runs a controlled SQL SELECT extraction query, writes records into a raw customer landing CSV, and includes unit tests for config validation, invalid query protection, missing database handling, and output generation.
+docs/v22_advanced_data_quality_rule_catalog.md
+```
+
+V22 interview explanation:
+
+```text
+I added an advanced data quality rule catalog to my data engineering project. It uses metadata-driven JSON rules, supports multiple rule types and severity levels, evaluates rules against customer landing data, produces a structured DQ summary, and includes tests for clean data, critical failures, warning-only failures, uniqueness, missing input, and invalid catalog configuration.
 ```
