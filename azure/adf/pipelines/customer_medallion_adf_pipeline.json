@@ -1,0 +1,59 @@
+{
+  "name": "customer_medallion_adf_pipeline",
+  "properties": {
+    "description": "Azure Data Factory style orchestration simulation for the customer medallion pipeline.",
+    "parameters": {
+      "run_date": {"type": "String", "defaultValue": "2026-06-23"},
+      "environment": {"type": "String", "defaultValue": "dev"},
+      "trigger_mode": {"type": "String", "defaultValue": "dry_run"}
+    },
+    "activities": [
+      {
+        "name": "Validate_Runtime_Parameters",
+        "type": "DatabricksNotebook",
+        "dependsOn": [],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/orchestration/validate_runtime_parameters"}
+      },
+      {
+        "name": "Run_API_Ingestion",
+        "type": "DatabricksNotebook",
+        "dependsOn": [{"activity": "Validate_Runtime_Parameters", "dependencyConditions": ["Succeeded"]}],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/ingestion/api_ingestion"}
+      },
+      {
+        "name": "Run_Database_Ingestion",
+        "type": "DatabricksNotebook",
+        "dependsOn": [{"activity": "Validate_Runtime_Parameters", "dependencyConditions": ["Succeeded"]}],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/ingestion/database_ingestion"}
+      },
+      {
+        "name": "Run_Advanced_DQ_Catalog",
+        "type": "DatabricksNotebook",
+        "dependsOn": [
+          {"activity": "Run_API_Ingestion", "dependencyConditions": ["Succeeded"]},
+          {"activity": "Run_Database_Ingestion", "dependencyConditions": ["Succeeded"]}
+        ],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/data_quality/advanced_dq_rule_catalog"}
+      },
+      {
+        "name": "Run_Medallion_Orchestrator",
+        "type": "DatabricksNotebook",
+        "dependsOn": [{"activity": "Run_Advanced_DQ_Catalog", "dependencyConditions": ["Succeeded"]}],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/orchestration/customer_medallion_orchestrator"}
+      },
+      {
+        "name": "Validate_Runtime_Cleanliness",
+        "type": "DatabricksNotebook",
+        "dependsOn": [{"activity": "Run_Medallion_Orchestrator", "dependencyConditions": ["Succeeded"]}],
+        "linkedServiceName": {"referenceName": "ls_databricks_customer_pipeline", "type": "LinkedServiceReference"},
+        "typeProperties": {"notebookPath": "/notebooks/validation/runtime_cleanliness"}
+      }
+    ],
+    "annotations": ["v24.0.0", "azure-data-factory", "orchestration-simulation"]
+  }
+}
