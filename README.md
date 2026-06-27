@@ -2,10 +2,10 @@
 
 This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
+It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, and validated through CI/CD quality gates.
 
 ```text
-Current Version: v17.0.0
+Current Version: v18.0.0
 ```
 
 ---
@@ -30,6 +30,11 @@ Current Version: v17.0.0
 | v13.0.0 | Data Observability + Pipeline Metrics Mart |
 | v13.0.1 | Pre-V14 repository review and roadmap handoff cleanup |
 | v13.0.2 | Markdown formatting cleanup before V14 |
+| v14.0.0 | Pipeline Orchestration + Job Control Framework |
+| v15.0.0 | Scheduling, Dependency Management, and Runtime Parameterization |
+| v16.0.0 | Pipeline Alerting, Failure Notification, and SLA Monitoring |
+| v17.0.0 | Retry Framework, Recovery Handling, and Failure Replay |
+| v18.0.0 | CI/CD Hardening, Quality Gates, and Release Automation |
 
 ---
 
@@ -59,6 +64,14 @@ Pipeline Audit Update
 V13 Observability Metrics Mart
 ↓
 V14 Job Orchestration + Job Control
+↓
+V15 Runtime Parameters + Dependency Validation
+↓
+V16 Alerting + SLA Monitoring
+↓
+V17 Retry + Recovery + Failure Replay
+↓
+V18 CI/CD Quality Gates + Release Verification
 ```
 
 ---
@@ -79,115 +92,15 @@ V14 Job Orchestration + Job Control
 - Custom exception handling
 - SCD Type 2 customer history tracking
 - Data observability metrics mart
-- JSON summary metrics output
-- JSONL and CSV historical metrics logs
+- Alerting and SLA monitoring
+- Retry, recovery, and replay handling
+- Runtime parameterization and dry-run support
+- Python syntax validation gate
+- Config validation gate
+- Runtime-output cleanliness validation gate
+- Release verification and tag safety checks
+- Staged GitHub Actions CI
 - Reltio-style JSON payload generation
-- Unit testing
-- GitHub Actions CI
-
----
-
-## V12 - SCD Type 2 Historical Tracking
-
-V12 adds a customer history Delta table:
-
-```text
-data/gold/customer_history
-```
-
-Tracked business key:
-
-```text
-customer_id
-```
-
-Tracked attributes:
-
-```text
-first_name
-last_name
-email
-phone
-city
-state
-source_system
-```
-
-SCD2 metadata columns:
-
-```text
-effective_start_date
-effective_end_date
-is_current
-record_hash
-created_at
-updated_at
-```
-
-Documentation:
-
-```text
-docs/v12_scd_type2_historical_tracking.md
-```
-
----
-
-## V13 - Data Observability + Pipeline Metrics Mart
-
-V13 adds a production-style observability layer that summarizes pipeline health and data movement across the lakehouse pipeline.
-
-It captures:
-
-- Latest pipeline audit status
-- Bronze row count
-- Silver row count
-- Quarantine row count
-- Gold row count
-- Customer History row count
-- Latest DQ validation status
-- Latest schema validation status
-- Current watermark value
-- Pending watermark value
-- SCD Type 2 total history rows
-- SCD Type 2 current rows
-- SCD Type 2 expired rows
-- Changed customer count
-
-V13 writes metrics to:
-
-```text
-output/observability/pipeline_metrics_summary.json
-output/observability/pipeline_metrics_history.jsonl
-output/observability/pipeline_metrics_history.csv
-```
-
-Run command:
-
-```bash
-python -m scripts.pipeline_observability
-```
-
-Documentation:
-
-```text
-docs/v13_data_observability_metrics.md
-```
-
----
-
-## Pre-V14 Roadmap Handoff
-
-The pre-V14 cleanup adds a single roadmap progress document:
-
-```text
-docs/12_month_data_engineering_roadmap_progress.md
-```
-
-This document summarizes the completed roadmap from v0.0.0 through v13.0.0 and defines the next planned milestone:
-
-```text
-v14.0.0 - Pipeline Orchestration + Job Control Framework
-```
 
 ---
 
@@ -199,30 +112,15 @@ Pipeline configuration is stored in:
 config/pipeline/local_config.json
 ```
 
-Important current config keys:
+Main supporting configuration files:
 
-```json
-{
-    "storage_format": "delta",
-    "lakehouse_write_strategy": "merge",
-    "customer_history_output_path": "data/gold/customer_history",
-    "scd2_business_keys": ["customer_id"],
-    "scd2_tracked_columns": [
-        "first_name",
-        "last_name",
-        "email",
-        "phone",
-        "city",
-        "state",
-        "source_system"
-    ],
-    "scd2_effective_start_column": "created_date",
-    "observability_enabled": true,
-    "observability_output_dir": "output/observability",
-    "observability_summary_file": "output/observability/pipeline_metrics_summary.json",
-    "observability_history_jsonl_file": "output/observability/pipeline_metrics_history.jsonl",
-    "observability_history_csv_file": "output/observability/pipeline_metrics_history.csv"
-}
+```text
+config/jobs/customer_medallion_job.json
+config/rules/customer_dq_rules.json
+config/alerts/customer_medallion_alerts.json
+config/retries/customer_medallion_retry_policy.json
+configs/schema_contracts/bronze_customers_schema.json
+configs/schema_contracts/silver_customers_schema.json
 ```
 
 ---
@@ -232,37 +130,17 @@ Important current config keys:
 ```text
 data-engineering-project/
 ├── .github/workflows/python-ci.yml
-├── config/jobs/customer_medallion_job.json
-├── config/pipeline/local_config.json
-├── config/rules/customer_dq_rules.json
-├── configs/schema_contracts/bronze_customers_schema.json
-├── configs/schema_contracts/silver_customers_schema.json
+├── config/
+├── configs/schema_contracts/
 ├── data/raw/
 ├── data/bronze/
 ├── data/silver/
 ├── data/gold/
 ├── data/audit/
-├── docs/12_month_data_engineering_roadmap_progress.md
-├── docs/v12_scd_type2_historical_tracking.md
-├── docs/v13_data_observability_metrics.md
-├── docs/v14_pipeline_orchestration_job_control.md
-├── output/audit/
-├── output/dq_reports/
-├── output/quarantine/
-├── output/logs/
-├── output/observability/
-├── output/job_control/
-├── output/reltio_payloads/
-├── scripts/job_control.py
-├── scripts/metrics_collector.py
-├── scripts/pipeline_observability.py
-├── scripts/pipeline_orchestrator.py
-├── scripts/pyspark_pipeline_runner.py
-├── scripts/pyspark_customer_history_scd2.py
-├── tests/test_job_control.py
-├── tests/test_metrics_collector.py
-├── tests/test_pipeline_orchestrator.py
-├── tests/test_scd_type2.py
+├── docs/
+├── output/
+├── scripts/
+├── tests/
 ├── main.py
 ├── requirements.txt
 ├── README.md
@@ -285,61 +163,60 @@ Install dependencies:
 python -m pip install -r requirements.txt
 ```
 
-Create clean sample data:
+Create sample data:
 
 ```bash
 python -m scripts.create_sample_data
 ```
 
-Run the V14 orchestrator:
+Run the orchestrated pipeline:
 
 ```bash
-python -m scripts.pipeline_orchestrator
+python -m scripts.pipeline_orchestrator --run-date 2026-06-23
 ```
 
-Run the full PySpark pipeline:
+Run dry-run orchestration:
 
 ```bash
-python -m scripts.pyspark_pipeline_runner
+python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 ```
 
-Run V13 observability:
+Run independent alerting:
 
 ```bash
-python -m scripts.pipeline_observability
-```
-
-Run the V1 Python-only pipeline:
-
-```bash
-python main.py
+python -m scripts.pipeline_alerting
 ```
 
 ---
 
-## Testing
+## Testing and Release Verification
 
-Run all tests:
+Run the full test suite:
 
 ```bash
 python -m unittest discover tests
 ```
 
-Expected result:
-
-```text
-OK
-```
-
-Recommended validation before every release:
+Run V18 quality gates:
 
 ```bash
-python -m py_compile scripts/metrics_collector.py
-python -m py_compile scripts/pipeline_observability.py
-python -m unittest tests.test_metrics_collector
-python -m unittest discover tests
-python -m scripts.pyspark_pipeline_runner
-python -m scripts.pipeline_observability
+python -m scripts.validate_python_project
+python -m scripts.validate_config_files
+python -m unittest tests.test_v18_quality_gates
+python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
+python -m scripts.validate_runtime_cleanliness
+```
+
+Run full release verification:
+
+```bash
+python -m scripts.release_verification --version v18.0.0
+```
+
+Validate release tag safety before tagging:
+
+```bash
+python -m scripts.validate_release_tag --version v18.0.0
 ```
 
 ---
@@ -363,6 +240,15 @@ output/reltio_payloads/customer_payload_json
 output/observability/pipeline_metrics_summary.json
 output/observability/pipeline_metrics_history.jsonl
 output/observability/pipeline_metrics_history.csv
+output/job_control/job_runs.csv
+output/job_control/step_runs.csv
+output/runtime_parameters/runtime_parameters_<job_run_id>.json
+output/alerts/alert_events.jsonl
+output/alerts/alert_events.csv
+output/alerts/notification_summary.txt
+output/recovery/retry_events.csv
+output/recovery/retry_events.jsonl
+output/recovery/replay_requests.jsonl
 ```
 
 Only `.gitkeep` placeholders are committed for runtime output folders.
@@ -388,78 +274,27 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Quarantine handling
 - Audit logging
 - Structured exception handling
-- Unit testing
+- Alerting and SLA monitoring
+- Retry and recovery handling
+- CI/CD quality gates
+- Release verification
 - GitHub Actions CI
 - Reltio-style JSON payload generation
 
 ---
 
-## Future Enhancements
-
-- Scheduling, dependency management, and runtime parameterization
-- API ingestion source
-- Database ingestion source
-- Great Expectations-style checks
-- Data observability dashboard
-- Docker support
-- Databricks Asset Bundle structure
-- Deployment documentation
-
 ## V14.0.0 - Pipeline Orchestration + Job Control Framework
 
 V14 adds a config-driven orchestration and job-control layer on top of the existing PySpark medallion pipeline.
 
-### V14 Highlights
+Highlights:
 
-- Added job-level orchestration configuration.
-- Added step-level execution control.
-- Added enabled/disabled step handling.
-- Added critical vs optional step handling.
-- Added expected status validation.
-- Added job run audit logging.
-- Added step run audit logging.
-- Added observability as an orchestrated pipeline step.
-
-### V14 Runtime Outputs
-
-```text
-output/job_control/job_runs.csv
-output/job_control/step_runs.csv
-```
-
-### V14 Run Command
-
-```bash
-python -m scripts.pipeline_orchestrator
-```
-
-### V14 Orchestrated Flow
-
-```text
-Bronze Ingestion
-↓
-Silver DQ Validation
-↓
-Customer History SCD Type 2
-↓
-Gold Canonical Transformation
-↓
-Commit Watermark
-↓
-Pipeline Observability
-```
-
-### V14 Verification
-
-```text
-V14 unit tests: OK
-Full test suite: expected OK
-Orchestrator status: SUCCESS
-Total steps: 6
-Successful steps: 6
-Failed steps: 0
-Skipped steps: 0
-```
+- Job-level orchestration configuration
+- Step-level execution control
+- Enabled/disabled step handling
+- Critical vs optional step handling
+- Expected status validation
+- Job and step run audit logging
 
 Documentation:
 
@@ -471,43 +306,15 @@ docs/v14_pipeline_orchestration_job_control.md
 
 ## V15.0.0 - Scheduling, Dependency Management, and Runtime Parameterization
 
-V15 upgrades the V14 config-driven orchestrator with runtime parameters, dependency validation, dry-run support, and schedule metadata.
+V15 upgrades orchestration with runtime parameters, dependency validation, dry-run support, and schedule metadata.
 
-### V15 Highlights
+Highlights:
 
-- Added runtime parameter defaults.
-- Added manual, scheduled, and backfill run modes.
-- Added dry-run execution mode.
-- Added step dependency metadata.
-- Added dependency validation before execution.
-- Added schedule metadata for local portfolio simulation.
-- Added runtime parameter snapshots for each orchestrated job run.
-
-### V15 Run Commands
-
-Manual run:
-
-```bash
-python -m scripts.pipeline_orchestrator --run-mode manual --run-date 2026-06-23
-```
-
-Dry run:
-
-```bash
-python -m scripts.pipeline_orchestrator --run-mode manual --run-date 2026-06-23 --dry-run
-```
-
-Backfill-mode simulation:
-
-```bash
-python -m scripts.pipeline_orchestrator --run-mode backfill --backfill-start-date 2026-06-16 --backfill-end-date 2026-06-17
-```
-
-### V15 Runtime Outputs
-
-```text
-output/runtime_parameters/runtime_parameters_<job_run_id>.json
-```
+- Runtime parameter defaults
+- Manual, scheduled, and backfill run modes
+- Dry-run execution mode
+- Step dependency metadata
+- Runtime parameter snapshots
 
 Documentation:
 
@@ -515,70 +322,75 @@ Documentation:
 docs/v15_scheduling_dependency_runtime_parameters.md
 ```
 
+---
 
 ## V16.0.0 - Pipeline Alerting, Failure Notification, and SLA Monitoring
 
-V16 adds a production-style alerting and SLA monitoring layer to the V15 orchestration framework.
+V16 adds a production-style alerting and SLA monitoring layer to the orchestration framework.
 
-### V16 Highlights
+Highlights:
 
-- Added alerting configuration.
-- Added pipeline failure alert generation.
-- Added critical and optional step failure alerts.
-- Added pipeline duration SLA monitoring.
-- Added step duration SLA monitoring.
-- Added DQ, schema, and quarantine threshold alert checks.
-- Added alert event JSONL and CSV outputs.
-- Added notification summary output.
-- Integrated alerting after orchestrator job completion.
+- Alerting configuration
+- Pipeline failure alert generation
+- Critical and optional step failure alerts
+- Pipeline and step duration SLA monitoring
+- DQ, schema, and quarantine threshold checks
+- Alert event JSONL and CSV outputs
+- Notification summary output
 
-### V16 Runtime Outputs
-
-```text
-output/alerts/alert_events.jsonl
-output/alerts/alert_events.csv
-output/alerts/notification_summary.txt
-```
-
-### V16 Run Commands
-
-```bash
-python -m scripts.pipeline_orchestrator --run-date 2026-06-23
-python -m scripts.pipeline_alerting
-```
-
+---
 
 ## V17.0.0 - Retry Framework, Recovery Handling, and Failure Replay
 
-V17 adds retry, recovery, and replay handling to the existing production-style pipeline orchestration framework.
+V17 adds retry, recovery, and replay handling to the production-style pipeline orchestration framework.
 
-### V17 Highlights
+Highlights:
 
-- Added config-driven retry policy.
-- Added step-level retry enablement.
-- Added retry attempt limits.
-- Added retry event logging.
-- Added recovery success tracking.
-- Added recovery exhausted tracking.
-- Added non-retryable exception handling.
-- Added replay request creation utility.
-- Integrated retry wrapper into the V16 orchestrator.
+- Config-driven retry policy
+- Step-level retry enablement
+- Retry attempt limits
+- Retry event logging
+- Recovery success and exhausted tracking
+- Non-retryable exception handling
+- Replay request creation utility
+- Retry wrapper integration into the orchestrator
 
-### V17 Runtime Outputs
+Documentation:
 
 ```text
-output/recovery/retry_events.csv
-output/recovery/retry_events.jsonl
-output/recovery/replay_requests.jsonl
+docs/v17_retry_recovery_failure_replay.md
 ```
 
-### V17 Validation Commands
+---
 
-```bash
-python -m unittest tests.test_pipeline_retry
-python -m unittest tests.test_v17_orchestrator_retry
-python -m unittest discover tests
-python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
-python -m scripts.pipeline_orchestrator --run-date 2026-06-23
+## V18.0.0 - CI/CD Hardening, Quality Gates, and Release Automation
+
+V18 adds release-readiness controls on top of the V17 retry, recovery, and replay framework.
+
+Highlights:
+
+- Hardened GitHub Actions into staged CI quality gates
+- Added Python syntax validation
+- Added config file validation
+- Added targeted V17/V18 tests
+- Added full test gate
+- Added dry-run orchestrator gate
+- Added runtime-output cleanliness validation
+- Added release verification runner
+- Added release tag safety check
+- Added pull request checklist
+- Hardened Delta table existence detection for clean local runs
+- Ignored generated raw sample input files
+
+Documentation:
+
+```text
+docs/v18_cicd_quality_gates_release_automation.md
+docs/pull_request_checklist.md
 ```
 
+V18 interview explanation:
+
+```text
+I hardened the CI/CD process for my PySpark medallion pipeline by splitting validation into staged quality gates. The release process now validates Python syntax, JSON configs, targeted framework tests, full tests, dry-run orchestration, runtime-output cleanliness, release verification, and tag safety before a version is released.
+```
