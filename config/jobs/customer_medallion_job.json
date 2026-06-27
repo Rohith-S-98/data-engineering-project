@@ -105,7 +105,7 @@
             "allow_dry_run": true
         }
     ],
-    "version": "v15.0.0",
+    "version": "v16.0.0",
     "schedule": {
         "schedule_name": "customer_medallion_daily_schedule",
         "enabled": false,
@@ -121,5 +121,10 @@
         "backfill_end_date": null,
         "triggered_by": "local_cli",
         "allow_optional_step_failure": true
+    },
+    "alerting": {
+        "enabled": true,
+        "alert_config_path": "config/alerts/customer_medallion_alerts.json",
+        "description": "Run V16 alerting and SLA evaluation after the orchestrated job completes."
     }
 }

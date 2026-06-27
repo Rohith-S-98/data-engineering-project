@@ -157,6 +157,28 @@ def _build_runtime_parameters(
     return validate_runtime_parameters(merged_parameters)
 
 
+
+def _run_v16_alerting_if_enabled(job_config: dict[str, Any]) -> None:
+    alerting_config = job_config.get("alerting", {})
+
+    if not alerting_config.get("enabled", False):
+        return
+
+    alert_config_path = alerting_config.get(
+        "alert_config_path",
+        "config/alerts/customer_medallion_alerts.json",
+    )
+
+    try:
+        from scripts.pipeline_alerting import run_pipeline_alerting
+
+        alert_status = run_pipeline_alerting(alert_config_path=alert_config_path)
+        print(f"V16 alerting completed with status: {alert_status}")
+    except Exception as alert_error:
+        print("WARNING: V16 alerting failed but pipeline status was not changed.")
+        print(f"Alerting Error Type: {type(alert_error).__name__}")
+        print(f"Alerting Error Message: {alert_error}")
+
 def run_pipeline_orchestrator(
     job_config_path: str = DEFAULT_JOB_CONFIG_PATH,
     raise_on_failure: bool = True,
@@ -196,7 +218,7 @@ def run_pipeline_orchestrator(
     )
 
     print("=" * 70)
-    print("Starting V15 Pipeline Orchestration Job")
+    print("Starting V16 Pipeline Orchestration Job")
     print(f"Job Name: {job_name}")
     print(f"Job Run ID: {job_run_id}")
     print(f"Run Mode: {runtime_parameters['run_mode']}")
@@ -363,8 +385,10 @@ def run_pipeline_orchestrator(
         job_run_log_file=job_run_log_file,
     )
 
+    _run_v16_alerting_if_enabled(job_config)
+
     print("\n" + "=" * 70)
-    print("V15 Pipeline Orchestration Job Completed")
+    print("V16 Pipeline Orchestration Job Completed")
     print(f"Final Status    : {final_status}")
     print(f"Total Steps     : {total_steps}")
     print(f"Successful Steps: {successful_steps}")
