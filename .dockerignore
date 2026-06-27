@@ -34,9 +34,6 @@ data/raw/*
 data/database/*
 
 # Runtime pipeline outputs
--data/bronze
--data/silver
--data/gold
 data/bronze
 data/silver
 data/gold
