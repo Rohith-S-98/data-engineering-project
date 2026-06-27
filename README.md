@@ -10,6 +10,87 @@ Current Version: v25.0.1
 
 ---
 
+## Interviewer Review Snapshot
+
+This project is designed to show production-style Data Engineering thinking, not only basic transformation code.
+
+| Review Area | What This Project Demonstrates |
+|---|---|
+| Role alignment | Azure / Databricks / PySpark Data Engineering pipeline design |
+| End-to-end system thinking | Source ingestion -> raw landing -> bronze -> silver -> gold -> downstream MDM-style output |
+| Production controls | Schema validation, DQ rules, quarantine, audit, alerting, SLA monitoring, retry, replay, CI/CD, Docker |
+| Versioned engineering maturity | The project evolved from foundation pipelines to observability, orchestration, deployment, and dashboard readiness |
+| Real-work alignment | Mirrors Apexon / IQVIA-style MDM ingestion, DQ, canonical modeling, and JSON payload generation patterns |
+
+---
+
+## End-to-End Flow
+
+```mermaid
+flowchart LR
+    A[Source Systems<br/>API / File / Database] --> B[Raw Landing<br/>JSON / CSV / Tables]
+    B --> C[Schema Contracts<br/>Required Fields + Types]
+    C --> D[Bronze Layer<br/>Standardization]
+    D --> E[Data Quality Framework<br/>Rules + Severity]
+    E --> F{Valid?}
+    F -- Yes --> G[Silver Layer<br/>Clean + Transformed Data]
+    F -- No --> H[Quarantine Layer<br/>Rejected Records]
+    G --> I[Gold Layer<br/>Canonical Model]
+    I --> J[SCD Type 2<br/>History Tracking]
+    J --> K[Reltio-style<br/>JSON Payloads]
+    K --> L[Audit + Run Metadata]
+    L --> M[Observability Metrics]
+    M --> N[Alerts + SLA Monitoring]
+    N --> O[Retry / Recovery / Replay]
+    O --> P[CI/CD + Release Verification]
+    P --> Q[Docker + Databricks / ADF-style Deployment]
+    Q --> R[Power BI-ready Outputs]
+```
+
+### What this flow proves
+
+- I can design pipelines beyond simple ETL scripts.
+- I understand ingestion, schema validation, data quality, quarantine, canonical modeling, and downstream integration.
+- I can add production controls such as audit metadata, observability, alerting, retry/recovery, release gates, and CI/CD.
+- I can explain a complete source-to-consumption pipeline in interview discussions.
+
+---
+
+## Versioned Project Maturity
+
+```mermaid
+flowchart LR
+    A[v1-v5<br/>Foundation<br/>Python DQ, PySpark, Config, Audit] --> B[v6-v12<br/>Quality + Lakehouse<br/>DQ Severity, Schema, Watermark, Merge, SCD2]
+    B --> C[v13-v17<br/>Operations<br/>Observability, Orchestration, Scheduling, Alerts, Retry]
+    C --> D[v18-v22<br/>Production + Ingestion<br/>CI/CD, Docker, API, Database, Advanced DQ]
+    D --> E[v23-v26<br/>Deployment + Analytics<br/>Databricks, ADF, Power BI, Live API Testing]
+```
+
+| Version Range | Engineering Maturity Added | What It Proves |
+|---|---|---|
+| v1 - v5 | Config-driven Python pipeline, PySpark medallion flow, Databricks-style structure, centralized config, audit tracking | Strong foundation and clean project structure |
+| v6 - v12 | Severity-based DQ, custom exceptions, schema validation, incremental load, watermarking, merge/upsert, SCD Type 2 | Data quality, reliability, and lakehouse processing depth |
+| v13 - v17 | Observability mart, orchestration, job control, scheduling, dependency checks, alerting, SLA monitoring, retry and replay | Operational thinking beyond basic transformation code |
+| v18 - v22 | CI/CD hardening, Docker runtime, API ingestion, database ingestion, advanced DQ rule catalog | Production-readiness, testability, and ingestion framework design |
+| v23 - v26 | Databricks Asset Bundle-style structure, Azure Data Factory simulation, Power BI observability, planned live public API integration | Cloud deployment style, analytics visibility, and real-world integration practice |
+
+---
+
+## Real-Work Alignment
+
+This project is connected to real Apexon / IQVIA-style MDM Data Engineering scenarios.
+
+| Real Work Pattern | Portfolio Implementation |
+|---|---|
+| API, file, connector, and system source ingestion | Config-driven API/database ingestion and raw landing |
+| Landing to staging and business-rule transformations | Bronze and Silver processing with schema and DQ checks |
+| Data quality failures and quarantine handling | Severity-based DQ framework with clean/quarantine split |
+| Canonical modeling for downstream systems | Gold canonical layer and Reltio-style JSON payload generation |
+| Incremental processing and error triage | Watermarks, audit logs, retry/recovery, failure replay, SLA monitoring |
+| Production release discipline | CI/CD gates, release verification, Docker, repo hygiene, runtime cleanliness checks |
+
+---
+
 ## Project Versions
 
 | Version | Feature |
