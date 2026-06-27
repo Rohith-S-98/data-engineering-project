@@ -1,0 +1,35 @@
+services:
+  data-engineering-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: data-engineering-project:v19
+    container_name: data-engineering-project-v19
+    environment:
+      PYTHONWARNINGS: ignore::ResourceWarning
+    volumes:
+      - ./data:/app/data
+      - ./output:/app/output
+    command:
+      - python
+      - -m
+      - scripts.pipeline_orchestrator
+      - --dry-run
+      - --run-date
+      - "2026-06-23"
+
+  release-verification:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: data-engineering-project:v19
+    environment:
+      PYTHONWARNINGS: ignore::ResourceWarning
+    command:
+      - python
+      - -m
+      - scripts.release_verification
+      - --version
+      - v19.0.0
+      - --skip-real-run
+      - --skip-alerting
