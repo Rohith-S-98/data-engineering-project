@@ -1,0 +1,13 @@
+{
+  "name": "ls_databricks_customer_pipeline",
+  "properties": {
+    "type": "AzureDatabricks",
+    "description": "ADF-style linked service metadata for the customer medallion Databricks workspace. This file intentionally contains placeholders only and no secrets.",
+    "typeProperties": {
+      "workspaceUrl": "https://example-dev.azuredatabricks.net",
+      "clusterReference": "DATABRICKS_CLUSTER_ID_PLACEHOLDER",
+      "authenticationMode": "workspace-managed-placeholder"
+    },
+    "annotations": ["v24.0.0", "databricks-linked-service", "placeholder-only"]
+  }
+}
