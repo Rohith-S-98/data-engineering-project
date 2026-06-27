@@ -1,0 +1,39 @@
+{
+  "source_name": "customer_mock_api",
+  "enabled": true,
+  "base_url": "mock://customer-api/v1/customers",
+  "http_method": "GET",
+  "auth_type": "none",
+  "pagination": {
+    "type": "page_number",
+    "page_param": "page",
+    "page_size": 2,
+    "max_pages": 2
+  },
+  "mock_response_path": "data/api/mock_customer_api_response.json",
+  "target_csv_path": "data/raw/customer_data_api.csv",
+  "target_columns": [
+    "customer_id",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "city",
+    "state",
+    "created_date",
+    "source_system"
+  ],
+  "field_mapping": {
+    "id": "customer_id",
+    "firstName": "first_name",
+    "lastName": "last_name",
+    "emailAddress": "email",
+    "mobileNumber": "phone",
+    "city": "city",
+    "state": "state",
+    "createdDate": "created_date"
+  },
+  "default_values": {
+    "source_system": "API"
+  }
+}

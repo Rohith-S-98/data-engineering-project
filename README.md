@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
+It demonstrates how customer data can be generated or extracted from an API-style source, landed into raw storage, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
 
 ```text
-Current Version: v19.0.0
+Current Version: v20.0.0
 ```
 
 ---
@@ -36,13 +36,16 @@ Current Version: v19.0.0
 | v17.0.0 | Retry Framework, Recovery Handling, and Failure Replay |
 | v18.0.0 | CI/CD Hardening, Quality Gates, and Release Automation |
 | v19.0.0 | Docker Containerized Local Runtime |
+| v20.0.0 | API Ingestion Framework |
 
 ---
 
 ## Current Architecture
 
 ```text
-Raw Customer CSV
+Mock API / Raw Customer CSV
+↓
+V20 API Ingestion + Raw Landing
 ↓
 Bronze Schema Validation
 ↓
@@ -82,6 +85,9 @@ V19 Docker Containerized Runtime
 ## Features
 
 - Python config-driven DQ pipeline
+- Config-driven API ingestion framework
+- Mock paginated source API fixture
+- API field mapping into raw customer schema
 - PySpark medallion pipeline
 - Bronze, Silver, Gold, Quarantine, and Customer History layers
 - Delta Lake storage support
@@ -120,6 +126,7 @@ config/pipeline/local_config.json
 Main supporting configuration files:
 
 ```text
+config/api/customer_api_ingestion_config.json
 config/jobs/customer_medallion_job.json
 config/rules/customer_dq_rules.json
 config/alerts/customer_medallion_alerts.json
@@ -140,6 +147,7 @@ data-engineering-project/
 ├── .dockerignore
 ├── config/
 ├── configs/schema_contracts/
+├── data/api/
 ├── data/raw/
 ├── data/bronze/
 ├── data/silver/
@@ -169,6 +177,12 @@ Install dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
+```
+
+Run API ingestion:
+
+```bash
+python -m scripts.api_ingestion
 ```
 
 Create sample data:
@@ -227,13 +241,14 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V19 quality gates:
+Run V20 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
 python -m scripts.validate_docker_artifacts
-python -m unittest tests.test_v19_docker_artifacts
+python -m unittest tests.test_v20_api_ingestion
+python -m scripts.api_ingestion
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
 ```
@@ -241,13 +256,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v19.0.0
+python -m scripts.release_verification --version v20.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v19.0.0
+python -m scripts.validate_release_tag --version v20.0.0
 ```
 
 ---
@@ -257,6 +272,10 @@ python -m scripts.validate_release_tag --version v19.0.0
 Runtime outputs are generated locally and intentionally ignored by Git:
 
 ```text
+data/raw/customer_data.csv
+data/raw/customer_data_clean.csv
+data/raw/customer_data_dirty.csv
+data/raw/customer_data_api.csv
 data/bronze/customer_bronze
 data/silver/customer_valid
 data/gold/customer_canonical
@@ -289,6 +308,8 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 ## Skills Demonstrated
 
 - Python
+- API ingestion
+- Config-driven source extraction
 - PySpark
 - Delta Lake
 - Docker
@@ -447,4 +468,32 @@ V19 interview explanation:
 
 ```text
 I containerized my PySpark medallion pipeline by adding a Dockerfile, Docker Compose runtime commands, Docker ignore rules, validation checks, and CI-friendly tests. This makes the project easier to run consistently across machines and closer to production deployment practices.
+```
+
+---
+
+## V20.0.0 - API Ingestion Framework
+
+V20 adds a config-driven API ingestion layer before the medallion pipeline.
+
+Highlights:
+
+- Added API ingestion source config
+- Added mock paginated API response fixture
+- Added reusable API ingestion runner
+- Added API field mapping into raw customer schema
+- Added generated raw API landing CSV output
+- Added V20 API ingestion unit tests
+- Added API config into config validation
+
+Documentation:
+
+```text
+docs/v20_api_ingestion_framework.md
+```
+
+V20 interview explanation:
+
+```text
+I added an API ingestion layer to my data engineering project. It uses a config-driven source definition, supports paginated API-style payloads, maps source API fields into my raw customer schema, writes a raw CSV landing file, and includes unit tests for config validation, pagination, missing source handling, and output generation.
 ```

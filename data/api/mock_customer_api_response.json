@@ -1,0 +1,46 @@
+{
+  "pages": [
+    {
+      "page_number": 1,
+      "next_page": 2,
+      "records": [
+        {
+          "id": "CUST101",
+          "firstName": "Asha",
+          "lastName": "Rao",
+          "emailAddress": "asha.rao@example.com",
+          "mobileNumber": "9876500101",
+          "city": "Bengaluru",
+          "state": "Karnataka",
+          "createdDate": "2026-06-20"
+        },
+        {
+          "id": "CUST102",
+          "firstName": "Vikram",
+          "lastName": "Shah",
+          "emailAddress": "vikram.shah@example.com",
+          "mobileNumber": "9876500102",
+          "city": "Mumbai",
+          "state": "Maharashtra",
+          "createdDate": "2026-06-20"
+        }
+      ]
+    },
+    {
+      "page_number": 2,
+      "next_page": null,
+      "records": [
+        {
+          "id": "CUST103",
+          "firstName": "Nisha",
+          "lastName": "Menon",
+          "emailAddress": "nisha.menon@example.com",
+          "mobileNumber": "9876500103",
+          "city": "Kochi",
+          "state": "Kerala",
+          "createdDate": "2026-06-21"
+        }
+      ]
+    }
+  ]
+}

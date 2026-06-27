@@ -85,3 +85,6 @@ output/job_control/*.csv
 /data/raw/customer_data.csv
 /data/raw/customer_data_clean.csv
 /data/raw/customer_data_dirty.csv
+
+# V20 generated API raw output
+/data/raw/customer_data_api.csv

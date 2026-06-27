@@ -56,6 +56,7 @@ output/recovery/*
 data/raw/customer_data.csv
 data/raw/customer_data_clean.csv
 data/raw/customer_data_dirty.csv
+data/raw/customer_data_api.csv
 
 # Spark and Delta generated files
 *.crc
