@@ -1,0 +1,63 @@
+# Git and local environments
+.git
+.gitignore
+.venv
+venv
+.env
+.env.local
+
+# Python caches
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.coverage
+htmlcov
+
+# OS and editor files
+.DS_Store
+.idea
+.vscode
+.ipynb_checkpoints
+
+# Local Spark and Derby artifacts
+metastore_db
+spark-warehouse
+derby.log
+
+# Runtime pipeline outputs
+data/bronze
+data/silver
+data/gold
+data/audit/*
+!data/audit/.gitkeep
+output/audit/*
+!output/audit/.gitkeep
+output/dq_reports/*
+!output/dq_reports/.gitkeep
+output/quarantine/*
+!output/quarantine/.gitkeep
+output/reltio_payloads/*
+!output/reltio_payloads/.gitkeep
+output/logs/*
+!output/logs/.gitkeep
+output/observability/*
+!output/observability/.gitkeep
+output/job_control/*
+!output/job_control/.gitkeep
+output/runtime_parameters/*
+!output/runtime_parameters/.gitkeep
+output/alerts/*
+!output/alerts/.gitkeep
+output/recovery/*
+!output/recovery/.gitkeep
+
+# Generated raw sample data
+data/raw/customer_data.csv
+data/raw/customer_data_clean.csv
+data/raw/customer_data_dirty.csv
+
+# Spark and Delta generated files
+*.crc
+*.snappy.parquet
+_delta_log
