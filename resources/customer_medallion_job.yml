@@ -1,0 +1,48 @@
+resources:
+  jobs:
+    customer_medallion_pipeline_job:
+      name: customer-medallion-pipeline-${bundle.target}
+      description: Databricks Asset Bundle style job for the customer medallion pipeline.
+      max_concurrent_runs: 1
+      tags:
+        project: data-engineering-project
+        version: v23.0.0
+        layer: orchestration
+      job_clusters:
+        - job_cluster_key: customer_pipeline_cluster
+          new_cluster:
+            spark_version: 14.3.x-scala2.12
+            node_type_id: Standard_DS3_v2
+            num_workers: 1
+            spark_env_vars:
+              PIPELINE_ENV: ${bundle.target}
+      tasks:
+        - task_key: validate_python_project
+          job_cluster_key: customer_pipeline_cluster
+          spark_python_task:
+            python_file: ../scripts/validate_python_project.py
+
+        - task_key: validate_config_files
+          depends_on:
+            - task_key: validate_python_project
+          job_cluster_key: customer_pipeline_cluster
+          spark_python_task:
+            python_file: ../scripts/validate_config_files.py
+
+        - task_key: run_pipeline_dry_run
+          depends_on:
+            - task_key: validate_config_files
+          job_cluster_key: customer_pipeline_cluster
+          spark_python_task:
+            python_file: ../scripts/pipeline_orchestrator.py
+            parameters:
+              - --dry-run
+              - --run-date
+              - ${var.run_date}
+
+        - task_key: run_runtime_cleanliness
+          depends_on:
+            - task_key: run_pipeline_dry_run
+          job_cluster_key: customer_pipeline_cluster
+          spark_python_task:
+            python_file: ../scripts/validate_runtime_cleanliness.py
