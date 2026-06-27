@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment structure, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
+It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, organized for Databricks-style deployment, and run through a containerized local runtime.
 
 ```text
-Current Version: v22.0.0
+Current Version: v23.0.0
 ```
 
 ---
@@ -39,6 +39,7 @@ Current Version: v22.0.0
 | v20.0.0 | API Ingestion Framework |
 | v21.0.0 | Database Ingestion Framework |
 | v22.0.0 | Advanced Data Quality Rule Catalog |
+| v23.0.0 | Databricks Asset Bundle Style Deployment Structure |
 
 ---
 
@@ -82,6 +83,8 @@ V17 Retry + Recovery + Failure Replay
 V18 CI/CD Quality Gates + Release Verification
 ↓
 V19 Docker Containerized Runtime
+↓
+V23 Databricks Asset Bundle Style Deployment Structure
 ```
 
 ---
@@ -92,6 +95,8 @@ V19 Docker Containerized Runtime
 - Advanced metadata-driven DQ rule catalog
 - Config-driven API ingestion framework
 - Config-driven database ingestion framework
+- Databricks Asset Bundle-style deployment structure
+- Local Databricks bundle structure validation
 - Local SQLite source extraction for deterministic testing
 - Mock paginated source API fixture
 - API and database field landing into raw customer schema
@@ -125,6 +130,8 @@ V19 Docker Containerized Runtime
 ## Key Configuration
 
 ```text
+databricks.yml
+resources/customer_medallion_job.yml
 config/pipeline/local_config.json
 config/rules/customer_dq_rules.json
 config/rules/advanced_customer_dq_rule_catalog.json
@@ -153,6 +160,12 @@ Install dependencies:
 python -m pip install -r requirements.txt
 ```
 
+Validate Databricks bundle-style structure:
+
+```bash
+python -m scripts.validate_databricks_bundle_structure
+```
+
 Run API ingestion:
 
 ```bash
@@ -176,6 +189,28 @@ Run dry-run orchestration:
 ```bash
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 ```
+
+---
+
+## Databricks Bundle-Style Deployment
+
+V23 adds a local Databricks Asset Bundle-style structure:
+
+```text
+databricks.yml
+resources/customer_medallion_job.yml
+deployment/databricks/README.md
+```
+
+A real Databricks deployment would use:
+
+```bash
+databricks bundle validate -t dev
+databricks bundle deploy -t dev
+databricks bundle run customer_medallion_pipeline_job -t dev
+```
+
+This portfolio project validates the structure locally without requiring a Databricks workspace.
 
 ---
 
@@ -209,14 +244,14 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V22 quality gates:
+Run V23 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
 python -m scripts.validate_docker_artifacts
-python -m unittest tests.test_v22_advanced_dq_rule_catalog
-python -m scripts.advanced_dq_rule_catalog
+python -m scripts.validate_databricks_bundle_structure
+python -m unittest tests.test_v23_databricks_bundle_structure
 python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
@@ -225,13 +260,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v22.0.0
+python -m scripts.release_verification --version v23.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v22.0.0
+python -m scripts.validate_release_tag --version v23.0.0
 ```
 
 ---
@@ -284,6 +319,10 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Database ingestion
 - Advanced data quality rule catalog
 - Metadata-driven validation
+- Databricks Asset Bundles
+- Databricks deployment structure
+- Databricks job/resource metadata
+- Unity Catalog-style environment variables
 - SQLite source extraction
 - SQL query-based extraction
 - Config-driven source extraction
@@ -314,43 +353,9 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ---
 
-## V20.0.0 - API Ingestion Framework
-
-V20 adds a config-driven API ingestion layer before the medallion pipeline.
-
-Documentation:
-
-```text
-docs/v20_api_ingestion_framework.md
-```
-
----
-
-## V21.0.0 - Database Ingestion Framework
-
-V21 adds a config-driven relational database ingestion layer before the medallion pipeline.
-
-Documentation:
-
-```text
-docs/v21_database_ingestion_framework.md
-```
-
----
-
 ## V22.0.0 - Advanced Data Quality Rule Catalog
 
 V22 adds a metadata-driven advanced DQ rule catalog before the medallion pipeline.
-
-Highlights:
-
-- Added advanced customer DQ rule catalog
-- Added reusable rule evaluator
-- Added not-null, regex, allowed-values, unique, and min-length rule support
-- Added critical and warning severity handling
-- Added structured DQ summary JSON output
-- Added V22 DQ catalog unit tests
-- Added V22 config validation and release verification gates
 
 Documentation:
 
@@ -358,8 +363,30 @@ Documentation:
 docs/v22_advanced_data_quality_rule_catalog.md
 ```
 
-V22 interview explanation:
+---
+
+## V23.0.0 - Databricks Asset Bundle Style Deployment Structure
+
+V23 adds a Databricks Asset Bundle-style deployment structure for the pipeline.
+
+Highlights:
+
+- Added root `databricks.yml`
+- Added Databricks job resource metadata
+- Added dev and prod bundle targets
+- Added placeholder workspace paths
+- Added local Databricks bundle structure validator
+- Added V23 bundle structure tests
+- Added V23 release verification gates
+
+Documentation:
 
 ```text
-I added an advanced data quality rule catalog to my data engineering project. It uses metadata-driven JSON rules, supports multiple rule types and severity levels, evaluates rules against customer landing data, produces a structured DQ summary, and includes tests for clean data, critical failures, warning-only failures, uniqueness, missing input, and invalid catalog configuration.
+docs/v23_databricks_asset_bundle_structure.md
+```
+
+V23 interview explanation:
+
+```text
+I added a Databricks Asset Bundle-style deployment structure to my data engineering project. It includes a root databricks.yml, separate job resource metadata, dev and prod targets, placeholder workspace paths, a customer medallion pipeline job definition, a local bundle structure validator, and tests to ensure deployment files and required deployment tokens are present.
 ```
