@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v15.0.0
+Current Version: v16.0.0
 ```
 
 ---
@@ -514,3 +514,36 @@ Documentation:
 ```text
 docs/v15_scheduling_dependency_runtime_parameters.md
 ```
+
+
+## V16.0.0 - Pipeline Alerting, Failure Notification, and SLA Monitoring
+
+V16 adds a production-style alerting and SLA monitoring layer to the V15 orchestration framework.
+
+### V16 Highlights
+
+- Added alerting configuration.
+- Added pipeline failure alert generation.
+- Added critical and optional step failure alerts.
+- Added pipeline duration SLA monitoring.
+- Added step duration SLA monitoring.
+- Added DQ, schema, and quarantine threshold alert checks.
+- Added alert event JSONL and CSV outputs.
+- Added notification summary output.
+- Integrated alerting after orchestrator job completion.
+
+### V16 Runtime Outputs
+
+```text
+output/alerts/alert_events.jsonl
+output/alerts/alert_events.csv
+output/alerts/notification_summary.txt
+```
+
+### V16 Run Commands
+
+```bash
+python -m scripts.pipeline_orchestrator --run-date 2026-06-23
+python -m scripts.pipeline_alerting
+```
+

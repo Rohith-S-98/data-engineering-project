@@ -71,3 +71,8 @@ _delta_log/
 
 # V14 job-control runtime logs
 output/job_control/*.csv
+
+# V16 alerting runtime outputs
+/output/alerts/*
+!/output/alerts/.gitkeep
+

@@ -1,0 +1,42 @@
+{
+  "alerting_enabled": true,
+  "pipeline_name": "customer_medallion_orchestration_job",
+  "environment": "local",
+  "severity_mapping": {
+    "pipeline_failure": "CRITICAL",
+    "critical_step_failure": "CRITICAL",
+    "optional_step_failure": "WARNING",
+    "pipeline_sla_breach": "WARNING",
+    "step_sla_breach": "WARNING",
+    "dq_failure": "CRITICAL",
+    "schema_failure": "CRITICAL",
+    "quarantine_threshold_breach": "WARNING"
+  },
+  "sla_thresholds": {
+    "max_pipeline_duration_seconds": 900,
+    "max_step_duration_seconds": 300,
+    "max_quarantine_rows": 0
+  },
+  "input_paths": {
+    "job_run_log_file": "output/job_control/job_runs.csv",
+    "step_run_log_file": "output/job_control/step_runs.csv",
+    "observability_summary_file": "output/observability/pipeline_metrics_summary.json"
+  },
+  "output_paths": {
+    "alert_events_jsonl": "output/alerts/alert_events.jsonl",
+    "alert_events_csv": "output/alerts/alert_events.csv",
+    "notification_summary_file": "output/alerts/notification_summary.txt"
+  },
+  "notification_channels": [
+    {
+      "channel_name": "console",
+      "channel_type": "console",
+      "enabled": true
+    },
+    {
+      "channel_name": "file_summary",
+      "channel_type": "file",
+      "enabled": true
+    }
+  ]
+}
