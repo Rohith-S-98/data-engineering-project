@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, and validated through CI/CD quality gates.
+It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
 
 ```text
-Current Version: v18.0.0
+Current Version: v19.0.0
 ```
 
 ---
@@ -35,6 +35,7 @@ Current Version: v18.0.0
 | v16.0.0 | Pipeline Alerting, Failure Notification, and SLA Monitoring |
 | v17.0.0 | Retry Framework, Recovery Handling, and Failure Replay |
 | v18.0.0 | CI/CD Hardening, Quality Gates, and Release Automation |
+| v19.0.0 | Docker Containerized Local Runtime |
 
 ---
 
@@ -72,6 +73,8 @@ V16 Alerting + SLA Monitoring
 V17 Retry + Recovery + Failure Replay
 ↓
 V18 CI/CD Quality Gates + Release Verification
+↓
+V19 Docker Containerized Runtime
 ```
 
 ---
@@ -98,8 +101,10 @@ V18 CI/CD Quality Gates + Release Verification
 - Python syntax validation gate
 - Config validation gate
 - Runtime-output cleanliness validation gate
+- Docker artifact validation gate
 - Release verification and tag safety checks
 - Staged GitHub Actions CI
+- Dockerfile and Docker Compose local runtime
 - Reltio-style JSON payload generation
 
 ---
@@ -130,6 +135,9 @@ configs/schema_contracts/silver_customers_schema.json
 ```text
 data-engineering-project/
 ├── .github/workflows/python-ci.yml
+├── Dockerfile
+├── docker-compose.yml
+├── .dockerignore
 ├── config/
 ├── configs/schema_contracts/
 ├── data/raw/
@@ -149,7 +157,7 @@ data-engineering-project/
 
 ---
 
-## How to Run
+## How to Run Locally
 
 Activate virtual environment:
 
@@ -189,6 +197,28 @@ python -m scripts.pipeline_alerting
 
 ---
 
+## How to Run with Docker
+
+Build the image:
+
+```bash
+docker compose build
+```
+
+Run dry-run orchestration in Docker:
+
+```bash
+docker compose run --rm data-engineering-pipeline
+```
+
+Run Docker-based release verification without real data writes:
+
+```bash
+docker compose run --rm release-verification
+```
+
+---
+
 ## Testing and Release Verification
 
 Run the full test suite:
@@ -197,12 +227,13 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V18 quality gates:
+Run V19 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
-python -m unittest tests.test_v18_quality_gates
+python -m scripts.validate_docker_artifacts
+python -m unittest tests.test_v19_docker_artifacts
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
 ```
@@ -210,13 +241,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v18.0.0
+python -m scripts.release_verification --version v19.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v18.0.0
+python -m scripts.validate_release_tag --version v19.0.0
 ```
 
 ---
@@ -260,6 +291,7 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Python
 - PySpark
 - Delta Lake
+- Docker
 - Data Engineering
 - Medallion architecture
 - Config-driven framework design
@@ -277,6 +309,7 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Alerting and SLA monitoring
 - Retry and recovery handling
 - CI/CD quality gates
+- Containerized runtime design
 - Release verification
 - GitHub Actions CI
 - Reltio-style JSON payload generation
@@ -389,8 +422,29 @@ docs/v18_cicd_quality_gates_release_automation.md
 docs/pull_request_checklist.md
 ```
 
-V18 interview explanation:
+---
+
+## V19.0.0 - Docker Containerized Local Runtime
+
+V19 adds Docker-based local runtime support for the PySpark medallion pipeline.
+
+Highlights:
+
+- Added Dockerfile with Python 3.11 and Java 17 runtime
+- Added `.dockerignore` for cleaner and safer Docker builds
+- Added `docker-compose.yml` services for dry-run orchestration and release verification
+- Added Docker artifact validation script
+- Added V19 Docker artifact unit tests
+- Added Docker validation into release verification
+
+Documentation:
 
 ```text
-I hardened the CI/CD process for my PySpark medallion pipeline by splitting validation into staged quality gates. The release process now validates Python syntax, JSON configs, targeted framework tests, full tests, dry-run orchestration, runtime-output cleanliness, release verification, and tag safety before a version is released.
+docs/v19_docker_containerized_local_runtime.md
+```
+
+V19 interview explanation:
+
+```text
+I containerized my PySpark medallion pipeline by adding a Dockerfile, Docker Compose runtime commands, Docker ignore rules, validation checks, and CI-friendly tests. This makes the project easier to run consistently across machines and closer to production deployment practices.
 ```
