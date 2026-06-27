@@ -13,6 +13,7 @@ CONFIG_FILES = [
     "config/alerts/customer_medallion_alerts.json",
     "config/retries/customer_medallion_retry_policy.json",
     "config/api/customer_api_ingestion_config.json",
+    "config/database/customer_database_ingestion_config.json",
 ]
 
 
