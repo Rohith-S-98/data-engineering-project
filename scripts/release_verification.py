@@ -17,9 +17,11 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
     commands = [
         VerificationCommand("python syntax", [python, "-m", "scripts.validate_python_project"]),
         VerificationCommand("config validation", [python, "-m", "scripts.validate_config_files"]),
+        VerificationCommand("docker artifact validation", [python, "-m", "scripts.validate_docker_artifacts"]),
         VerificationCommand("targeted retry tests", [python, "-m", "unittest", "tests.test_pipeline_retry"]),
         VerificationCommand("targeted orchestrator retry tests", [python, "-m", "unittest", "tests.test_v17_orchestrator_retry"]),
         VerificationCommand("targeted v18 quality tests", [python, "-m", "unittest", "tests.test_v18_quality_gates"]),
+        VerificationCommand("targeted v19 docker tests", [python, "-m", "unittest", "tests.test_v19_docker_artifacts"]),
         VerificationCommand("full test suite", [python, "-m", "unittest", "discover", "tests"]),
         VerificationCommand("dry-run orchestrator", [python, "-m", "scripts.pipeline_orchestrator", "--dry-run", "--run-date", "2026-06-23"]),
     ]
@@ -52,8 +54,8 @@ def run_commands(commands: list[VerificationCommand]) -> int:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run V18 release verification gates.")
-    parser.add_argument("--version", default="v18.0.0", help="Release version being verified.")
+    parser = argparse.ArgumentParser(description="Run release verification gates.")
+    parser.add_argument("--version", default="v19.0.0", help="Release version being verified.")
     parser.add_argument("--skip-real-run", action="store_true", help="Skip real orchestrator execution.")
     parser.add_argument("--skip-alerting", action="store_true", help="Skip independent alerting execution.")
     args = parser.parse_args()
