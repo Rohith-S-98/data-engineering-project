@@ -7,6 +7,7 @@ from pathlib import Path
 CONFIG_FILES = [
     "config/pipeline/local_config.json",
     "config/rules/customer_dq_rules.json",
+    "config/rules/advanced_customer_dq_rule_catalog.json",
     "configs/schema_contracts/bronze_customers_schema.json",
     "configs/schema_contracts/silver_customers_schema.json",
     "config/jobs/customer_medallion_job.json",
