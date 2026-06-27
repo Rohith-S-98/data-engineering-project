@@ -4,15 +4,24 @@
 .venv
 venv
 .env
-.env.local
+.env.*
 
-# Python caches
+# Python caches and test artifacts
 __pycache__
 *.pyc
 *.pyo
 .pytest_cache
+.mypy_cache
+.ruff_cache
+.tox
 .coverage
 htmlcov
+
+# Python packaging artifacts
+build
+dist
+*.egg-info
+pip-wheel-metadata
 
 # OS and editor files
 .DS_Store
@@ -52,7 +61,7 @@ output/alerts/*
 output/recovery/*
 !output/recovery/.gitkeep
 
-# Generated raw sample data
+# Generated raw landing data
 data/raw/customer_data.csv
 data/raw/customer_data_clean.csv
 data/raw/customer_data_dirty.csv
