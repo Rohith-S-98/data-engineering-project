@@ -44,6 +44,7 @@ Current Version: v25.0.1
 | v24.0.0 | Azure Data Factory Orchestration Simulation |
 | v25.0.0 | Power BI-Ready Observability Dashboard |
 | v25.0.1 | Documentation and Release Gate Alignment |
+| v26.0.0 | Planned Live Public API Integration Testing Framework |
 
 ---
 
@@ -94,6 +95,53 @@ V24 Azure Data Factory Style Orchestration Simulation
 ↓
 V25 Power BI-Ready Observability Dashboard Outputs
 ```
+
+---
+
+## Planned V26 Phase: Live Public API Integration Testing
+
+V26 will extend the existing V20 API ingestion framework by adding a controlled live-public-API integration testing layer. The old `Public-API` repository will be reused as a supporting integration source registry instead of remaining only as a copied public API README list.
+
+The goal of this phase is to test the pipeline against real HTTP APIs while keeping the main Data Engineering project stable, repeatable, and production-style.
+
+Planned V26 scope:
+
+- Select a small set of stable public APIs for controlled live ingestion tests.
+- Build a source registry for API name, endpoint, method, expected status, timeout, retry policy, and expected schema.
+- Add a reusable API client with timeout handling, response validation, and structured exceptions.
+- Store raw live API responses in a raw landing format.
+- Validate JSON response shape using schema contracts.
+- Route failed, empty, malformed, or schema-invalid responses to quarantine.
+- Normalize valid responses into tabular records for Bronze/Silver processing.
+- Capture audit metrics for endpoint status, latency, response size, record count, and failure reason.
+- Add unit tests with mocked API responses so CI/CD does not depend on internet availability.
+- Add optional manual live integration test execution for local practice and demo purposes.
+
+Planned V26 architecture extension:
+
+```text
+Selected Live Public APIs
+↓
+Public API Source Registry
+↓
+Live API Client + Timeout/Retry Handling
+↓
+Raw JSON Landing
+↓
+Schema Contract Validation
+↓
+Valid Response Path / Quarantine Path
+↓
+Bronze + Silver Normalization
+↓
+Audit + Observability Metrics
+↓
+Existing Orchestration, Alerting, Retry, CI/CD, and Dashboard Layers
+```
+
+V26 will not replace the current mock API ingestion. It will add a realistic integration-testing option that demonstrates how a production Data Engineering pipeline handles live upstream data instability.
+
+Detailed phase document: `docs/roadmap/v26_live_public_api_integration_testing.md`
 
 ---
 
@@ -216,99 +264,4 @@ Validate release tag safety before tagging:
 
 ```bash
 python -m scripts.validate_release_tag --version v25.0.1
-```
-
----
-
-## Databricks Bundle-Style Deployment
-
-V23 adds a local Databricks Asset Bundle-style structure:
-
-```text
-databricks.yml
-resources/customer_medallion_job.yml
-deployment/databricks/README.md
-```
-
-A real Databricks deployment would use:
-
-```bash
-databricks bundle validate -t dev
-databricks bundle deploy -t dev
-databricks bundle run customer_medallion_pipeline_job -t dev
-```
-
----
-
-## Azure Data Factory Orchestration Simulation
-
-V24 adds ADF-style orchestration metadata:
-
-```text
-azure/adf/pipelines/customer_medallion_adf_pipeline.json
-azure/adf/linked_services/ls_databricks_customer_pipeline.json
-azure/adf/datasets/customer_landing_metadata.json
-azure/adf/README.md
-```
-
-Validate ADF artifacts:
-
-```bash
-python -m scripts.validate_adf_artifacts
-```
-
----
-
-## Power BI Observability Dashboard
-
-V25 adds Power BI-ready observability outputs:
-
-```text
-dashboards/powerbi/observability_dashboard_schema.json
-dashboards/powerbi/README.md
-output/observability/powerbi/dashboard_kpi_snapshot.csv
-output/observability/powerbi/dashboard_data_quality_snapshot.csv
-output/observability/powerbi/dashboard_layer_row_counts.csv
-```
-
-Validate Power BI dashboard artifacts:
-
-```bash
-python -m scripts.validate_powerbi_dashboard_artifacts
-```
-
----
-
-## Runtime Outputs
-
-Runtime outputs are generated locally and intentionally ignored by Git. Only `.gitkeep` placeholders are committed for runtime output folders.
-
----
-
-## Documentation
-
-```text
-docs/v23_databricks_asset_bundle_structure.md
-docs/v23_0_1_pre_v24_professional_cleanup.md
-docs/v24_azure_data_factory_orchestration_simulation.md
-docs/v25_powerbi_observability_dashboard.md
-```
-
----
-
-## Skills Demonstrated
-
-```text
-Python, SQL-style extraction, PySpark, Delta Lake, Databricks deployment structure,
-Azure Data Factory orchestration concepts, Docker, CI/CD, metadata-driven DQ,
-watermarking, SCD2, observability, alerting, retry/replay, Power BI-ready reporting,
-Git/GitHub release discipline, and production-style data engineering design.
-```
-
----
-
-## Latest Interview Explanation
-
-```text
-This project simulates an end-to-end production-style data engineering platform. It includes API and database ingestion, metadata-driven data quality, medallion processing, Delta-style storage, SCD2 history, observability, alerting, retry/replay, Databricks deployment metadata, ADF orchestration metadata, Docker runtime, CI/CD quality gates, and Power BI-ready dashboard exports. The latest cleanup aligned README, CI, and release verification gates through V25.0.1.
 ```
