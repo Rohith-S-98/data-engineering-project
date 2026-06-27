@@ -1,19 +1,29 @@
-# Python
+# Python caches and test artifacts
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
 .pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
 .coverage
 htmlcov/
 
-# Virtual environments
+# Python packaging artifacts
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# Virtual environments and local secrets
 .venv/
 venv/
 .env
-.env.local
+.env.*
+!.env.example
 
-# OS / editor
+# OS and editor files
 .DS_Store
 .idea/
 .vscode/
@@ -26,6 +36,11 @@ venv/
 metastore_db/
 spark-warehouse/
 derby.log
+
+# Spark / Delta generated files
+*.crc
+*.snappy.parquet
+_delta_log/
 
 # Runtime pipeline outputs - keep only folder placeholders
 /data/bronze/*
@@ -58,37 +73,24 @@ derby.log
 /output/observability/*
 !/output/observability/.gitkeep
 
-# Spark / Delta generated files
-*.crc
-*.snappy.parquet
-_delta_log/
-
-# V14 job-control runtime logs
 /output/job_control/*
 !/output/job_control/.gitkeep
+
 /output/runtime_parameters/*
 !/output/runtime_parameters/.gitkeep
 
-# V14 job-control runtime logs
-output/job_control/*.csv
-
-# V16 alerting runtime outputs
 /output/alerts/*
 !/output/alerts/.gitkeep
 
-
-# V17 retry and recovery runtime outputs
 /output/recovery/*
 !/output/recovery/.gitkeep
 
-# Generated raw sample data
+# Generated raw landing data
 /data/raw/customer_data.csv
 /data/raw/customer_data_clean.csv
 /data/raw/customer_data_dirty.csv
-
-# V20 generated API raw output
 /data/raw/customer_data_api.csv
-
-# V21 generated database ingestion outputs
-/data/database/*.db
 /data/raw/customer_data_db.csv
+
+# Generated database ingestion outputs
+/data/database/*.db
