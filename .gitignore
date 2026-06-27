@@ -76,3 +76,7 @@ output/job_control/*.csv
 /output/alerts/*
 !/output/alerts/.gitkeep
 
+
+# V17 retry and recovery runtime outputs
+/output/recovery/*
+!/output/recovery/.gitkeep

@@ -17,6 +17,7 @@ from scripts.job_control import (
     update_step_run,
 )
 from scripts.pipeline_config import load_pipeline_config
+from scripts.pipeline_retry import execute_step_with_retry, load_retry_policy
 from scripts.runtime_parameters import (
     load_default_runtime_parameters,
     merge_runtime_parameters,
@@ -60,13 +61,18 @@ def load_job_config(job_config_path: str = DEFAULT_JOB_CONFIG_PATH) -> dict[str,
 
 def _import_step_function(module_name: str, function_name: str) -> Callable[..., Any]:
     module = importlib.import_module(module_name)
+    target: Any = module
 
-    if not hasattr(module, function_name):
-        raise AttributeError(
-            f"Function '{function_name}' not found in module '{module_name}'"
-        )
+    for attribute_name in function_name.split("."):
+        if not hasattr(target, attribute_name):
+            raise AttributeError(
+                f"Function or attribute '{function_name}' not found in module "
+                f"'{module_name}'"
+            )
 
-    return getattr(module, function_name)
+        target = getattr(target, attribute_name)
+
+    return target
 
 
 def _normalize_result_status(result: Any) -> str:
@@ -197,6 +203,12 @@ def run_pipeline_orchestrator(
         runtime_parameters.get("allow_optional_step_failure", True),
     )
 
+    retry_policy_path = job_config.get(
+        "retry_policy_path",
+        "config/retries/customer_medallion_retry_policy.json",
+    )
+    retry_policy = load_retry_policy(retry_policy_path)
+
     steps = _sort_steps(job_config["steps"])
     total_steps = len(steps)
     successful_steps = 0
@@ -218,7 +230,7 @@ def run_pipeline_orchestrator(
     )
 
     print("=" * 70)
-    print("Starting V16 Pipeline Orchestration Job")
+    print("Starting V17 Pipeline Orchestration Job")
     print(f"Job Name: {job_name}")
     print(f"Job Run ID: {job_run_id}")
     print(f"Run Mode: {runtime_parameters['run_mode']}")
@@ -319,7 +331,13 @@ def run_pipeline_orchestrator(
                 pipeline_config=pipeline_config,
             )
 
-            raw_result = step_function(**kwargs)
+            raw_result = execute_step_with_retry(
+                step_function=step_function,
+                step_config=step_config,
+                step_kwargs=kwargs,
+                job_run_id=job_run_id,
+                retry_policy=retry_policy,
+            )
             result_status = _normalize_result_status(raw_result)
             expected_statuses = step_config.get(
                 "expected_success_statuses",
@@ -388,7 +406,7 @@ def run_pipeline_orchestrator(
     _run_v16_alerting_if_enabled(job_config)
 
     print("\n" + "=" * 70)
-    print("V16 Pipeline Orchestration Job Completed")
+    print("V17 Pipeline Orchestration Job Completed")
     print(f"Final Status    : {final_status}")
     print(f"Total Steps     : {total_steps}")
     print(f"Successful Steps: {successful_steps}")

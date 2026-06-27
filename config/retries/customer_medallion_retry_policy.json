@@ -1,0 +1,55 @@
+{
+  "retry_policy_name": "customer_medallion_retry_policy",
+  "environment": "local",
+  "enabled": true,
+  "default_max_retry_attempts": 2,
+  "default_retry_delay_seconds": 0,
+  "retry_event_jsonl_file": "output/recovery/retry_events.jsonl",
+  "retry_event_csv_file": "output/recovery/retry_events.csv",
+  "replay_request_file": "output/recovery/replay_requests.jsonl",
+  "retryable_result_statuses": [
+    "FAILED",
+    "ERROR"
+  ],
+  "retryable_exceptions": [
+    "RuntimeError",
+    "PipelineExecutionError",
+    "Exception"
+  ],
+  "non_retryable_exceptions": [
+    "KeyboardInterrupt",
+    "SystemExit"
+  ],
+  "steps": {
+    "bronze_ingestion": {
+      "retry_enabled": true,
+      "max_retry_attempts": 2,
+      "retry_delay_seconds": 0
+    },
+    "silver_dq_validation": {
+      "retry_enabled": true,
+      "max_retry_attempts": 2,
+      "retry_delay_seconds": 0
+    },
+    "customer_history_scd2": {
+      "retry_enabled": true,
+      "max_retry_attempts": 2,
+      "retry_delay_seconds": 0
+    },
+    "gold_canonical_transformation": {
+      "retry_enabled": true,
+      "max_retry_attempts": 2,
+      "retry_delay_seconds": 0
+    },
+    "commit_watermark": {
+      "retry_enabled": true,
+      "max_retry_attempts": 2,
+      "retry_delay_seconds": 0
+    },
+    "pipeline_observability": {
+      "retry_enabled": false,
+      "max_retry_attempts": 0,
+      "retry_delay_seconds": 0
+    }
+  }
+}

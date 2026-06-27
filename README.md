@@ -5,7 +5,7 @@ This project is a portfolio-ready Data Engineering pipeline simulator built with
 It demonstrates how customer data can be generated, ingested, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, and exported as downstream-ready Reltio-style JSON output.
 
 ```text
-Current Version: v16.0.0
+Current Version: v17.0.0
 ```
 
 ---
@@ -545,5 +545,40 @@ output/alerts/notification_summary.txt
 ```bash
 python -m scripts.pipeline_orchestrator --run-date 2026-06-23
 python -m scripts.pipeline_alerting
+```
+
+
+## V17.0.0 - Retry Framework, Recovery Handling, and Failure Replay
+
+V17 adds retry, recovery, and replay handling to the existing production-style pipeline orchestration framework.
+
+### V17 Highlights
+
+- Added config-driven retry policy.
+- Added step-level retry enablement.
+- Added retry attempt limits.
+- Added retry event logging.
+- Added recovery success tracking.
+- Added recovery exhausted tracking.
+- Added non-retryable exception handling.
+- Added replay request creation utility.
+- Integrated retry wrapper into the V16 orchestrator.
+
+### V17 Runtime Outputs
+
+```text
+output/recovery/retry_events.csv
+output/recovery/retry_events.jsonl
+output/recovery/replay_requests.jsonl
+```
+
+### V17 Validation Commands
+
+```bash
+python -m unittest tests.test_pipeline_retry
+python -m unittest tests.test_v17_orchestrator_retry
+python -m unittest discover tests
+python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
+python -m scripts.pipeline_orchestrator --run-date 2026-06-23
 ```
 
