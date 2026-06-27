@@ -19,23 +19,6 @@ REQUIRED_REPOSITORY_FILES = [
     "scripts/validate_databricks_bundle_structure.py",
 ]
 
-REQUIRED_PLACEHOLDERS = [
-    "data/bronze/.gitkeep",
-    "data/silver/.gitkeep",
-    "data/gold/.gitkeep",
-    "data/audit/.gitkeep",
-    "output/audit/.gitkeep",
-    "output/dq_reports/.gitkeep",
-    "output/quarantine/.gitkeep",
-    "output/reltio_payloads/.gitkeep",
-    "output/logs/.gitkeep",
-    "output/observability/.gitkeep",
-    "output/job_control/.gitkeep",
-    "output/runtime_parameters/.gitkeep",
-    "output/alerts/.gitkeep",
-    "output/recovery/.gitkeep",
-]
-
 REQUIRED_GITIGNORE_TOKENS = [
     "__pycache__/",
     ".venv/",
@@ -76,8 +59,6 @@ TRACKED_RUNTIME_OUTPUT_PREFIXES = [
     "output/recovery/",
 ]
 
-ALLOWED_RUNTIME_PLACEHOLDERS = set(REQUIRED_PLACEHOLDERS)
-
 DISALLOWED_TRACKED_PATHS = {
     "data/raw/customer_data.csv",
     "data/raw/customer_data_clean.csv",
@@ -114,7 +95,7 @@ def validate_required_files(root: Path | str = Path(".")) -> list[str]:
     root_path = Path(root)
     issues: list[str] = []
 
-    for relative_path in REQUIRED_REPOSITORY_FILES + REQUIRED_PLACEHOLDERS:
+    for relative_path in REQUIRED_REPOSITORY_FILES:
         if not (root_path / relative_path).exists():
             issues.append(f"missing required repository file: {relative_path}")
 
@@ -173,7 +154,7 @@ def validate_tracked_files(tracked_files: list[str]) -> list[str]:
 
 
 def _is_tracked_runtime_output(tracked_file: str) -> bool:
-    if tracked_file in ALLOWED_RUNTIME_PLACEHOLDERS:
+    if tracked_file.endswith("/.gitkeep"):
         return False
     return any(tracked_file.startswith(prefix) for prefix in TRACKED_RUNTIME_OUTPUT_PREFIXES)
 
@@ -202,7 +183,6 @@ def main() -> int:
 
     print("Repository hygiene validation SUCCESS")
     print(f"Required files checked: {len(REQUIRED_REPOSITORY_FILES)}")
-    print(f"Runtime placeholders checked: {len(REQUIRED_PLACEHOLDERS)}")
     return 0
 
 

@@ -1,4 +1,4 @@
-# Python caches and test artifacts
+# Python caches and build artifacts
 __pycache__/
 *.py[cod]
 *.pyo
@@ -9,12 +9,9 @@ __pycache__/
 .tox/
 .coverage
 htmlcov/
-
-# Python packaging artifacts
 build/
 dist/
 *.egg-info/
-pip-wheel-metadata/
 
 # Virtual environments and local secrets
 .venv/
@@ -37,10 +34,17 @@ metastore_db/
 spark-warehouse/
 derby.log
 
-# Spark / Delta generated files
-*.crc
-*.snappy.parquet
-_delta_log/
+# Runtime raw/database outputs - static test data belongs in tests/fixtures/
+/data/raw/*
+!/data/raw/.gitkeep
+/data/raw/customer_data.csv
+/data/raw/customer_data_clean.csv
+/data/raw/customer_data_dirty.csv
+/data/raw/customer_data_api.csv
+/data/raw/customer_data_db.csv
+/data/database/*
+!/data/database/.gitkeep
+/data/database/*.db
 
 # Runtime pipeline outputs - keep only folder placeholders
 /data/bronze/*
@@ -85,12 +89,7 @@ _delta_log/
 /output/recovery/*
 !/output/recovery/.gitkeep
 
-# Generated raw landing data
-/data/raw/customer_data.csv
-/data/raw/customer_data_clean.csv
-/data/raw/customer_data_dirty.csv
-/data/raw/customer_data_api.csv
-/data/raw/customer_data_db.csv
-
-# Generated database ingestion outputs
-/data/database/*.db
+# Spark / Delta generated files
+*.crc
+*.snappy.parquet
+_delta_log/

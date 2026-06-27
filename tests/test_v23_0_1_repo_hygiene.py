@@ -17,8 +17,7 @@ from scripts.validate_repo_hygiene import (
 
 class TestV2301RepoHygiene(unittest.TestCase):
     def test_repository_hygiene_is_valid_for_current_repo(self):
-        issues = validate_repo_hygiene()
-        self.assertEqual(issues, [])
+        self.assertEqual(validate_repo_hygiene(), [])
 
     def test_disallows_tracked_generated_runtime_files(self):
         tracked_files = [
@@ -40,9 +39,7 @@ class TestV2301RepoHygiene(unittest.TestCase):
             "data/bronze/.gitkeep",
         ]
 
-        issues = validate_tracked_files(tracked_files)
-
-        self.assertEqual(issues, [])
+        self.assertEqual(validate_tracked_files(tracked_files), [])
 
     def test_required_ignore_tokens_are_reported_when_missing(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -55,12 +52,12 @@ class TestV2301RepoHygiene(unittest.TestCase):
             self.assertTrue(any("missing .gitignore token" in issue for issue in issues))
             self.assertTrue(any("missing .dockerignore token" in issue for issue in issues))
 
-    def test_assert_valid_repo_hygiene_raises_when_git_ls_files_fails(self):
+    def test_assert_valid_repo_hygiene_raises_when_git_command_fails(self):
         failed_process = subprocess.CompletedProcess(
             args=["git", "ls-files"],
             returncode=1,
             stdout="",
-            stderr="not a git repository",
+            stderr="git command failed",
         )
         with patch("scripts.validate_repo_hygiene.subprocess.run", return_value=failed_process):
             with self.assertRaises(RepoHygieneValidationError):
