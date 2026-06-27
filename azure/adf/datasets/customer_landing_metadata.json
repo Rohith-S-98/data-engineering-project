@@ -1,0 +1,8 @@
+{
+  "name": "customer_landing_metadata",
+  "description": "ADF-style landing metadata for the customer pipeline.",
+  "format": "csv",
+  "folder": "customers/raw",
+  "columns": ["customer_id", "first_name", "last_name", "country", "created_date"],
+  "version": "v24.0.0"
+}
