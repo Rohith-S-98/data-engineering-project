@@ -19,6 +19,7 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
         VerificationCommand("config validation", [python, "-m", "scripts.validate_config_files"]),
         VerificationCommand("targeted retry tests", [python, "-m", "unittest", "tests.test_pipeline_retry"]),
         VerificationCommand("targeted orchestrator retry tests", [python, "-m", "unittest", "tests.test_v17_orchestrator_retry"]),
+        VerificationCommand("targeted v18 quality tests", [python, "-m", "unittest", "tests.test_v18_quality_gates"]),
         VerificationCommand("full test suite", [python, "-m", "unittest", "discover", "tests"]),
         VerificationCommand("dry-run orchestrator", [python, "-m", "scripts.pipeline_orchestrator", "--dry-run", "--run-date", "2026-06-23"]),
     ]
