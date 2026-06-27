@@ -1,0 +1,4 @@
+customer_id,first_name,last_name,email,phone,city,state,created_date,source_system
+CUST901,Aarav,Rao,aarav.rao@example.com,9876500901,Bengaluru,Karnataka,2026-06-26,CSV
+CUST902,Isha,Nair,isha.nair@example.com,9876500902,Kochi,Kerala,2026-06-26,API
+CUST903,Ravi,Kumar,ravi.kumar@example.com,9876500903,Chennai,Tamil Nadu,2026-06-26,DB
