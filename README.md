@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment structure, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment structure, repository hygiene gates, and production-style framework patterns.
 
-It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, organized for Databricks-style deployment, and run through a containerized local runtime.
+It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, organized for Databricks-style deployment, protected by repository hygiene checks, and run through a containerized local runtime.
 
 ```text
-Current Version: v23.0.0
+Current Version: v23.0.1
 ```
 
 ---
@@ -40,6 +40,7 @@ Current Version: v23.0.0
 | v21.0.0 | Database Ingestion Framework |
 | v22.0.0 | Advanced Data Quality Rule Catalog |
 | v23.0.0 | Databricks Asset Bundle Style Deployment Structure |
+| v23.0.1 | Pre-V24 Professional Repository Cleanup |
 
 ---
 
@@ -85,6 +86,8 @@ V18 CI/CD Quality Gates + Release Verification
 V19 Docker Containerized Runtime
 ↓
 V23 Databricks Asset Bundle Style Deployment Structure
+↓
+V23.0.1 Repository Hygiene Validation
 ```
 
 ---
@@ -97,6 +100,8 @@ V23 Databricks Asset Bundle Style Deployment Structure
 - Config-driven database ingestion framework
 - Databricks Asset Bundle-style deployment structure
 - Local Databricks bundle structure validation
+- Repository hygiene validation gate
+- Hardened `.gitignore` and `.dockerignore`
 - Local SQLite source extraction for deterministic testing
 - Mock paginated source API fixture
 - API and database field landing into raw customer schema
@@ -158,6 +163,12 @@ Install dependencies:
 
 ```bash
 python -m pip install -r requirements.txt
+```
+
+Validate repository hygiene:
+
+```bash
+python -m scripts.validate_repo_hygiene
 ```
 
 Validate Databricks bundle-style structure:
@@ -244,14 +255,15 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V23 quality gates:
+Run V23.0.1 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
 python -m scripts.validate_docker_artifacts
 python -m scripts.validate_databricks_bundle_structure
-python -m unittest tests.test_v23_databricks_bundle_structure
+python -m scripts.validate_repo_hygiene
+python -m unittest tests.test_v23_0_1_repo_hygiene
 python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
@@ -260,13 +272,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v23.0.0
+python -m scripts.release_verification --version v23.0.1
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v23.0.0
+python -m scripts.validate_release_tag --version v23.0.1
 ```
 
 ---
@@ -323,6 +335,8 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 - Databricks deployment structure
 - Databricks job/resource metadata
 - Unity Catalog-style environment variables
+- Repository hygiene validation
+- CI/CD repository quality gates
 - SQLite source extraction
 - SQL query-based extraction
 - Config-driven source extraction
@@ -353,31 +367,9 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ---
 
-## V22.0.0 - Advanced Data Quality Rule Catalog
-
-V22 adds a metadata-driven advanced DQ rule catalog before the medallion pipeline.
-
-Documentation:
-
-```text
-docs/v22_advanced_data_quality_rule_catalog.md
-```
-
----
-
 ## V23.0.0 - Databricks Asset Bundle Style Deployment Structure
 
 V23 adds a Databricks Asset Bundle-style deployment structure for the pipeline.
-
-Highlights:
-
-- Added root `databricks.yml`
-- Added Databricks job resource metadata
-- Added dev and prod bundle targets
-- Added placeholder workspace paths
-- Added local Databricks bundle structure validator
-- Added V23 bundle structure tests
-- Added V23 release verification gates
 
 Documentation:
 
@@ -385,8 +377,30 @@ Documentation:
 docs/v23_databricks_asset_bundle_structure.md
 ```
 
-V23 interview explanation:
+---
+
+## V23.0.1 - Pre-V24 Professional Repository Cleanup
+
+V23.0.1 cleans and hardens the repository before V24.
+
+Highlights:
+
+- Hardened `.gitignore`
+- Hardened `.dockerignore`
+- Added repository hygiene validator
+- Added repository hygiene tests
+- Added repository hygiene gate to release verification
+- Added repository hygiene job to GitHub Actions CI
+- Preserved required docs, configs, tests, fixtures, and runtime placeholders
+
+Documentation:
 
 ```text
-I added a Databricks Asset Bundle-style deployment structure to my data engineering project. It includes a root databricks.yml, separate job resource metadata, dev and prod targets, placeholder workspace paths, a customer medallion pipeline job definition, a local bundle structure validator, and tests to ensure deployment files and required deployment tokens are present.
+docs/v23_0_1_pre_v24_professional_cleanup.md
+```
+
+V23.0.1 interview explanation:
+
+```text
+Before starting V24, I performed a professional repository cleanup release. I hardened .gitignore and .dockerignore, added a repository hygiene validator, added tests to prevent generated data or runtime artifacts from being tracked, integrated the hygiene gate into release verification and CI, and preserved all required docs, tests, configs, and sample fixtures.
 ```

@@ -12,11 +12,20 @@ __pycache__
 *.pyc
 *.pyo
 .pytest_cache
+.mypy_cache
+.ruff_cache
+.tox
 .coverage
 htmlcov
 build
 dist
 *.egg-info
+
+# Python packaging artifacts
+build
+dist
+*.egg-info
+pip-wheel-metadata
 
 # OS and editor files
 .DS_Store
