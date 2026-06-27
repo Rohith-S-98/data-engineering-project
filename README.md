@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, and production-style framework patterns.
 
-It demonstrates how customer data can be generated or extracted from an API-style source, landed into raw storage, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
+It demonstrates how customer data can be generated, extracted from API-style sources, extracted from relational database sources, landed into raw storage, validated, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting/retry controls, validated through CI/CD quality gates, and run through a containerized local runtime.
 
 ```text
-Current Version: v20.0.0
+Current Version: v21.0.0
 ```
 
 ---
@@ -37,15 +37,16 @@ Current Version: v20.0.0
 | v18.0.0 | CI/CD Hardening, Quality Gates, and Release Automation |
 | v19.0.0 | Docker Containerized Local Runtime |
 | v20.0.0 | API Ingestion Framework |
+| v21.0.0 | Database Ingestion Framework |
 
 ---
 
 ## Current Architecture
 
 ```text
-Mock API / Raw Customer CSV
+Mock API / SQLite Database / Raw Customer CSV
 ↓
-V20 API Ingestion + Raw Landing
+V20 API Ingestion + V21 Database Ingestion + Raw Landing
 ↓
 Bronze Schema Validation
 ↓
@@ -86,8 +87,10 @@ V19 Docker Containerized Runtime
 
 - Python config-driven DQ pipeline
 - Config-driven API ingestion framework
+- Config-driven database ingestion framework
+- Local SQLite source extraction for deterministic testing
 - Mock paginated source API fixture
-- API field mapping into raw customer schema
+- API and database field landing into raw customer schema
 - PySpark medallion pipeline
 - Bronze, Silver, Gold, Quarantine, and Customer History layers
 - Delta Lake storage support
@@ -117,16 +120,10 @@ V19 Docker Containerized Runtime
 
 ## Key Configuration
 
-Pipeline configuration is stored in:
-
 ```text
 config/pipeline/local_config.json
-```
-
-Main supporting configuration files:
-
-```text
 config/api/customer_api_ingestion_config.json
+config/database/customer_database_ingestion_config.json
 config/jobs/customer_medallion_job.json
 config/rules/customer_dq_rules.json
 config/alerts/customer_medallion_alerts.json
@@ -148,6 +145,7 @@ data-engineering-project/
 ├── config/
 ├── configs/schema_contracts/
 ├── data/api/
+├── data/database/
 ├── data/raw/
 ├── data/bronze/
 ├── data/silver/
@@ -185,6 +183,12 @@ Run API ingestion:
 python -m scripts.api_ingestion
 ```
 
+Run database ingestion:
+
+```bash
+python -m scripts.database_ingestion
+```
+
 Create sample data:
 
 ```bash
@@ -203,12 +207,6 @@ Run dry-run orchestration:
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 ```
 
-Run independent alerting:
-
-```bash
-python -m scripts.pipeline_alerting
-```
-
 ---
 
 ## How to Run with Docker
@@ -225,7 +223,7 @@ Run dry-run orchestration in Docker:
 docker compose run --rm data-engineering-pipeline
 ```
 
-Run Docker-based release verification without real data writes:
+Run Docker-based release verification:
 
 ```bash
 docker compose run --rm release-verification
@@ -241,14 +239,15 @@ Run the full test suite:
 python -m unittest discover tests
 ```
 
-Run V20 quality gates:
+Run V21 quality gates:
 
 ```bash
 python -m scripts.validate_python_project
 python -m scripts.validate_config_files
 python -m scripts.validate_docker_artifacts
-python -m unittest tests.test_v20_api_ingestion
-python -m scripts.api_ingestion
+python -m unittest tests.test_v21_database_ingestion
+python -m scripts.database_ingestion
+python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
 ```
@@ -256,13 +255,13 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v20.0.0
+python -m scripts.release_verification --version v21.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v20.0.0
+python -m scripts.validate_release_tag --version v21.0.0
 ```
 
 ---
@@ -272,10 +271,12 @@ python -m scripts.validate_release_tag --version v20.0.0
 Runtime outputs are generated locally and intentionally ignored by Git:
 
 ```text
+data/database/customer_source.db
 data/raw/customer_data.csv
 data/raw/customer_data_clean.csv
 data/raw/customer_data_dirty.csv
 data/raw/customer_data_api.csv
+data/raw/customer_data_db.csv
 data/bronze/customer_bronze
 data/silver/customer_valid
 data/gold/customer_canonical
@@ -309,6 +310,9 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 - Python
 - API ingestion
+- Database ingestion
+- SQLite source extraction
+- SQL query-based extraction
 - Config-driven source extraction
 - PySpark
 - Delta Lake
@@ -337,141 +341,6 @@ Only `.gitkeep` placeholders are committed for runtime output folders.
 
 ---
 
-## V14.0.0 - Pipeline Orchestration + Job Control Framework
-
-V14 adds a config-driven orchestration and job-control layer on top of the existing PySpark medallion pipeline.
-
-Highlights:
-
-- Job-level orchestration configuration
-- Step-level execution control
-- Enabled/disabled step handling
-- Critical vs optional step handling
-- Expected status validation
-- Job and step run audit logging
-
-Documentation:
-
-```text
-docs/v14_pipeline_orchestration_job_control.md
-```
-
----
-
-## V15.0.0 - Scheduling, Dependency Management, and Runtime Parameterization
-
-V15 upgrades orchestration with runtime parameters, dependency validation, dry-run support, and schedule metadata.
-
-Highlights:
-
-- Runtime parameter defaults
-- Manual, scheduled, and backfill run modes
-- Dry-run execution mode
-- Step dependency metadata
-- Runtime parameter snapshots
-
-Documentation:
-
-```text
-docs/v15_scheduling_dependency_runtime_parameters.md
-```
-
----
-
-## V16.0.0 - Pipeline Alerting, Failure Notification, and SLA Monitoring
-
-V16 adds a production-style alerting and SLA monitoring layer to the orchestration framework.
-
-Highlights:
-
-- Alerting configuration
-- Pipeline failure alert generation
-- Critical and optional step failure alerts
-- Pipeline and step duration SLA monitoring
-- DQ, schema, and quarantine threshold checks
-- Alert event JSONL and CSV outputs
-- Notification summary output
-
----
-
-## V17.0.0 - Retry Framework, Recovery Handling, and Failure Replay
-
-V17 adds retry, recovery, and replay handling to the production-style pipeline orchestration framework.
-
-Highlights:
-
-- Config-driven retry policy
-- Step-level retry enablement
-- Retry attempt limits
-- Retry event logging
-- Recovery success and exhausted tracking
-- Non-retryable exception handling
-- Replay request creation utility
-- Retry wrapper integration into the orchestrator
-
-Documentation:
-
-```text
-docs/v17_retry_recovery_failure_replay.md
-```
-
----
-
-## V18.0.0 - CI/CD Hardening, Quality Gates, and Release Automation
-
-V18 adds release-readiness controls on top of the V17 retry, recovery, and replay framework.
-
-Highlights:
-
-- Hardened GitHub Actions into staged CI quality gates
-- Added Python syntax validation
-- Added config file validation
-- Added targeted V17/V18 tests
-- Added full test gate
-- Added dry-run orchestrator gate
-- Added runtime-output cleanliness validation
-- Added release verification runner
-- Added release tag safety check
-- Added pull request checklist
-- Hardened Delta table existence detection for clean local runs
-- Ignored generated raw sample input files
-
-Documentation:
-
-```text
-docs/v18_cicd_quality_gates_release_automation.md
-docs/pull_request_checklist.md
-```
-
----
-
-## V19.0.0 - Docker Containerized Local Runtime
-
-V19 adds Docker-based local runtime support for the PySpark medallion pipeline.
-
-Highlights:
-
-- Added Dockerfile with Python 3.11 and Java 17 runtime
-- Added `.dockerignore` for cleaner and safer Docker builds
-- Added `docker-compose.yml` services for dry-run orchestration and release verification
-- Added Docker artifact validation script
-- Added V19 Docker artifact unit tests
-- Added Docker validation into release verification
-
-Documentation:
-
-```text
-docs/v19_docker_containerized_local_runtime.md
-```
-
-V19 interview explanation:
-
-```text
-I containerized my PySpark medallion pipeline by adding a Dockerfile, Docker Compose runtime commands, Docker ignore rules, validation checks, and CI-friendly tests. This makes the project easier to run consistently across machines and closer to production deployment practices.
-```
-
----
-
 ## V20.0.0 - API Ingestion Framework
 
 V20 adds a config-driven API ingestion layer before the medallion pipeline.
@@ -496,4 +365,33 @@ V20 interview explanation:
 
 ```text
 I added an API ingestion layer to my data engineering project. It uses a config-driven source definition, supports paginated API-style payloads, maps source API fields into my raw customer schema, writes a raw CSV landing file, and includes unit tests for config validation, pagination, missing source handling, and output generation.
+```
+
+---
+
+## V21.0.0 - Database Ingestion Framework
+
+V21 adds a config-driven relational database ingestion layer before the medallion pipeline.
+
+Highlights:
+
+- Added database ingestion source config
+- Added local SQLite source database seeding
+- Added SQL query-based extraction
+- Added reusable database ingestion runner
+- Added generated raw DB landing CSV output
+- Added V21 database ingestion unit tests
+- Added database config into config validation
+- Added V21 targeted tests into release verification
+
+Documentation:
+
+```text
+docs/v21_database_ingestion_framework.md
+```
+
+V21 interview explanation:
+
+```text
+I added a database ingestion layer to my data engineering project. It uses a config-driven SQLite source definition, seeds a local source table for reproducibility, runs a controlled SQL SELECT extraction query, writes records into a raw customer landing CSV, and includes unit tests for config validation, invalid query protection, missing database handling, and output generation.
 ```
