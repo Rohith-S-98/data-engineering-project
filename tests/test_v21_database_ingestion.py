@@ -5,6 +5,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 from scripts.database_ingestion import (
@@ -140,7 +141,7 @@ def _build_config(database_path: Path, target_path: Path) -> dict:
 
 def _create_existing_database(database_path: Path) -> None:
     database_path.parent.mkdir(parents=True, exist_ok=True)
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection:
         connection.execute(
             """
             CREATE TABLE source_customers (
