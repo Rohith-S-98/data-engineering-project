@@ -62,10 +62,19 @@ def write_lakehouse_table(
 
 def is_delta_table_path(table_path: str) -> bool:
     """
-    Check whether a path looks like a Delta table.
+    Check whether a path contains a usable Delta transaction log.
+
+    A folder named _delta_log by itself is not enough. Cleanups or failed local
+    test runs can leave an empty Delta log folder behind. DeltaTable.forPath
+    still fails in that state, so this check requires at least one committed
+    Delta JSON transaction file.
     """
 
-    return (Path(table_path) / "_delta_log").exists()
+    delta_log_path = Path(table_path) / "_delta_log"
+    if not delta_log_path.exists() or not delta_log_path.is_dir():
+        return False
+
+    return any(delta_log_path.glob("*.json"))
 
 
 def assert_delta_table_exists(
@@ -79,7 +88,7 @@ def assert_delta_table_exists(
     if not is_delta_table_path(table_path):
         raise ValueError(
             f"{table_name} is not a valid Delta table path: {table_path}. "
-            "Expected _delta_log folder was not found."
+            "Expected a committed Delta transaction log JSON file."
         )
 
 
