@@ -1,0 +1,52 @@
+{
+  "version": "v25.0.0",
+  "dashboard_name": "Customer Pipeline Observability Dashboard",
+  "description": "Power BI-ready dashboard contract for customer medallion pipeline observability.",
+  "fact_tables": [
+    {
+      "name": "dashboard_kpi_snapshot",
+      "path": "output/observability/powerbi/dashboard_kpi_snapshot.csv",
+      "grain": "one row per metrics export snapshot",
+      "primary_measures": [
+        "bronze_rows",
+        "silver_rows",
+        "quarantine_rows",
+        "gold_rows",
+        "customer_history_rows",
+        "quarantine_rate_pct",
+        "dq_failure_rate_pct",
+        "changed_customer_count"
+      ]
+    },
+    {
+      "name": "dashboard_data_quality_snapshot",
+      "path": "output/observability/powerbi/dashboard_data_quality_snapshot.csv",
+      "grain": "one row per data quality export snapshot",
+      "primary_measures": [
+        "total_input_rows",
+        "valid_rows",
+        "quarantined_rows",
+        "total_rules",
+        "failed_rule_count",
+        "dq_pass_rate_pct",
+        "dq_failure_rate_pct"
+      ]
+    },
+    {
+      "name": "dashboard_layer_row_counts",
+      "path": "output/observability/powerbi/dashboard_layer_row_counts.csv",
+      "grain": "one row per pipeline layer per export snapshot",
+      "primary_measures": ["row_count"]
+    }
+  ],
+  "recommended_visuals": [
+    "Pipeline status card",
+    "DQ status card",
+    "Layer row count bar chart",
+    "Quarantine rate KPI",
+    "DQ failure rate KPI",
+    "Watermark status card",
+    "SCD2 current vs expired records chart"
+  ],
+  "refresh_guidance": "Run scripts.pipeline_observability first, then scripts.powerbi_observability_exporter. Import the generated CSV files into Power BI."
+}
