@@ -9,7 +9,7 @@ The goal is to move beyond hard-coded DQ checks and demonstrate a reusable, meta
 ## V22 Additions
 
 - Advanced DQ rule catalog at `config/rules/advanced_customer_dq_rule_catalog.json`
-- Clean sample input at `data/raw/customer_data_dq_catalog_sample.csv`
+- Clean sample input fixture at `tests/fixtures/customer_data_dq_catalog_sample.csv`
 - Rule catalog evaluator at `scripts/advanced_dq_rule_catalog.py`
 - V22 unit tests at `tests/test_v22_advanced_dq_rule_catalog.py`
 - Config validation now includes the advanced DQ catalog
@@ -37,7 +37,7 @@ Critical failures produce a final status of `FAILED`. Warning-only failures prod
 ## Data Flow
 
 ```text
-Customer CSV input
+Customer CSV fixture/input
 ↓
 Advanced DQ rule catalog JSON
 ↓
@@ -45,7 +45,7 @@ Rule evaluator
 ↓
 Per-rule results
 ↓
-DQ summary JSON
+DQ summary JSON runtime output
 ```
 
 ## Run Advanced DQ Catalog
@@ -54,7 +54,7 @@ DQ summary JSON
 python -m scripts.advanced_dq_rule_catalog
 ```
 
-Expected output for the committed clean sample:
+Expected output for the committed clean fixture:
 
 ```text
 Advanced DQ rule catalog evaluation SUCCESS
@@ -82,6 +82,8 @@ python -m scripts.validate_runtime_cleanliness
 In production, data quality rules are often maintained as metadata rather than hard-coded logic. A central rule catalog makes it easier to add, disable, audit, and reuse validation checks across pipelines and datasets.
 
 V22 models that pattern by using JSON-based rule metadata and a reusable evaluator that supports required checks, regex format validation, allowed values, uniqueness, and minimum length rules.
+
+Static sample input belongs under `tests/fixtures/`; runtime landing data belongs under `data/raw/` and should not be committed.
 
 ## Interview Explanation
 

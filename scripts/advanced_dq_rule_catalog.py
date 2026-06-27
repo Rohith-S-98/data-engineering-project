@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_CATALOG_PATH = Path("config/rules/advanced_customer_dq_rule_catalog.json")
-DEFAULT_INPUT_PATH = Path("data/raw/customer_data_dq_catalog_sample.csv")
+DEFAULT_INPUT_PATH = Path("tests/fixtures/customer_data_dq_catalog_sample.csv")
 DEFAULT_SUMMARY_PATH = Path("output/dq_reports/advanced_dq_catalog_summary.json")
 
 SUPPORTED_RULE_TYPES = {"not_null", "regex", "allowed_values", "unique", "min_length"}
@@ -152,7 +152,9 @@ def _record_fails_rule(value: str, rule: dict[str, Any]) -> bool:
     raise DqRuleCatalogConfigError(f"Unsupported rule_type: {rule_type}")
 
 
-def evaluate_rule_catalog(records: list[dict[str, str]], catalog: dict[str, Any]) -> tuple[DqCatalogEvaluationSummary, list[RuleEvaluationResult]]:
+def evaluate_rule_catalog(
+    records: list[dict[str, str]], catalog: dict[str, Any]
+) -> tuple[DqCatalogEvaluationSummary, list[RuleEvaluationResult]]:
     enabled_rules = [rule for rule in catalog["rules"] if rule.get("enabled", False)]
     results = [evaluate_rule(records, rule) for rule in enabled_rules]
 
@@ -211,7 +213,7 @@ def run_advanced_dq_rule_catalog(
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run V22 advanced data quality rule catalog.")
     parser.add_argument("--catalog", default=str(DEFAULT_CATALOG_PATH), help="Path to advanced DQ rule catalog JSON.")
-    parser.add_argument("--input", default=str(DEFAULT_INPUT_PATH), help="Path to input customer CSV.")
+    parser.add_argument("--input", default=str(DEFAULT_INPUT_PATH), help="Path to input customer CSV fixture.")
     parser.add_argument("--output", default=str(DEFAULT_SUMMARY_PATH), help="Path to output DQ summary JSON.")
     args = parser.parse_args()
 

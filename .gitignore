@@ -1,4 +1,4 @@
-# Python
+# Python caches and build artifacts
 __pycache__/
 *.py[cod]
 *.pyo
@@ -6,14 +6,18 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+build/
+dist/
+*.egg-info/
 
-# Virtual environments
+# Virtual environments and local secrets
 .venv/
 venv/
 .env
-.env.local
+.env.*
+!.env.example
 
-# OS / editor
+# OS and editor files
 .DS_Store
 .idea/
 .vscode/
@@ -26,6 +30,12 @@ venv/
 metastore_db/
 spark-warehouse/
 derby.log
+
+# Runtime raw/database outputs - static test data belongs in tests/fixtures/
+/data/raw/*
+!/data/raw/.gitkeep
+/data/database/*
+!/data/database/.gitkeep
 
 # Runtime pipeline outputs - keep only folder placeholders
 /data/bronze/*
@@ -58,37 +68,19 @@ derby.log
 /output/observability/*
 !/output/observability/.gitkeep
 
+/output/job_control/*
+!/output/job_control/.gitkeep
+
+/output/runtime_parameters/*
+!/output/runtime_parameters/.gitkeep
+
+/output/alerts/*
+!/output/alerts/.gitkeep
+
+/output/recovery/*
+!/output/recovery/.gitkeep
+
 # Spark / Delta generated files
 *.crc
 *.snappy.parquet
 _delta_log/
-
-# V14 job-control runtime logs
-/output/job_control/*
-!/output/job_control/.gitkeep
-/output/runtime_parameters/*
-!/output/runtime_parameters/.gitkeep
-
-# V14 job-control runtime logs
-output/job_control/*.csv
-
-# V16 alerting runtime outputs
-/output/alerts/*
-!/output/alerts/.gitkeep
-
-
-# V17 retry and recovery runtime outputs
-/output/recovery/*
-!/output/recovery/.gitkeep
-
-# Generated raw sample data
-/data/raw/customer_data.csv
-/data/raw/customer_data_clean.csv
-/data/raw/customer_data_dirty.csv
-
-# V20 generated API raw output
-/data/raw/customer_data_api.csv
-
-# V21 generated database ingestion outputs
-/data/database/*.db
-/data/raw/customer_data_db.csv

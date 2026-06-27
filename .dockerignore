@@ -4,15 +4,19 @@
 .venv
 venv
 .env
-.env.local
+.env.*
+!.env.example
 
-# Python caches
+# Python caches and build artifacts
 __pycache__
 *.pyc
 *.pyo
 .pytest_cache
 .coverage
 htmlcov
+build
+dist
+*.egg-info
 
 # OS and editor files
 .DS_Store
@@ -24,6 +28,10 @@ htmlcov
 metastore_db
 spark-warehouse
 derby.log
+
+# Runtime raw/database outputs - fixtures remain under tests/fixtures
+data/raw/*
+data/database/*
 
 # Runtime pipeline outputs
 data/bronze
@@ -51,14 +59,6 @@ output/alerts/*
 !output/alerts/.gitkeep
 output/recovery/*
 !output/recovery/.gitkeep
-
-# Generated raw sample data
-data/raw/customer_data.csv
-data/raw/customer_data_clean.csv
-data/raw/customer_data_dirty.csv
-data/raw/customer_data_api.csv
-data/raw/customer_data_db.csv
-data/database/*.db
 
 # Spark and Delta generated files
 *.crc
