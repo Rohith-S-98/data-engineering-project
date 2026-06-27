@@ -68,3 +68,6 @@ _delta_log/
 !/output/job_control/.gitkeep
 /output/runtime_parameters/*
 !/output/runtime_parameters/.gitkeep
+
+# V14 job-control runtime logs
+output/job_control/*.csv
