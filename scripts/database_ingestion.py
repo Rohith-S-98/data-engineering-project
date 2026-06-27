@@ -5,6 +5,7 @@ import csv
 import json
 import sqlite3
 import sys
+from contextlib import closing
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -96,7 +97,7 @@ def seed_sqlite_source_database(config: dict[str, Any]) -> None:
     if not isinstance(rows, list):
         raise DatabaseIngestionConfigError("seed_source.rows must be a list")
 
-    with sqlite3.connect(database_path) as connection:
+    with closing(sqlite3.connect(database_path)) as connection:
         connection.execute(f"DROP TABLE IF EXISTS {config['source_table']}")
         connection.execute(CREATE_CUSTOMER_TABLE_SQL.replace("source_customers", config["source_table"]))
         connection.executemany(
@@ -140,7 +141,7 @@ def extract_database_records(config: dict[str, Any]) -> list[dict[str, str]]:
         raise DatabaseIngestionSourceError(f"Source database file not found: {database_path}")
 
     try:
-        with sqlite3.connect(database_path) as connection:
+        with closing(sqlite3.connect(database_path)) as connection:
             connection.row_factory = sqlite3.Row
             rows = connection.execute(config["extract_query"]).fetchall()
     except sqlite3.Error as exc:
