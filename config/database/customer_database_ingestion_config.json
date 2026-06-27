@@ -1,0 +1,58 @@
+{
+  "source_name": "customer_sqlite_database",
+  "enabled": true,
+  "database_type": "sqlite",
+  "database_path": "data/database/customer_source.db",
+  "source_table": "source_customers",
+  "extract_query": "SELECT customer_id, first_name, last_name, email, phone, city, state, created_date, source_system FROM source_customers ORDER BY customer_id",
+  "target_csv_path": "data/raw/customer_data_db.csv",
+  "target_columns": [
+    "customer_id",
+    "first_name",
+    "last_name",
+    "email",
+    "phone",
+    "city",
+    "state",
+    "created_date",
+    "source_system"
+  ],
+  "seed_source": {
+    "enabled": true,
+    "rows": [
+      {
+        "customer_id": "CUST501",
+        "first_name": "Deepak",
+        "last_name": "Sharma",
+        "email": "deepak.sharma@example.com",
+        "phone": "9876500501",
+        "city": "Delhi",
+        "state": "Delhi",
+        "created_date": "2026-06-24",
+        "source_system": "DB"
+      },
+      {
+        "customer_id": "CUST502",
+        "first_name": "Priya",
+        "last_name": "Iyer",
+        "email": "priya.iyer@example.com",
+        "phone": "9876500502",
+        "city": "Chennai",
+        "state": "Tamil Nadu",
+        "created_date": "2026-06-24",
+        "source_system": "DB"
+      },
+      {
+        "customer_id": "CUST503",
+        "first_name": "Farhan",
+        "last_name": "Khan",
+        "email": "farhan.khan@example.com",
+        "phone": "9876500503",
+        "city": "Hyderabad",
+        "state": "Telangana",
+        "created_date": "2026-06-25",
+        "source_system": "DB"
+      }
+    ]
+  }
+}
