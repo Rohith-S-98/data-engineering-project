@@ -34,8 +34,14 @@ derby.log
 # Runtime raw/database outputs - static test data belongs in tests/fixtures/
 /data/raw/*
 !/data/raw/.gitkeep
+/data/raw/customer_data.csv
+/data/raw/customer_data_clean.csv
+/data/raw/customer_data_dirty.csv
+/data/raw/customer_data_api.csv
+/data/raw/customer_data_db.csv
 /data/database/*
 !/data/database/.gitkeep
+/data/database/*.db
 
 # Runtime pipeline outputs - keep only folder placeholders
 /data/bronze/*

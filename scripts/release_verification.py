@@ -19,6 +19,7 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
         VerificationCommand("config validation", [python, "-m", "scripts.validate_config_files"]),
         VerificationCommand("docker artifact validation", [python, "-m", "scripts.validate_docker_artifacts"]),
         VerificationCommand("databricks bundle structure validation", [python, "-m", "scripts.validate_databricks_bundle_structure"]),
+        VerificationCommand("repository hygiene validation", [python, "-m", "scripts.validate_repo_hygiene"]),
         VerificationCommand("targeted retry tests", [python, "-m", "unittest", "tests.test_pipeline_retry"]),
         VerificationCommand("targeted orchestrator retry tests", [python, "-m", "unittest", "tests.test_v17_orchestrator_retry"]),
         VerificationCommand("targeted v18 quality tests", [python, "-m", "unittest", "tests.test_v18_quality_gates"]),
@@ -27,6 +28,7 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
         VerificationCommand("targeted v21 database tests", [python, "-m", "unittest", "tests.test_v21_database_ingestion"]),
         VerificationCommand("targeted v22 dq catalog tests", [python, "-m", "unittest", "tests.test_v22_advanced_dq_rule_catalog"]),
         VerificationCommand("targeted v23 databricks bundle tests", [python, "-m", "unittest", "tests.test_v23_databricks_bundle_structure"]),
+        VerificationCommand("targeted repo hygiene tests", [python, "-m", "unittest", "tests.test_v23_0_1_repo_hygiene"]),
         VerificationCommand("full test suite", [python, "-m", "unittest", "discover", "tests"]),
         VerificationCommand("dry-run orchestrator", [python, "-m", "scripts.pipeline_orchestrator", "--dry-run", "--run-date", "2026-06-23"]),
     ]
@@ -60,7 +62,7 @@ def run_commands(commands: list[VerificationCommand]) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run release verification gates.")
-    parser.add_argument("--version", default="v23.0.0", help="Release version being verified.")
+    parser.add_argument("--version", default="v23.0.1", help="Release version being verified.")
     parser.add_argument("--skip-real-run", action="store_true", help="Skip real orchestrator execution.")
     parser.add_argument("--skip-alerting", action="store_true", help="Skip independent alerting execution.")
     args = parser.parse_args()
