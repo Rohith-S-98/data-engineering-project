@@ -41,13 +41,25 @@ class TestLakehouseIO(unittest.TestCase):
 
         self.assertEqual(result, "merge")
 
-    def test_is_delta_table_path_returns_true_when_delta_log_exists(self):
+    def test_is_delta_table_path_returns_true_when_delta_log_has_commit_json(self):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            table_path = Path(temp_dir) / "customer_table"
+            delta_log_path = table_path / "_delta_log"
+            delta_log_path.mkdir(parents=True)
+            (delta_log_path / "00000000000000000000.json").write_text(
+                "{}\n",
+                encoding="utf-8",
+            )
+
+            self.assertTrue(is_delta_table_path(str(table_path)))
+
+    def test_is_delta_table_path_returns_false_when_delta_log_is_empty(self):
         with tempfile.TemporaryDirectory() as temp_dir:
             table_path = Path(temp_dir) / "customer_table"
             delta_log_path = table_path / "_delta_log"
             delta_log_path.mkdir(parents=True)
 
-            self.assertTrue(is_delta_table_path(str(table_path)))
+            self.assertFalse(is_delta_table_path(str(table_path)))
 
     def test_is_delta_table_path_returns_false_when_delta_log_missing(self):
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -68,7 +80,7 @@ class TestLakehouseIO(unittest.TestCase):
                 )
 
             self.assertIn(
-                "Expected _delta_log folder was not found",
+                "Expected a committed Delta transaction log JSON file",
                 str(context.exception),
             )
 
