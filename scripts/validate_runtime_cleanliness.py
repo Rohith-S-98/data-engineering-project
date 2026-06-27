@@ -23,13 +23,17 @@ RUNTIME_DIRS = (
 
 
 def _run_git_command(args: list[str]) -> list[str]:
-    result = subprocess.run(
-        ["git", *args],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-        check=False,
-    )
+    try:
+        result = subprocess.run(
+            ["git", *args],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=False,
+        )
+    except FileNotFoundError:
+        return []
+
     if result.returncode != 0:
         return []
     return [line.strip() for line in result.stdout.splitlines() if line.strip()]
