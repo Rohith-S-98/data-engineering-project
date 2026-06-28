@@ -1,0 +1,32 @@
+name: V30 Capstone Readiness CI
+
+on:
+  push:
+    branches:
+      - main
+      - "v*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  v30-capstone-readiness:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONWARNINGS: ignore::ResourceWarning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate capstone readiness
+        run: |
+          python -m scripts.validate_capstone_readiness
+
+      - name: Run V30 targeted tests
+        run: |
+          python -m unittest tests.test_v30_capstone_readiness

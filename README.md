@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment metadata, Azure Data Factory-style orchestration metadata, Power BI-ready observability outputs, secret-safe environment configuration, end-to-end integration testing, partitioning strategy, interview storytelling, CI/CD gates, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment metadata, Azure Data Factory-style orchestration metadata, Power BI-ready observability outputs, secret-safe environment configuration, end-to-end integration testing, partitioning strategy, interview storytelling, capstone readiness validation, CI/CD gates, and production-style framework patterns.
 
-It demonstrates how customer data can be extracted from API-style and database-style sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting and retry controls, organized for Databricks and ADF-style deployment, exported into Power BI-ready dashboard datasets, configured through secret-safe environment references, validated through manifest-driven E2E integration checks, governed by table partitioning and maintenance metadata, translated into interview-ready storytelling, and verified through automated release gates.
+It demonstrates how customer data can be extracted from API-style and database-style sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting and retry controls, organized for Databricks and ADF-style deployment, exported into Power BI-ready dashboard datasets, configured through secret-safe environment references, validated through manifest-driven E2E integration checks, governed by table partitioning and maintenance metadata, translated into interview-ready storytelling, and validated as a production-ready capstone release.
 
 ```text
-Current Version: v29.0.0
+Current Version: v30.0.0
 ```
 
 ---
@@ -18,8 +18,8 @@ This project is designed to show production-style Data Engineering thinking, not
 |---|---|
 | Role alignment | Azure / Databricks / PySpark Data Engineering pipeline design |
 | End-to-end system thinking | Source ingestion -> raw landing -> bronze -> silver -> gold -> downstream MDM-style output |
-| Production controls | Schema validation, DQ rules, quarantine, audit, alerting, SLA monitoring, retry, replay, CI/CD, Docker, environment configuration, E2E integration testing, partition strategy |
-| Versioned engineering maturity | The project evolved from foundation pipelines to observability, orchestration, deployment, dashboard readiness, secure configuration, integration validation, table-layout planning, and storytelling readiness |
+| Production controls | Schema validation, DQ rules, quarantine, audit, alerting, SLA monitoring, retry, replay, CI/CD, Docker, environment configuration, E2E integration testing, partition strategy, and capstone readiness validation |
+| Versioned engineering maturity | The project evolved from foundation pipelines to observability, orchestration, deployment, dashboard readiness, secure configuration, integration validation, table-layout planning, storytelling readiness, and final capstone validation |
 | Real-work alignment | Mirrors Apexon / IQVIA-style MDM ingestion, DQ, canonical modeling, JSON payload generation, environment handling, release validation, Databricks table design, and interview explanation patterns |
 
 ---
@@ -49,13 +49,14 @@ flowchart LR
     S --> T[Manifest-driven<br/>E2E Integration Testing]
     T --> U[Partitioning + Table<br/>Maintenance Strategy]
     U --> V[Interview + Resume<br/>Storytelling Pack]
+    V --> W[Capstone Readiness<br/>Manifest + Validation]
 ```
 
 ### What this flow proves
 
 - I can design pipelines beyond simple ETL scripts.
 - I understand ingestion, schema validation, data quality, quarantine, canonical modeling, and downstream integration.
-- I can add production controls such as audit metadata, observability, alerting, retry/recovery, release gates, CI/CD, environment safety, E2E validation, partition strategy, and interview explanation artifacts.
+- I can add production controls such as audit metadata, observability, alerting, retry/recovery, release gates, CI/CD, environment safety, E2E validation, partition strategy, interview explanation artifacts, and capstone readiness evidence.
 - I can explain a complete source-to-consumption pipeline in interview discussions.
 
 ---
@@ -67,7 +68,7 @@ flowchart LR
     A[v1-v5<br/>Foundation<br/>Python DQ, PySpark, Config, Audit] --> B[v6-v12<br/>Quality + Lakehouse<br/>DQ Severity, Schema, Watermark, Merge, SCD2]
     B --> C[v13-v17<br/>Operations<br/>Observability, Orchestration, Scheduling, Alerts, Retry]
     C --> D[v18-v22<br/>Production + Ingestion<br/>CI/CD, Docker, API, Database, Advanced DQ]
-    D --> E[v23-v29<br/>Deployment + Analytics + Safety + E2E + Table Strategy + Storytelling<br/>Databricks, ADF, Power BI, Environment Config, Integration Testing, Partitioning, Interview Pack]
+    D --> E[v23-v30<br/>Deployment + Analytics + Safety + E2E + Table Strategy + Storytelling + Capstone<br/>Databricks, ADF, Power BI, Environment Config, Integration Testing, Partitioning, Interview Pack, Readiness Manifest]
 ```
 
 | Version Range | Engineering Maturity Added | What It Proves |
@@ -76,7 +77,7 @@ flowchart LR
 | v6 - v12 | Severity-based DQ, custom exceptions, schema validation, incremental load, watermarking, merge/upsert, SCD Type 2 | Data quality, reliability, and lakehouse processing depth |
 | v13 - v17 | Observability mart, orchestration, job control, scheduling, dependency checks, alerting, SLA monitoring, retry and replay | Operational thinking beyond basic transformation code |
 | v18 - v22 | CI/CD hardening, Docker runtime, API ingestion, database ingestion, advanced DQ rule catalog | Production-readiness, testability, and ingestion framework design |
-| v23 - v29 | Databricks Asset Bundle-style structure, Azure Data Factory simulation, Power BI observability, secret-safe environment configuration, E2E integration testing, partitioning strategy, storytelling pack | Cloud deployment style, analytics visibility, secure release discipline, system-level validation, lakehouse table-layout planning, and interview readiness |
+| v23 - v30 | Databricks Asset Bundle-style structure, Azure Data Factory simulation, Power BI observability, secret-safe environment configuration, E2E integration testing, partitioning strategy, storytelling pack, capstone readiness manifest | Cloud deployment style, analytics visibility, secure release discipline, system-level validation, lakehouse table-layout planning, interview readiness, and final capstone evidence |
 
 ---
 
@@ -96,6 +97,7 @@ This project is connected to real Apexon / IQVIA-style MDM Data Engineering scen
 | System-level validation | Manifest-driven E2E smoke/full integration gates |
 | Databricks table design | Partition columns, clustering columns, target file sizes, retention windows, and table maintenance metadata |
 | Interview explanation | Two-minute overview, deep-dive walkthrough, resume bullets, mock questions, and Apexon/IQVIA mapping |
+| Capstone readiness | Production-readiness manifest with evidence across ingestion, DQ, lakehouse, operations, CI/CD, observability, security, E2E, and storytelling |
 
 ---
 
@@ -137,6 +139,7 @@ This project is connected to real Apexon / IQVIA-style MDM Data Engineering scen
 | v27.0.0 | End-to-End Integration Testing Framework |
 | v28.0.0 | Performance Optimization and Partitioning Strategy |
 | v29.0.0 | Interview, Resume, and Project Storytelling Pack |
+| v30.0.0 | Final Production-Ready Capstone Release |
 
 ---
 
@@ -168,6 +171,8 @@ This project is connected to real Apexon / IQVIA-style MDM Data Engineering scen
 - Interview and resume storytelling pack
 - Apexon/IQVIA project mapping
 - Mock interview question bank
+- Production-readiness capstone manifest
+- Capstone readiness validator and tests
 - Alerting and SLA monitoring
 - Retry, recovery, and replay handling
 - Runtime parameterization and dry-run support
@@ -211,6 +216,7 @@ docs/storytelling/deep_dive_walkthrough.md
 docs/storytelling/resume_bullets.md
 docs/storytelling/apexon_iqvia_mapping.md
 docs/storytelling/mock_interview_questions.md
+release/capstone/v30_production_readiness_manifest.json
 ```
 
 ---
@@ -247,10 +253,10 @@ Run E2E full integration gates:
 python -m scripts.run_e2e_integration_tests --mode full --run-date 2026-06-23
 ```
 
-Validate V28 partition strategy:
+Validate V30 capstone readiness:
 
 ```bash
-python -m scripts.validate_partition_strategy
+python -m scripts.validate_capstone_readiness
 ```
 
 Validate V29 storytelling pack:
@@ -259,16 +265,10 @@ Validate V29 storytelling pack:
 python -m scripts.validate_storytelling_pack
 ```
 
-Run observability collection:
+Validate V28 partition strategy:
 
 ```bash
-python -m scripts.pipeline_observability
-```
-
-Export Power BI-ready observability files:
-
-```bash
-python -m scripts.powerbi_observability_exporter
+python -m scripts.validate_partition_strategy
 ```
 
 Validate secret-safe environment configuration:
@@ -294,6 +294,7 @@ python -m scripts.validate_powerbi_dashboard_artifacts
 python -m scripts.validate_secret_environment_config
 python -m scripts.validate_partition_strategy
 python -m scripts.validate_storytelling_pack
+python -m scripts.validate_capstone_readiness
 python -m scripts.run_e2e_integration_tests --mode smoke --run-date 2026-06-23
 python -m unittest tests.test_v24_adf_artifacts
 python -m unittest tests.test_v25_powerbi_observability_dashboard
@@ -301,6 +302,7 @@ python -m unittest tests.test_v26_secret_environment_config
 python -m unittest tests.test_v27_e2e_integration_framework
 python -m unittest tests.test_v28_partition_strategy
 python -m unittest tests.test_v29_storytelling_pack
+python -m unittest tests.test_v30_capstone_readiness
 python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
@@ -309,46 +311,34 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v29.0.0
+python -m scripts.release_verification --version v30.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v29.0.0
+python -m scripts.validate_release_tag --version v30.0.0
 ```
 
 ---
 
-## End-to-End Integration Testing
+## Final Production-Ready Capstone Release
 
-V27 adds a manifest-driven E2E integration framework:
-
-```text
-tests/integration/customer_pipeline_e2e_manifest.json
-scripts/run_e2e_integration_tests.py
-tests/test_v27_e2e_integration_framework.py
-.github/workflows/v27-e2e-integration-ci.yml
-```
-
----
-
-## Performance Optimization and Partitioning Strategy
-
-V28 adds a metadata-driven partitioning and table maintenance strategy:
+V30 adds a production-readiness manifest and validator:
 
 ```text
-config/partitioning/customer_partition_strategy.json
-scripts/validate_partition_strategy.py
-tests/test_v28_partition_strategy.py
-.github/workflows/v28-partition-strategy-ci.yml
+release/capstone/v30_production_readiness_manifest.json
+scripts/validate_capstone_readiness.py
+tests/test_v30_capstone_readiness.py
+.github/workflows/v30-capstone-readiness-ci.yml
+docs/v30_final_production_ready_capstone_release.md
 ```
 
-Validate V28 artifacts:
+Validate V30 artifacts:
 
 ```bash
-python -m scripts.validate_partition_strategy
-python -m unittest tests.test_v28_partition_strategy
+python -m scripts.validate_capstone_readiness
+python -m unittest tests.test_v30_capstone_readiness
 ```
 
 ---
@@ -368,92 +358,30 @@ tests/test_v29_storytelling_pack.py
 .github/workflows/v29-storytelling-pack-ci.yml
 ```
 
-Validate V29 artifacts:
+---
 
-```bash
-python -m scripts.validate_storytelling_pack
-python -m unittest tests.test_v29_storytelling_pack
+## Performance Optimization and Partitioning Strategy
+
+V28 adds a metadata-driven partitioning and table maintenance strategy:
+
+```text
+config/partitioning/customer_partition_strategy.json
+scripts/validate_partition_strategy.py
+tests/test_v28_partition_strategy.py
+.github/workflows/v28-partition-strategy-ci.yml
 ```
 
 ---
 
-## Databricks Bundle-Style Deployment
+## End-to-End Integration Testing
 
-V23 adds a local Databricks Asset Bundle-style structure:
-
-```text
-databricks.yml
-resources/customer_medallion_job.yml
-deployment/databricks/README.md
-```
-
----
-
-## Azure Data Factory Orchestration Simulation
-
-V24 adds ADF-style orchestration metadata:
+V27 adds a manifest-driven E2E integration framework:
 
 ```text
-azure/adf/pipelines/customer_medallion_adf_pipeline.json
-azure/adf/linked_services/ls_databricks_customer_pipeline.json
-azure/adf/datasets/customer_landing_metadata.json
-azure/adf/README.md
-```
-
-Validate ADF artifacts:
-
-```bash
-python -m scripts.validate_adf_artifacts
-```
-
----
-
-## Power BI Observability Dashboard
-
-V25 adds Power BI-ready observability outputs:
-
-```text
-dashboards/powerbi/observability_dashboard_schema.json
-dashboards/powerbi/README.md
-output/observability/powerbi/dashboard_kpi_snapshot.csv
-output/observability/powerbi/dashboard_data_quality_snapshot.csv
-output/observability/powerbi/dashboard_layer_row_counts.csv
-```
-
-Validate Power BI dashboard artifacts:
-
-```bash
-python -m scripts.validate_powerbi_dashboard_artifacts
-```
-
----
-
-## Secrets and Environment Configuration
-
-V26 adds a secret-safe environment configuration layer:
-
-```text
-.env.example
-config/environments/dev.json
-config/environments/test.json
-config/environments/prod.json
-scripts/validate_secret_environment_config.py
-.github/workflows/v26-secret-environment-ci.yml
-```
-
-Real credentials are not committed. Environment configs store references only, such as:
-
-```text
-ENV:CUSTOMER_SOURCE_API_CREDENTIAL
-ENV:CUSTOMER_DATABASE_CREDENTIAL
-ENV:DATABRICKS_WORKSPACE_CREDENTIAL
-ENV:AZURE_STORAGE_CREDENTIAL
-```
-
-Validate V26 environment configuration:
-
-```bash
-python -m scripts.validate_secret_environment_config
+tests/integration/customer_pipeline_e2e_manifest.json
+scripts/run_e2e_integration_tests.py
+tests/test_v27_e2e_integration_framework.py
+.github/workflows/v27-e2e-integration-ci.yml
 ```
 
 ---
@@ -466,7 +394,7 @@ Live public API integration testing is deferred to V31:
 docs/roadmap/v26_live_public_api_integration_testing.md
 ```
 
-That item is preserved as a final-phase enhancement idea. The implemented V29.0.0 release is focused on interview, resume, and project storytelling readiness.
+That item is preserved as a final-phase enhancement idea. The implemented V30.0.0 release is focused on final production-ready capstone validation. GitHub profile update remains deferred until after V31/final phase.
 
 ---
 
@@ -487,6 +415,7 @@ docs/v25_0_1_docs_release_alignment.md
 docs/v26_secrets_environments_deployment_config.md
 docs/v27_end_to_end_integration_testing_framework.md
 docs/v28_performance_optimization_partitioning_strategy.md
+docs/v30_final_production_ready_capstone_release.md
 docs/storytelling/project_overview_2_minute.md
 docs/storytelling/deep_dive_walkthrough.md
 docs/storytelling/resume_bullets.md
@@ -504,7 +433,8 @@ Python, SQL-style extraction, PySpark, Delta Lake, Databricks deployment structu
 Azure Data Factory orchestration concepts, Docker, CI/CD, metadata-driven DQ,
 watermarking, SCD2, observability, alerting, retry/replay, Power BI-ready reporting,
 secret-safe environment configuration, E2E integration testing, partitioning strategy,
-interview storytelling, Git/GitHub release discipline, and production-style data engineering design.
+interview storytelling, capstone readiness validation, Git/GitHub release discipline,
+and production-style data engineering design.
 ```
 
 ---
@@ -512,5 +442,5 @@ interview storytelling, Git/GitHub release discipline, and production-style data
 ## Latest Interview Explanation
 
 ```text
-This project simulates an end-to-end production-style data engineering platform. It includes API and database ingestion, metadata-driven data quality, medallion processing, Delta-style storage, SCD2 history, observability, alerting, retry/replay, Databricks deployment metadata, ADF orchestration metadata, Docker runtime, CI/CD quality gates, Power BI-ready dashboard exports, secret-safe dev/test/prod environment configuration, manifest-driven E2E integration testing, table partitioning strategy, and a validated storytelling pack. The latest version converts the technical project into interview-ready material with a two-minute overview, deep-dive walkthrough, resume bullets, Apexon/IQVIA mapping, and mock interview questions.
+This project simulates an end-to-end production-style data engineering platform. It includes API and database ingestion, metadata-driven data quality, medallion processing, Delta-style storage, SCD2 history, observability, alerting, retry/replay, Databricks deployment metadata, ADF orchestration metadata, Docker runtime, CI/CD quality gates, Power BI-ready dashboard exports, secret-safe dev/test/prod environment configuration, manifest-driven E2E integration testing, table partitioning strategy, and a validated storytelling pack. The latest version adds a production-readiness manifest and capstone validation gate that checks evidence across ingestion, data quality, lakehouse processing, operations, deployment, observability, security, E2E validation, and storytelling readiness.
 ```

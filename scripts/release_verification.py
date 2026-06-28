@@ -25,6 +25,7 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
         VerificationCommand("secret environment config validation", [python, "-m", "scripts.validate_secret_environment_config"]),
         VerificationCommand("partition strategy validation", [python, "-m", "scripts.validate_partition_strategy"]),
         VerificationCommand("storytelling pack validation", [python, "-m", "scripts.validate_storytelling_pack"]),
+        VerificationCommand("capstone readiness validation", [python, "-m", "scripts.validate_capstone_readiness"]),
         VerificationCommand("e2e integration smoke", [python, "-m", "scripts.run_e2e_integration_tests", "--mode", "smoke", "--run-date", "2026-06-23"]),
         VerificationCommand("targeted retry tests", [python, "-m", "unittest", "tests.test_pipeline_retry"]),
         VerificationCommand("targeted orchestrator retry tests", [python, "-m", "unittest", "tests.test_v17_orchestrator_retry"]),
@@ -41,6 +42,7 @@ def build_commands(skip_real_run: bool, skip_alerting: bool) -> list[Verificatio
         VerificationCommand("targeted v27 e2e framework tests", [python, "-m", "unittest", "tests.test_v27_e2e_integration_framework"]),
         VerificationCommand("targeted v28 partition strategy tests", [python, "-m", "unittest", "tests.test_v28_partition_strategy"]),
         VerificationCommand("targeted v29 storytelling tests", [python, "-m", "unittest", "tests.test_v29_storytelling_pack"]),
+        VerificationCommand("targeted v30 capstone tests", [python, "-m", "unittest", "tests.test_v30_capstone_readiness"]),
         VerificationCommand("full test suite", [python, "-m", "unittest", "discover", "tests"]),
         VerificationCommand("dry-run orchestrator", [python, "-m", "scripts.pipeline_orchestrator", "--dry-run", "--run-date", "2026-06-23"]),
     ]
@@ -74,7 +76,7 @@ def run_commands(commands: list[VerificationCommand]) -> int:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run release verification gates.")
-    parser.add_argument("--version", default="v29.0.0", help="Release version being verified.")
+    parser.add_argument("--version", default="v30.0.0", help="Release version being verified.")
     parser.add_argument("--skip-real-run", action="store_true", help="Skip real orchestrator execution.")
     parser.add_argument("--skip-alerting", action="store_true", help="Skip independent alerting execution.")
     args = parser.parse_args()
