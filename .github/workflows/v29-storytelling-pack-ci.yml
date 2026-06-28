@@ -1,0 +1,32 @@
+name: V29 Storytelling Pack CI
+
+on:
+  push:
+    branches:
+      - main
+      - "v*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  v29-storytelling-pack:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONWARNINGS: ignore::ResourceWarning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate storytelling pack
+        run: |
+          python -m scripts.validate_storytelling_pack
+
+      - name: Run V29 targeted tests
+        run: |
+          python -m unittest tests.test_v29_storytelling_pack
