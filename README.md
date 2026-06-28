@@ -1,11 +1,11 @@
 # End-to-End Data Engineering Pipeline Simulator
 
-This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment metadata, Azure Data Factory-style orchestration metadata, Power BI-ready observability outputs, CI/CD gates, and production-style framework patterns.
+This project is a portfolio-ready Data Engineering pipeline simulator built with Python, PySpark, Delta Lake, Docker, API ingestion, database ingestion, advanced data quality, Databricks deployment metadata, Azure Data Factory-style orchestration metadata, Power BI-ready observability outputs, secret-safe environment configuration, CI/CD gates, and production-style framework patterns.
 
-It demonstrates how customer data can be extracted from API-style and database-style sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting and retry controls, organized for Databricks and ADF-style deployment, exported into Power BI-ready dashboard datasets, and verified through automated release gates.
+It demonstrates how customer data can be extracted from API-style and database-style sources, landed into raw storage, validated through metadata-driven DQ rules, quarantined, transformed into a canonical model, historically tracked using SCD Type 2, observed through pipeline metrics, protected with alerting and retry controls, organized for Databricks and ADF-style deployment, exported into Power BI-ready dashboard datasets, configured through secret-safe environment references, and verified through automated release gates.
 
 ```text
-Current Version: v25.0.1
+Current Version: v26.0.0
 ```
 
 ---
@@ -18,9 +18,9 @@ This project is designed to show production-style Data Engineering thinking, not
 |---|---|
 | Role alignment | Azure / Databricks / PySpark Data Engineering pipeline design |
 | End-to-end system thinking | Source ingestion -> raw landing -> bronze -> silver -> gold -> downstream MDM-style output |
-| Production controls | Schema validation, DQ rules, quarantine, audit, alerting, SLA monitoring, retry, replay, CI/CD, Docker |
-| Versioned engineering maturity | The project evolved from foundation pipelines to observability, orchestration, deployment, and dashboard readiness |
-| Real-work alignment | Mirrors Apexon / IQVIA-style MDM ingestion, DQ, canonical modeling, and JSON payload generation patterns |
+| Production controls | Schema validation, DQ rules, quarantine, audit, alerting, SLA monitoring, retry, replay, CI/CD, Docker, environment configuration |
+| Versioned engineering maturity | The project evolved from foundation pipelines to observability, orchestration, deployment, dashboard readiness, and secret-safe deployment configuration |
+| Real-work alignment | Mirrors Apexon / IQVIA-style MDM ingestion, DQ, canonical modeling, JSON payload generation, and secret-safe environment handling patterns |
 
 ---
 
@@ -45,13 +45,14 @@ flowchart LR
     O --> P[CI/CD + Release Verification]
     P --> Q[Docker + Databricks / ADF-style Deployment]
     Q --> R[Power BI-ready Outputs]
+    R --> S[Secret-safe<br/>Environment Configuration]
 ```
 
 ### What this flow proves
 
 - I can design pipelines beyond simple ETL scripts.
 - I understand ingestion, schema validation, data quality, quarantine, canonical modeling, and downstream integration.
-- I can add production controls such as audit metadata, observability, alerting, retry/recovery, release gates, and CI/CD.
+- I can add production controls such as audit metadata, observability, alerting, retry/recovery, release gates, CI/CD, and environment safety.
 - I can explain a complete source-to-consumption pipeline in interview discussions.
 
 ---
@@ -63,7 +64,7 @@ flowchart LR
     A[v1-v5<br/>Foundation<br/>Python DQ, PySpark, Config, Audit] --> B[v6-v12<br/>Quality + Lakehouse<br/>DQ Severity, Schema, Watermark, Merge, SCD2]
     B --> C[v13-v17<br/>Operations<br/>Observability, Orchestration, Scheduling, Alerts, Retry]
     C --> D[v18-v22<br/>Production + Ingestion<br/>CI/CD, Docker, API, Database, Advanced DQ]
-    D --> E[v23-v26<br/>Deployment + Analytics<br/>Databricks, ADF, Power BI, Live API Testing]
+    D --> E[v23-v26<br/>Deployment + Analytics + Safety<br/>Databricks, ADF, Power BI, Environment Config]
 ```
 
 | Version Range | Engineering Maturity Added | What It Proves |
@@ -72,7 +73,7 @@ flowchart LR
 | v6 - v12 | Severity-based DQ, custom exceptions, schema validation, incremental load, watermarking, merge/upsert, SCD Type 2 | Data quality, reliability, and lakehouse processing depth |
 | v13 - v17 | Observability mart, orchestration, job control, scheduling, dependency checks, alerting, SLA monitoring, retry and replay | Operational thinking beyond basic transformation code |
 | v18 - v22 | CI/CD hardening, Docker runtime, API ingestion, database ingestion, advanced DQ rule catalog | Production-readiness, testability, and ingestion framework design |
-| v23 - v26 | Databricks Asset Bundle-style structure, Azure Data Factory simulation, Power BI observability, planned live public API integration | Cloud deployment style, analytics visibility, and real-world integration practice |
+| v23 - v26 | Databricks Asset Bundle-style structure, Azure Data Factory simulation, Power BI observability, secret-safe environment configuration | Cloud deployment style, analytics visibility, and secure release discipline |
 
 ---
 
@@ -88,6 +89,7 @@ This project is connected to real Apexon / IQVIA-style MDM Data Engineering scen
 | Canonical modeling for downstream systems | Gold canonical layer and Reltio-style JSON payload generation |
 | Incremental processing and error triage | Watermarks, audit logs, retry/recovery, failure replay, SLA monitoring |
 | Production release discipline | CI/CD gates, release verification, Docker, repo hygiene, runtime cleanliness checks |
+| Secure deployment configuration | Dev/test/prod environment metadata with credential references instead of committed values |
 
 ---
 
@@ -125,104 +127,7 @@ This project is connected to real Apexon / IQVIA-style MDM Data Engineering scen
 | v24.0.0 | Azure Data Factory Orchestration Simulation |
 | v25.0.0 | Power BI-Ready Observability Dashboard |
 | v25.0.1 | Documentation and Release Gate Alignment |
-| v26.0.0 | Planned Live Public API Integration Testing Framework |
-
----
-
-## Current Architecture
-
-```text
-Mock API / SQLite Database / Raw Customer CSV
-↓
-V20 API Ingestion + V21 Database Ingestion + Raw Landing
-↓
-V22 Advanced DQ Rule Catalog
-↓
-Bronze Schema Validation
-↓
-Incremental Watermark Filter
-↓
-Bronze Delta Table
-↓
-Silver Delta Table + Quarantine Delta Table
-↓
-Customer History SCD2 Delta Table
-↓
-Gold Canonical Delta Table
-↓
-Reltio-style JSON Payload
-↓
-Commit Watermark After Success
-↓
-Pipeline Audit Update
-↓
-V13 Observability Metrics Mart
-↓
-V14 Job Orchestration + Job Control
-↓
-V15 Runtime Parameters + Dependency Validation
-↓
-V16 Alerting + SLA Monitoring
-↓
-V17 Retry + Recovery + Failure Replay
-↓
-V18 CI/CD Quality Gates + Release Verification
-↓
-V19 Docker Containerized Runtime
-↓
-V23 Databricks Asset Bundle Style Deployment Structure
-↓
-V24 Azure Data Factory Style Orchestration Simulation
-↓
-V25 Power BI-Ready Observability Dashboard Outputs
-```
-
----
-
-## Planned V26 Phase: Live Public API Integration Testing
-
-V26 will extend the existing V20 API ingestion framework by adding a controlled live-public-API integration testing layer. The old `Public-API` repository will be reused as a supporting integration source registry instead of remaining only as a copied public API README list.
-
-The goal of this phase is to test the pipeline against real HTTP APIs while keeping the main Data Engineering project stable, repeatable, and production-style.
-
-Planned V26 scope:
-
-- Select a small set of stable public APIs for controlled live ingestion tests.
-- Build a source registry for API name, endpoint, method, expected status, timeout, retry policy, and expected schema.
-- Add a reusable API client with timeout handling, response validation, and structured exceptions.
-- Store raw live API responses in a raw landing format.
-- Validate JSON response shape using schema contracts.
-- Route failed, empty, malformed, or schema-invalid responses to quarantine.
-- Normalize valid responses into tabular records for Bronze/Silver processing.
-- Capture audit metrics for endpoint status, latency, response size, record count, and failure reason.
-- Add unit tests with mocked API responses so CI/CD does not depend on internet availability.
-- Add optional manual live integration test execution for local practice and demo purposes.
-
-Planned V26 architecture extension:
-
-```text
-Selected Live Public APIs
-↓
-Public API Source Registry
-↓
-Live API Client + Timeout/Retry Handling
-↓
-Raw JSON Landing
-↓
-Schema Contract Validation
-↓
-Valid Response Path / Quarantine Path
-↓
-Bronze + Silver Normalization
-↓
-Audit + Observability Metrics
-↓
-Existing Orchestration, Alerting, Retry, CI/CD, and Dashboard Layers
-```
-
-V26 will not replace the current mock API ingestion. It will add a realistic integration-testing option that demonstrates how a production Data Engineering pipeline handles live upstream data instability.
-
-Detailed phase document: `docs/roadmap/v26_live_public_api_integration_testing.md`
+| v26.0.0 | Secrets, Environments, and Deployment Configuration |
 
 ---
 
@@ -246,6 +151,9 @@ Detailed phase document: `docs/roadmap/v26_live_public_api_integration_testing.m
 - SCD Type 2 history tracking
 - Data observability metrics mart
 - Power BI-ready observability dashboard exports
+- Secret-safe environment and deployment configuration
+- Dev, test, and prod environment metadata
+- Credential reference validation using environment-variable style references
 - Alerting and SLA monitoring
 - Retry, recovery, and replay handling
 - Runtime parameterization and dry-run support
@@ -262,12 +170,16 @@ Detailed phase document: `docs/roadmap/v26_live_public_api_integration_testing.m
 ## Key Configuration and Metadata
 
 ```text
+.env.example
 databricks.yml
 resources/customer_medallion_job.yml
 azure/adf/pipelines/customer_medallion_adf_pipeline.json
 azure/adf/linked_services/ls_databricks_customer_pipeline.json
 azure/adf/datasets/customer_landing_metadata.json
 dashboards/powerbi/observability_dashboard_schema.json
+config/environments/dev.json
+config/environments/test.json
+config/environments/prod.json
 config/pipeline/local_config.json
 config/rules/customer_dq_rules.json
 config/rules/advanced_customer_dq_rule_catalog.json
@@ -314,6 +226,12 @@ Export Power BI-ready observability files:
 python -m scripts.powerbi_observability_exporter
 ```
 
+Validate secret-safe environment configuration:
+
+```bash
+python -m scripts.validate_secret_environment_config
+```
+
 ---
 
 ## Validation and Release Gates
@@ -328,8 +246,10 @@ python -m scripts.validate_databricks_bundle_structure
 python -m scripts.validate_repo_hygiene
 python -m scripts.validate_adf_artifacts
 python -m scripts.validate_powerbi_dashboard_artifacts
+python -m scripts.validate_secret_environment_config
 python -m unittest tests.test_v24_adf_artifacts
 python -m unittest tests.test_v25_powerbi_observability_dashboard
+python -m unittest tests.test_v26_secret_environment_config
 python -m unittest discover tests
 python -m scripts.pipeline_orchestrator --dry-run --run-date 2026-06-23
 python -m scripts.validate_runtime_cleanliness
@@ -338,11 +258,143 @@ python -m scripts.validate_runtime_cleanliness
 Run full release verification:
 
 ```bash
-python -m scripts.release_verification --version v25.0.1
+python -m scripts.release_verification --version v26.0.0
 ```
 
 Validate release tag safety before tagging:
 
 ```bash
-python -m scripts.validate_release_tag --version v25.0.1
+python -m scripts.validate_release_tag --version v26.0.0
+```
+
+---
+
+## Databricks Bundle-Style Deployment
+
+V23 adds a local Databricks Asset Bundle-style structure:
+
+```text
+databricks.yml
+resources/customer_medallion_job.yml
+deployment/databricks/README.md
+```
+
+---
+
+## Azure Data Factory Orchestration Simulation
+
+V24 adds ADF-style orchestration metadata:
+
+```text
+azure/adf/pipelines/customer_medallion_adf_pipeline.json
+azure/adf/linked_services/ls_databricks_customer_pipeline.json
+azure/adf/datasets/customer_landing_metadata.json
+azure/adf/README.md
+```
+
+Validate ADF artifacts:
+
+```bash
+python -m scripts.validate_adf_artifacts
+```
+
+---
+
+## Power BI Observability Dashboard
+
+V25 adds Power BI-ready observability outputs:
+
+```text
+dashboards/powerbi/observability_dashboard_schema.json
+dashboards/powerbi/README.md
+output/observability/powerbi/dashboard_kpi_snapshot.csv
+output/observability/powerbi/dashboard_data_quality_snapshot.csv
+output/observability/powerbi/dashboard_layer_row_counts.csv
+```
+
+Validate Power BI dashboard artifacts:
+
+```bash
+python -m scripts.validate_powerbi_dashboard_artifacts
+```
+
+---
+
+## Secrets and Environment Configuration
+
+V26 adds a secret-safe environment configuration layer:
+
+```text
+.env.example
+config/environments/dev.json
+config/environments/test.json
+config/environments/prod.json
+scripts/validate_secret_environment_config.py
+.github/workflows/v26-secret-environment-ci.yml
+```
+
+Real credentials are not committed. Environment configs store references only, such as:
+
+```text
+ENV:CUSTOMER_SOURCE_API_CREDENTIAL
+ENV:CUSTOMER_DATABASE_CREDENTIAL
+ENV:DATABRICKS_WORKSPACE_CREDENTIAL
+ENV:AZURE_STORAGE_CREDENTIAL
+```
+
+Validate V26 environment configuration:
+
+```bash
+python -m scripts.validate_secret_environment_config
+```
+
+---
+
+## Future Backlog Note
+
+A separate roadmap note exists for live public API integration testing:
+
+```text
+docs/roadmap/v26_live_public_api_integration_testing.md
+```
+
+That item is preserved as a future enhancement idea. The implemented V26.0.0 release is focused on secrets, environments, and deployment configuration.
+
+---
+
+## Runtime Outputs
+
+Runtime outputs are generated locally and intentionally ignored by Git. Only `.gitkeep` placeholders are committed for runtime output folders.
+
+---
+
+## Documentation
+
+```text
+docs/v23_databricks_asset_bundle_structure.md
+docs/v23_0_1_pre_v24_professional_cleanup.md
+docs/v24_azure_data_factory_orchestration_simulation.md
+docs/v25_powerbi_observability_dashboard.md
+docs/v25_0_1_docs_release_alignment.md
+docs/v26_secrets_environments_deployment_config.md
+docs/roadmap/v26_live_public_api_integration_testing.md
+```
+
+---
+
+## Skills Demonstrated
+
+```text
+Python, SQL-style extraction, PySpark, Delta Lake, Databricks deployment structure,
+Azure Data Factory orchestration concepts, Docker, CI/CD, metadata-driven DQ,
+watermarking, SCD2, observability, alerting, retry/replay, Power BI-ready reporting,
+secret-safe environment configuration, Git/GitHub release discipline, and production-style data engineering design.
+```
+
+---
+
+## Latest Interview Explanation
+
+```text
+This project simulates an end-to-end production-style data engineering platform. It includes API and database ingestion, metadata-driven data quality, medallion processing, Delta-style storage, SCD2 history, observability, alerting, retry/replay, Databricks deployment metadata, ADF orchestration metadata, Docker runtime, CI/CD quality gates, Power BI-ready dashboard exports, and secret-safe dev/test/prod environment configuration. The latest version adds environment configuration files, credential references, a .env.example template, validation gates, tests, and documentation to show how production projects avoid committing real credentials.
 ```

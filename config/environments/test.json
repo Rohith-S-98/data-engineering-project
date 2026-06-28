@@ -1,0 +1,19 @@
+{
+    "environment": "test",
+    "deployment_target": "local-test",
+    "pipeline_config_path": "config/pipeline/local_config.json",
+    "workspace_profile": "test",
+    "catalog_name": "customer_test",
+    "schema_name": "pipeline",
+    "requires_approval": false,
+    "credential_references": {
+        "source_api": "ENV:CUSTOMER_SOURCE_API_CREDENTIAL",
+        "database": "ENV:CUSTOMER_DATABASE_CREDENTIAL",
+        "databricks_workspace": "ENV:DATABRICKS_WORKSPACE_CREDENTIAL",
+        "azure_storage": "ENV:AZURE_STORAGE_CREDENTIAL"
+    },
+    "runtime_roots": {
+        "data_root": "data",
+        "output_root": "output"
+    }
+}
