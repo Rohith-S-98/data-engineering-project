@@ -1,0 +1,104 @@
+{
+    "version": "v30.0.0",
+    "release_name": "Final Production-Ready Capstone Release",
+    "baseline_version": "v29.0.0",
+    "status": "capstone-ready",
+    "profile_update_status": "deferred-until-v31-final-phase",
+    "post_capstone_backlog": [
+        "v31.0.0 - Live Public API Integration Testing Framework"
+    ],
+    "production_readiness_categories": [
+        {
+            "name": "ingestion",
+            "evidence": [
+                "config/api/customer_api_ingestion_config.json",
+                "config/database/customer_database_ingestion_config.json",
+                "tests/test_v20_api_ingestion.py",
+                "tests/test_v21_database_ingestion.py"
+            ]
+        },
+        {
+            "name": "data_quality_and_quarantine",
+            "evidence": [
+                "config/rules/customer_dq_rules.json",
+                "config/rules/advanced_customer_dq_rule_catalog.json",
+                "tests/test_v22_advanced_dq_rule_catalog.py"
+            ]
+        },
+        {
+            "name": "lakehouse_processing",
+            "evidence": [
+                "configs/schema_contracts/bronze_customers_schema.json",
+                "configs/schema_contracts/silver_customers_schema.json",
+                "config/partitioning/customer_partition_strategy.json",
+                "tests/test_v28_partition_strategy.py"
+            ]
+        },
+        {
+            "name": "operations_and_recovery",
+            "evidence": [
+                "config/jobs/customer_medallion_job.json",
+                "config/alerts/customer_medallion_alerts.json",
+                "config/retries/customer_medallion_retry_policy.json",
+                "tests/test_pipeline_retry.py",
+                "tests/test_v17_orchestrator_retry.py"
+            ]
+        },
+        {
+            "name": "deployment_and_ci_cd",
+            "evidence": [
+                "databricks.yml",
+                "resources/customer_medallion_job.yml",
+                "azure/adf/pipelines/customer_medallion_adf_pipeline.json",
+                ".github/workflows/python-ci.yml",
+                "scripts/release_verification.py"
+            ]
+        },
+        {
+            "name": "observability_and_reporting",
+            "evidence": [
+                "dashboards/powerbi/observability_dashboard_schema.json",
+                "scripts/powerbi_observability_exporter.py",
+                "tests/test_v25_powerbi_observability_dashboard.py"
+            ]
+        },
+        {
+            "name": "security_and_environment_safety",
+            "evidence": [
+                ".env.example",
+                "config/environments/dev.json",
+                "config/environments/test.json",
+                "config/environments/prod.json",
+                "scripts/validate_secret_environment_config.py"
+            ]
+        },
+        {
+            "name": "system_validation_and_storytelling",
+            "evidence": [
+                "tests/integration/customer_pipeline_e2e_manifest.json",
+                "scripts/run_e2e_integration_tests.py",
+                "docs/storytelling/project_overview_2_minute.md",
+                "docs/storytelling/deep_dive_walkthrough.md",
+                "docs/storytelling/resume_bullets.md"
+            ]
+        }
+    ],
+    "required_release_gates": [
+        "python syntax",
+        "config validation",
+        "docker artifact validation",
+        "databricks bundle structure validation",
+        "repository hygiene validation",
+        "adf artifact validation",
+        "power bi dashboard artifact validation",
+        "secret environment config validation",
+        "partition strategy validation",
+        "storytelling pack validation",
+        "capstone readiness validation",
+        "e2e integration smoke",
+        "full test suite",
+        "dry-run orchestrator",
+        "runtime cleanliness"
+    ],
+    "completion_statement": "The repository is ready to be presented as a production-style Data Engineering capstone after local validation, CI validation, merge, tag, and final alignment checks."
+}
