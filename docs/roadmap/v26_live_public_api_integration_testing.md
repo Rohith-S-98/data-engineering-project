@@ -1,14 +1,20 @@
-# V26.0.0 - Live Public API Integration Testing Framework
+# V31.0.0 - Live Public API Integration Testing Framework
+
+## Status
+
+This item is a future backlog item for the final phase after V30.
+
+It was originally drafted as a V26 roadmap note, but the implemented V26 release became Secrets, Environments, and Deployment Configuration. The live public API integration testing work is now intentionally deferred to V31.
 
 ## Purpose
 
-V26.0.0 adds a realistic live-public-API integration testing phase to the Data Engineering roadmap. This phase is designed to connect the existing API ingestion framework with selected external APIs so the pipeline can be tested against real HTTP responses, unstable upstream behavior, schema drift, latency, empty payloads, and failed API calls.
+V31.0.0 will add a realistic live-public-API integration testing phase to the Data Engineering roadmap. This phase is designed to connect the existing API ingestion framework with selected external APIs so the pipeline can be tested against real HTTP responses, unstable upstream behavior, schema drift, latency, empty payloads, and failed API calls.
 
 This phase should be treated as a controlled integration layer, not as a replacement for the existing mock API framework. Mocked responses remain mandatory for repeatable CI/CD tests, while live API calls are used for local practice, manual integration validation, and portfolio demonstrations.
 
-## Why This Phase Matters
+## Why This Future Phase Matters
 
-Most real Data Engineering projects do not receive perfectly clean files every time. They often depend on source APIs that may be slow, unavailable, inconsistent, rate limited, or changed without notice. V26 introduces those realities into the roadmap in a safe and structured way.
+Most real Data Engineering projects do not receive perfectly clean files every time. They often depend on source APIs that may be slow, unavailable, inconsistent, rate limited, or changed without notice. V31 will introduce those realities into the roadmap in a safe and structured way.
 
 This phase supports the broader 12-month goal of becoming stronger in:
 
@@ -25,9 +31,9 @@ This phase supports the broader 12-month goal of becoming stronger in:
 
 ## Supporting Repository
 
-The existing `Rohith-S-98/Public-API` repository will be reused as a supporting source registry and practice repository.
+The existing `Rohith-S-98/Public-API` repository can be reused as a supporting source registry and practice repository.
 
-Its purpose in V26 will be:
+Its purpose in V31 will be:
 
 - Identify candidate public APIs for integration testing.
 - Maintain notes on selected endpoints.
@@ -38,7 +44,7 @@ The main implementation work should remain inside `Rohith-S-98/data-engineering-
 
 ## Planned Scope
 
-V26 should include the following implementation scope:
+V31 should include the following implementation scope:
 
 1. Create a configurable public API source registry.
 2. Add endpoint metadata such as API name, URL, HTTP method, timeout, expected status code, response type, and enabled flag.
@@ -94,7 +100,7 @@ src/validation/live_api_response_validator.py
 src/transformations/live_api_normalizer.py
 tests/test_live_api_client.py
 tests/test_live_api_response_validator.py
-tests/test_v26_live_public_api_integration.py
+tests/test_v31_live_public_api_integration.py
 docs/roadmap/v26_live_public_api_integration_testing.md
 ```
 
@@ -123,13 +129,15 @@ Required approach:
 
 ## Interview Story
 
-This phase can be explained in interviews as:
+This future phase can be explained in interviews as:
 
-> I extended my Data Engineering pipeline to support live public API integration testing. The framework reads endpoint metadata from config, calls APIs using a reusable client, handles timeout and retry scenarios, lands raw JSON, validates schema contracts, routes invalid responses to quarantine, normalizes valid data into pipeline-ready records, and captures audit/observability metrics. For CI/CD safety, all automated tests use mocked responses, while live API calls are kept as manual integration checks.
+```text
+I extended my Data Engineering pipeline to support live public API integration testing. The framework reads endpoint metadata from config, calls APIs using a reusable client, handles timeout and retry scenarios, lands raw JSON, validates schema contracts, routes invalid responses to quarantine, normalizes valid data into pipeline-ready records, and captures audit/observability metrics. For CI/CD safety, all automated tests use mocked responses, while live API calls are kept as manual integration checks.
+```
 
 ## Completion Criteria
 
-V26 should be considered complete only when:
+V31 should be considered complete only when:
 
 - Source registry exists and validates successfully.
 - At least two selected APIs are integrated in controlled mode.
@@ -140,5 +148,5 @@ V26 should be considered complete only when:
 - Audit metrics capture API status, latency, and failure details.
 - Unit tests pass without live internet calls.
 - Manual live integration command is documented.
-- README is updated from planned V26 to completed V26.
-- Release verification passes before tagging `v26.0.0`.
+- README is updated from planned V31 to completed V31.
+- Release verification passes before tagging `v31.0.0`.
