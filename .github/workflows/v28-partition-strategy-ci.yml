@@ -1,0 +1,32 @@
+name: V28 Partition Strategy CI
+
+on:
+  push:
+    branches:
+      - main
+      - "v*"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  v28-partition-strategy:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONWARNINGS: ignore::ResourceWarning
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate partition strategy
+        run: |
+          python -m scripts.validate_partition_strategy
+
+      - name: Run V28 targeted tests
+        run: |
+          python -m unittest tests.test_v28_partition_strategy
