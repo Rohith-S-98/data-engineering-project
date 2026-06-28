@@ -170,7 +170,8 @@ def is_allowed_literal(value: str) -> bool:
 def find_potential_hardcoded_credentials(root: Path = Path(".")) -> list[str]:
     issues: list[str] = []
     assignment_pattern = re.compile(
-        r"(?i)(password|secret|token|api[_-]?key|connection[_-]?string)\s*[:=]\s*([^\s,}\]]+)"
+        r"(?i)[\"']?(password|secret|token|api[_-]?key|connection[_-]?string)[\"']?"
+        r"\s*[:=]\s*[\"']?([^\"'\s,}\]]+)"
     )
 
     for path in root.rglob("*"):
