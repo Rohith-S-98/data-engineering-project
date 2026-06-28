@@ -1,0 +1,51 @@
+{
+  "version": "v31.0.0",
+  "registry_name": "public_api_registry",
+  "ci_safe_mode": true,
+  "manual_execution_only": true,
+  "sources": [
+    {
+      "source_name": "countries_reference_api",
+      "enabled": true,
+      "live_enabled": false,
+      "endpoint_reference": "ENV:PUBLIC_COUNTRIES_API_URL",
+      "http_method": "GET",
+      "auth_type": "none",
+      "timeout_seconds": 10,
+      "expected_status_code": 200,
+      "response_type": "json",
+      "mock_response_path": "data/api/mock_live_countries_response.json",
+      "raw_landing_path": "output/live_api/raw/countries_reference_api.json",
+      "normalized_csv_path": "output/live_api/normalized/countries_reference_api.csv",
+      "schema_contract_path": "configs/schema_contracts/live_public_api_schema.json",
+      "required_fields": ["name.common", "cca2", "region", "population"],
+      "field_mapping": {
+        "name.common": "country_name",
+        "cca2": "country_code",
+        "region": "region",
+        "population": "population"
+      }
+    },
+    {
+      "source_name": "public_test_users_api",
+      "enabled": true,
+      "live_enabled": false,
+      "endpoint_reference": "ENV:PUBLIC_TEST_USERS_API_URL",
+      "http_method": "GET",
+      "auth_type": "none",
+      "timeout_seconds": 10,
+      "expected_status_code": 200,
+      "response_type": "json",
+      "mock_response_path": "data/api/mock_live_users_response.json",
+      "raw_landing_path": "output/live_api/raw/public_test_users_api.json",
+      "normalized_csv_path": "output/live_api/normalized/public_test_users_api.csv",
+      "schema_contract_path": "configs/schema_contracts/live_public_api_schema.json",
+      "required_fields": ["id", "name", "email"],
+      "field_mapping": {
+        "id": "user_id",
+        "name": "user_name",
+        "email": "email"
+      }
+    }
+  ]
+}
