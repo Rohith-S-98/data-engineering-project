@@ -1,0 +1,58 @@
+{
+    "version": "v28.0.0",
+    "strategy_name": "customer_medallion_partition_strategy",
+    "description": "Partitioning and table maintenance strategy for the customer medallion pipeline.",
+    "default_target_file_size_mb": 128,
+    "tables": [
+        {
+            "dataset": "bronze_customers",
+            "layer": "bronze",
+            "expected_volume": "medium",
+            "partition_columns": ["ingestion_date"],
+            "clustering_columns": ["source_system", "customer_id"],
+            "target_file_size_mb": 128,
+            "retention_days": 30,
+            "maintenance_actions": ["compact-small-files", "collect-row-counts"]
+        },
+        {
+            "dataset": "silver_customers",
+            "layer": "silver",
+            "expected_volume": "medium",
+            "partition_columns": ["run_date"],
+            "clustering_columns": ["customer_id", "country"],
+            "target_file_size_mb": 128,
+            "retention_days": 60,
+            "maintenance_actions": ["compact-small-files", "check-dq-skew", "collect-row-counts"]
+        },
+        {
+            "dataset": "customer_history",
+            "layer": "history",
+            "expected_volume": "large",
+            "partition_columns": ["effective_year"],
+            "clustering_columns": ["customer_id", "is_current"],
+            "target_file_size_mb": 256,
+            "retention_days": 365,
+            "maintenance_actions": ["compact-small-files", "track-current-expired-ratio", "collect-row-counts"]
+        },
+        {
+            "dataset": "gold_customer_canonical",
+            "layer": "gold",
+            "expected_volume": "medium",
+            "partition_columns": ["run_date"],
+            "clustering_columns": ["customer_id", "source_system"],
+            "target_file_size_mb": 128,
+            "retention_days": 90,
+            "maintenance_actions": ["compact-small-files", "collect-row-counts"]
+        },
+        {
+            "dataset": "pipeline_observability_metrics",
+            "layer": "observability",
+            "expected_volume": "small",
+            "partition_columns": ["metric_date"],
+            "clustering_columns": ["pipeline_name", "status"],
+            "target_file_size_mb": 64,
+            "retention_days": 180,
+            "maintenance_actions": ["collect-row-counts", "dashboard-refresh-ready"]
+        }
+    ]
+}
