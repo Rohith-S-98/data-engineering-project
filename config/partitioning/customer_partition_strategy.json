@@ -12,7 +12,7 @@
             "clustering_columns": ["source_system", "customer_id"],
             "target_file_size_mb": 128,
             "retention_days": 30,
-            "optimization_actions": ["compact-small-files", "collect-row-counts"]
+            "maintenance_actions": ["compact-small-files", "collect-row-counts"]
         },
         {
             "dataset": "silver_customers",
@@ -22,7 +22,7 @@
             "clustering_columns": ["customer_id", "country"],
             "target_file_size_mb": 128,
             "retention_days": 60,
-            "optimization_actions": ["compact-small-files", "validate-dq-skew", "collect-row-counts"]
+            "maintenance_actions": ["compact-small-files", "check-dq-skew", "collect-row-counts"]
         },
         {
             "dataset": "customer_history",
@@ -32,7 +32,7 @@
             "clustering_columns": ["customer_id", "is_current"],
             "target_file_size_mb": 256,
             "retention_days": 365,
-            "optimization_actions": ["compact-small-files", "track-current-expired-ratio", "collect-row-counts"]
+            "maintenance_actions": ["compact-small-files", "track-current-expired-ratio", "collect-row-counts"]
         },
         {
             "dataset": "gold_customer_canonical",
@@ -42,7 +42,7 @@
             "clustering_columns": ["customer_id", "source_system"],
             "target_file_size_mb": 128,
             "retention_days": 90,
-            "optimization_actions": ["compact-small-files", "collect-row-counts"]
+            "maintenance_actions": ["compact-small-files", "collect-row-counts"]
         },
         {
             "dataset": "pipeline_observability_metrics",
@@ -52,7 +52,7 @@
             "clustering_columns": ["pipeline_name", "status"],
             "target_file_size_mb": 64,
             "retention_days": 180,
-            "optimization_actions": ["collect-row-counts", "dashboard-refresh-ready"]
+            "maintenance_actions": ["collect-row-counts", "dashboard-refresh-ready"]
         }
     ]
 }
