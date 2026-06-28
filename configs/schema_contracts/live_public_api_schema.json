@@ -1,0 +1,27 @@
+{
+  "version": "v31.0.0",
+  "contract_name": "public_api_response_contract",
+  "allowed_payload_types": ["object", "array"],
+  "required_source_keys": [
+    "source_name",
+    "enabled",
+    "live_enabled",
+    "endpoint_reference",
+    "http_method",
+    "auth_type",
+    "timeout_seconds",
+    "expected_status_code",
+    "response_type",
+    "mock_response_path",
+    "raw_landing_path",
+    "normalized_csv_path",
+    "schema_contract_path",
+    "required_fields",
+    "field_mapping"
+  ],
+  "normalized_output_rules": {
+    "include_source_name": true,
+    "include_ingestion_mode": true,
+    "include_record_index": true
+  }
+}
