@@ -10,10 +10,12 @@ CONFIG_FILES = [
     "config/rules/advanced_customer_dq_rule_catalog.json",
     "configs/schema_contracts/bronze_customers_schema.json",
     "configs/schema_contracts/silver_customers_schema.json",
+    "configs/schema_contracts/live_public_api_schema.json",
     "config/jobs/customer_medallion_job.json",
     "config/alerts/customer_medallion_alerts.json",
     "config/retries/customer_medallion_retry_policy.json",
     "config/api/customer_api_ingestion_config.json",
+    "config/api/live_public_api_sources.json",
     "config/database/customer_database_ingestion_config.json",
 ]
 

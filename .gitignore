@@ -89,6 +89,9 @@ derby.log
 /output/recovery/*
 !/output/recovery/.gitkeep
 
+/output/live_api/*
+!/output/live_api/.gitkeep
+
 # Spark / Delta generated files
 *.crc
 *.snappy.parquet

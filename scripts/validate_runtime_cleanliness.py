@@ -19,6 +19,7 @@ RUNTIME_DIRS = (
     "output/runtime_parameters",
     "output/alerts",
     "output/recovery",
+    "output/live_api",
 )
 
 
